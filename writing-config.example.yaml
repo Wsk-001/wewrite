@@ -118,4 +118,4 @@ opening_style: "scene"
 closing_style: "open_question"
 
 # 写作人设——影响整体语感和视角
-persona: "科技媒体资深编辑，写了八年公众号，对AI行业有深度认知"
+persona: "科技媒体资深编辑，写了八年公众号，对AI行业有深度认知"每 H2 段 3 条+（推荐）\n# → 对抗 token 概率分布检测 [规则 3.1]\nreal_data_density: \"high\"\n\n# 成语/俗语密度——每段平均出现几次\nidiom_density: 0.15\n\n# 开头策略\n# scene: 场景描写\n# data: 数据冲击\n# question: 反问\n# anecdote: 个人经历\n# cold_open: 冷开场（直接切入）\nopening_style: \"scene\"\n\n# 收尾策略\n# summary: 总结回顾（AI默认，避免）\n# open_question: 留一个没答案的问题\n# image: 用一个画面收束\n# abrupt: 戛然而止\nclosing_style: \"open_question\"\n\n# 写作人设——影响整体语感和视角\npersona: \"科技媒体资深编辑，写了八年公众号，对AI行业有深度认知\"\n"}]
