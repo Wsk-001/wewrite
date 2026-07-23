@@ -1,0 +1,56 @@
+# Credentials
+config.yaml
+
+# User data (generated at runtime, not tracked)
+style.yaml
+history.yaml
+playbook.md
+corpus/
+lessons/
+
+# Optimized writing parameters (user runs loop to generate their own)
+writing-config.yaml
+optimization-results.tsv
+
+# Generated output
+output/
+!output/.gitkeep
+
+# Exemplar library (user-specific content)
+references/exemplars/*.md
+references/exemplars/index.yaml
+# Build artifact: build_openclaw.py mirrors local exemplars into dist; never commit user content
+dist/openclaw/references/exemplars/
+
+# User-local reference/draft articles (external 爆款范文 collection, not part of the skill)
+example/
+
+# Legacy client directories
+clients/
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/*
+!dist/openclaw/
+!dist/codex/
+build/
+.venv/
+.venv
+venv/
+
+# Local web tool dev: skill→backend venv symlink target + runtime image artifacts
+.artifacts/
+
+# Internal dev docs
+docs/
+CLAUDE.md
+
+# IDE
+.vscode/
+.idea/
