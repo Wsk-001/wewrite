@@ -1,0 +1,7 @@
+markdown==3.10.2
+beautifulsoup4==4.14.3
+cssutils==2.11.1
+requests==2.33.1
+pyyaml==6.0.2
+Pillow==11.1.0
+Pygments==2.19.1

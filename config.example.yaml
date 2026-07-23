@@ -1,0 +1,6 @@
+# WeWrite config example
+wechat:
+  appid: "wx_your_appid"
+  secret: "your_secret"
+theme: "warm-editorial"
+author: "小科普oao"
