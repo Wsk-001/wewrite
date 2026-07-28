@@ -4,20 +4,29 @@ import requests
 from pathlib import Path
 from dataclasses import dataclass
 
+# Token cache
 _token_cache: dict = {}
 
+# Unified timeout for WeChat API calls
 API_TIMEOUT = 30
 
 
 @dataclass
 class TokenResult:
     access_token: str
-    expires_at: float
+    expires_at: float  # unix timestamp
     appid: str
     secret: str
 
 
 def get_access_token(appid: str, secret: str, force_refresh: bool = False) -> str:
+    """
+    Get access_token with caching and auto-refresh.
+    Cache key: appid
+    API: GET https://api.weixin.qq.com/cgi-bin/token
+    Cache until expires_in - 300 seconds (5 min buffer).
+    Raise ValueError on API error.
+    """
     now = time.time()
 
     if not force_refresh and appid in _token_cache:
@@ -27,7 +36,11 @@ def get_access_token(appid: str, secret: str, force_refresh: bool = False) -> st
 
     resp = requests.get(
         "https://api.weixin.qq.com/cgi-bin/token",
-        params={"grant_type": "client_credential", "appid": appid, "secret": secret},
+        params={
+            "grant_type": "client_credential",
+            "appid": appid,
+            "secret": secret,
+        },
         timeout=API_TIMEOUT,
     )
     data = resp.json()
@@ -51,6 +64,11 @@ def get_access_token(appid: str, secret: str, force_refresh: bool = False) -> st
 
 
 def ensure_valid_token(appid: str, secret: str) -> str:
+    """Get a valid token, force-refreshing if near expiry.
+
+    Use this instead of get_access_token for long-running operations
+    where the token may have expired since initial acquisition.
+    """
     now = time.time()
     if appid in _token_cache:
         cached = _token_cache[appid]
@@ -61,11 +79,18 @@ def ensure_valid_token(appid: str, secret: str) -> str:
 
 
 def _guess_content_type(file_path: str) -> str:
+    """Detect content type from file extension."""
     content_type, _ = mimetypes.guess_type(file_path)
     return content_type or "application/octet-stream"
 
 
 def upload_image(access_token: str, image_path: str) -> str:
+    """
+    Upload image for use inside article content.
+    API: POST https://api.weixin.qq.com/cgi-bin/media/uploadimg
+    Returns the url string.
+    Raise ValueError on error.
+    """
     path = Path(image_path)
     content_type = _guess_content_type(image_path)
 
@@ -88,6 +113,12 @@ def upload_image(access_token: str, image_path: str) -> str:
 
 
 def upload_thumb(access_token: str, image_path: str) -> str:
+    """
+    Upload cover image as permanent material.
+    API: POST https://api.weixin.qq.com/cgi-bin/material/add_material
+    Returns media_id string.
+    Raise ValueError on error.
+    """
     path = Path(image_path)
     content_type = _guess_content_type(image_path)
 

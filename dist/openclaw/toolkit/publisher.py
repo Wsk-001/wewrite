@@ -24,6 +24,12 @@ def create_draft(
     thumb_media_id: Optional[str] = None,
     author: Optional[str] = None,
 ) -> DraftResult:
+    """
+    Create a draft in WeChat.
+    API: POST https://api.weixin.qq.com/cgi-bin/draft/add
+    Returns DraftResult.
+    Raise ValueError on error (errcode present and != 0).
+    """
     article = {
         "title": title,
         "author": author or "",
@@ -32,11 +38,16 @@ def create_draft(
         "show_cover_pic": 0,
     }
 
+    # thumb_media_id is required by WeChat API — if not provided,
+    # upload a default 1x1 white pixel, or skip if truly empty
     if thumb_media_id:
         article["thumb_media_id"] = thumb_media_id
 
     body = {"articles": [article]}
 
+    # MUST use ensure_ascii=False — otherwise Chinese becomes \uXXXX
+    # and WeChat stores the escape sequences literally, causing title
+    # length overflow and garbled content.
     resp = requests.post(
         "https://api.weixin.qq.com/cgi-bin/draft/add",
         params={"access_token": access_token},
@@ -58,6 +69,11 @@ def create_draft(
 
 
 def get_draft(access_token: str, media_id: str) -> str:
+    """
+    Get draft content from WeChat by media_id.
+    API: POST https://api.weixin.qq.com/cgi-bin/draft/get
+    Returns the HTML content of the first article.
+    """
     resp = requests.post(
         "https://api.weixin.qq.com/cgi-bin/draft/get",
         params={"access_token": access_token},
@@ -79,12 +95,18 @@ def get_draft(access_token: str, media_id: str) -> str:
 
 
 def html_to_plaintext(html: str) -> str:
+    """Extract plain text from WeChat HTML, stripping all tags and styles."""
     import re
+    # Remove script/style blocks
     text = re.sub(r"<(script|style)[^>]*>.*?</\1>", "", html, flags=re.DOTALL | re.IGNORECASE)
+    # Replace block-level tags with newlines
     text = re.sub(r"<(br|p|div|section|h[1-6])[^>]*>", "\n", text, flags=re.IGNORECASE)
+    # Remove all remaining tags
     text = re.sub(r"<[^>]+>", "", text)
+    # Decode HTML entities
     import html as html_module
     text = html_module.unescape(text)
+    # Collapse whitespace
     text = re.sub(r"[ \t]+", " ", text)
     text = re.sub(r"\n{3,}", "\n\n", text)
     return text.strip()
@@ -98,6 +120,23 @@ def create_image_post(
     open_comment: bool = False,
     fans_only_comment: bool = False,
 ) -> ImagePostResult:
+    """
+    Create a WeChat image post (小绿书/图片帖) draft.
+
+    This uses article_type="newspic" which displays as a horizontal
+    swipe carousel (3:4 ratio), similar to Xiaohongshu.
+
+    Args:
+        access_token: WeChat access token.
+        title: Post title, max 32 characters.
+        image_media_ids: List of permanent media_ids from upload_thumb().
+                        Min 1, max 20. First image becomes the cover.
+        content: Plain text description, max ~1000 chars. No HTML.
+        open_comment: Allow comments.
+        fans_only_comment: Only followers can comment.
+
+    Returns ImagePostResult with media_id of created draft.
+    """
     if not image_media_ids:
         raise ValueError("At least 1 image is required for image post")
     if len(image_media_ids) > 20:
@@ -140,4 +179,4 @@ def create_image_post(
     return ImagePostResult(
         media_id=data["media_id"],
         image_count=len(image_media_ids),
-    )
+    )")\n\n    article = {\n        \"article_type\": \"newspic\",\n        \"title\": title,\n        \"content\": content,\n        \"image_info\": {\n            \"image_list\": [\n                {\"image_media_id\": mid} for mid in image_media_ids\n            ]\n        },\n        \"need_open_comment\": 1 if open_comment else 0,\n        \"only_fans_can_comment\": 1 if fans_only_comment else 0,\n    }\n\n    body = {\"articles\": [article]}\n\n    resp = requests.post(\n        \"https://api.weixin.qq.com/cgi-bin/draft/add\",\n        params={\"access_token\": access_token},\n        data=json.dumps(body, ensure_ascii=False).encode(\"utf-8\"),\n        headers={\"Content-Type\": \"application/json; charset=utf-8\"},\n    )\n\n    data = resp.json()\n\n    errcode = data.get(\"errcode\", 0)\n    if errcode != 0:\n        errmsg = data.get(\"errmsg\", \"unknown error\")\n        raise ValueError(f\"WeChat create_image_post error: errcode={errcode}, errmsg={errmsg}\")\n\n    if \"media_id\" not in data:\n        raise ValueError(f\"WeChat create_image_post: missing media_id in response: {data}\")\n\n    return ImagePostResult(\n        media_id=data[\"media_id\"],\n        image_count=len(image_media_ids),\n    )\n"}]
