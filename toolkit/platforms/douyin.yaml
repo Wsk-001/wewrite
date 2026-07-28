@@ -1,17 +1,35 @@
-id: douyin
-label: 抖音
-output_kind: oral_script
-output_filename: douyin.md
-min_chars: 0
-max_chars: 0
-needs_images: false
-tag_count: [0, 0]
-rewrite_brief: |
-  抖音口播脚本/分镜，目标是「可直接念出来、3 秒留住人」。
-  结构：
-  1. 钩子（0-3秒）：一句话制造冲突/好奇，给出最反直觉的结论。
-  2. 正文口播：口语短句，每句一个信息点，可念；配「【画面/分镜提示】」。
-  3. 节奏：每 5-10 秒一个小转折或数据点。
-  4. 结尾 CTA：引导互动（评论/关注/收藏）。
-  输出格式：用「口播：…」与「【画面：…】」交替排版，便于直接拍摄。
-  严禁照搬公众号书面表达；必须改写成可口播的短句。
+name: "douyin"
+description: "抖音/头条风格，大字标题，短段落，大间距，适合移动端快速阅读"
+colors:
+  primary: "#1e1e1e"
+  secondary: "#3b3b3b"
+  text: "#1a1a1a"
+  text_light: "#666666"
+  background: "#ffffff"
+  code_bg: "#f5f5f5"
+  code_color: "#d73a49"
+  quote_border: "#1e1e1e"
+  quote_bg: "#f5f5f5"
+  border_radius: "0px"
+base_css: |
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 18px;
+    line-height: 2.0;
+    color: #1a1a1a;
+    background: #ffffff;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px;
+    word-wrap: break-word;
+  }
+  h1 { font-size: 28px; font-weight: 800; color: #1a1a1a; margin: 36px 0 20px 0; line-height: 1.4; }
+  h2 { font-size: 24px; font-weight: 700; color: #1a1a1a; margin: 32px 0 16px 0; line-height: 1.4; }
+  h3 { font-size: 20px; font-weight: 600; color: #1a1a1a; margin: 28px 0 14px 0; line-height: 1.4; }
+  p { font-size: 18px; line-height: 2.0; color: #1a1a1a; margin: 20px 0; }
+  strong { font-weight: 700; color: #1a1a1a; }
+  blockquote { border-left: 4px solid #1e1e1e; background: #f5f5f5; margin: 20px 0; padding: 16px 20px; color: #555; }
+  ul, ol { padding-left: 28px; margin: 20px 0; }
+  li { font-size: 18px; line-height: 2.0; color: #1a1a1a; margin: 10px 0; }
+  img { max-width: 100%; display: block; margin: 28px auto; }
+  hr { border: none; border-top: 1px solid #e0e0e0; margin: 32px 0; }
