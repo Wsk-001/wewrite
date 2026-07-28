@@ -13,7 +13,7 @@ import re
 import sys
 from pathlib import Path
 
-_NORM = re.compile(r"[^\w\u4e00-\u9fff]+")
+_NORM = re.compile(r"[^\w一-鿿]+")
 
 
 def _normalize(text: str) -> str:

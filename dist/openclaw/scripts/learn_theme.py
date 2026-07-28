@@ -1,7 +1,3 @@
-import sys
-sys.setrecursionlimit(10000)
-
-
 """learn_theme.py — extract a WeWrite-compatible theme from a WeChat article URL.
 
 Usage:
@@ -441,6 +437,10 @@ def analyze_styles(grouped: dict) -> dict:
 # 4. Theme YAML generation
 # ---------------------------------------------------------------------------
 
+TEMPLATE_THEME = "professional-clean"
+THEMES_DIR = Path(__file__).resolve().parent.parent / "toolkit" / "themes"
+
+
 def _load_template_css() -> str:
     """Load the base_css from the professional-clean template theme."""
     template_path = THEMES_DIR / f"{TEMPLATE_THEME}.yaml"
@@ -495,7 +495,7 @@ def generate_theme_yaml(name: str, title: str, analyzed: dict) -> str:
 
     # body font-size
     css = re.sub(
-        r"(body\s*\{[^}]*font-size:\s*)[\d.]+px",
+        r"(body\s*\{[^}]*font-size:\s*)[\d.]+",
         lambda m: m.group(1) + font_size,
         css,
         flags=re.DOTALL,
@@ -507,7 +507,7 @@ def generate_theme_yaml(name: str, title: str, analyzed: dict) -> str:
         css,
         flags=re.DOTALL,
     )
-    # body font-family (replace the quoted chain)
+    # body font-family
     css = re.sub(
         r'(body\s*\{[^}]*font-family:\s*)[^;]+;',
         lambda m: m.group(1) + font_family + ";",
@@ -528,14 +528,7 @@ def generate_theme_yaml(name: str, title: str, analyzed: dict) -> str:
         css,
         flags=re.DOTALL,
     )
-    # li line-height (match p line-height)
-    css = re.sub(
-        r"(li\s*\{[^}]*line-height:\s*)[\d.]+",
-        lambda m: m.group(1) + line_height,
-        css,
-        flags=re.DOTALL,
-    )
-    # border-radius: 8px and border-radius: 4px
+    # border-radius
     css = css.replace("border-radius: 8px", f"border-radius: {border_radius}")
     css = css.replace("border-radius: 4px", f"border-radius: {border_radius}")
 
@@ -563,7 +556,7 @@ def generate_theme_yaml(name: str, title: str, analyzed: dict) -> str:
 
 
 # ---------------------------------------------------------------------------
-# CLI entry point / smoke test
+# CLI entry point
 # ---------------------------------------------------------------------------
 
 def _load_from_file(path: str):

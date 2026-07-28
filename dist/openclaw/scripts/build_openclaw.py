@@ -61,7 +61,7 @@ def transform_body(body: str) -> str:
     body = re.sub(r'(?m)^WebSearch:', 'web_search:', body)
     body = re.sub(r'(?<![`/])WebSearch(?=[ "：，）])', 'web_search', body)
     #    WebSearch in parentheses/tables: "（WebSearch）"
-    body = re.sub(r'(?<=\uff08)WebSearch(?=\uff09)', 'web_search', body)
+    body = re.sub(r'(?<=（)WebSearch(?=）)', 'web_search', body)
 
     # 3. Path convention note
     body = body.replace(
