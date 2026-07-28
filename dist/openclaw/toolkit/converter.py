@@ -19,12 +19,12 @@ from theme import Theme, load_theme, get_inline_css_rules
 
 @dataclass
 class ConvertResult:
-    """Result of a Markdown → WeChat HTML conversion."""
+    """Result of a Markdown to WeChat HTML conversion."""
 
-    html: str  # WeChat-compatible inline-style HTML (body content only)
-    title: str  # Extracted H1 title
-    digest: str  # Auto-generated summary (first 120 chars)
-    images: list[str] = field(default_factory=list)  # Image references found
+    html: str
+    title: str
+    digest: str
+    images: list[str] = field(default_factory=list)
 
 
 class WeChatConverter:
@@ -38,77 +38,34 @@ class WeChatConverter:
         self._css_rules = get_inline_css_rules(self._theme)
 
     def convert(self, markdown_text: str) -> ConvertResult:
-        """
-        Convert Markdown text to WeChat-compatible HTML.
-
-        Returns ConvertResult with:
-          - html: inline-style HTML (body content only, no <html>/<head> wrapper)
-          - title: extracted H1 title (or empty string)
-          - digest: first 120 characters of plain text
-          - images: list of image src references
-        """
         title = self._extract_title(markdown_text)
         markdown_text = self._strip_h1(markdown_text)
-
-        # Pre-process container blocks (:::dialogue, :::timeline, etc.)
         markdown_text = self._preprocess_containers(markdown_text)
-
-        # CJK fix: auto-space between CJK and Latin characters
         markdown_text = self._fix_cjk_spacing(markdown_text)
-
-        # Parse Markdown → HTML
         html = self._markdown_to_html(markdown_text)
-
-        # Enhance code blocks (add data-lang attribute)
         html = self._enhance_code_blocks(html)
-
-        # Process images (ensure responsive styling)
         html, images = self._process_images(html)
-
-        # CJK fix: move punctuation outside bold tags
         html = self._fix_cjk_bold_punctuation(html)
-
-        # CJK fix: convert ul/ol to section-based lists (WeChat renders native lists unreliably)
         html = self._convert_lists_to_sections(html)
-
-        # Convert external links to footnotes (WeChat blocks external links)
         html = self._convert_links_to_footnotes(html)
-
-        # Apply inline CSS from theme
         html = self._apply_inline_styles(html)
-
-        # Apply WeChat compatibility fixes
         html = self._apply_wechat_fixes(html)
-
-        # Inject dark mode attributes
         html = self._inject_darkmode(html)
-
-        # Apply CSS randomization if enabled (anti-fingerprint for WeChat low-creativity detection)
         if self._theme.colors.get("css_randomize") or getattr(self._theme, '_raw_data', {}).get('css_randomize'):
             html = self._randomize_css(html)
-
-        # Append AIGC declaration if theme enables it
         if self._theme.colors.get("aigc_footer") or getattr(self._theme, '_raw_data', {}).get('aigc_footer'):
             html = self._append_aigc_footer(html)
-
-        # Generate digest from plain text
         digest = self._generate_digest(html)
-
         return ConvertResult(html=html, title=title, digest=digest, images=images)
 
     def convert_file(self, input_path: str) -> ConvertResult:
-        """Convert a Markdown file."""
         path = Path(input_path)
         if not path.exists():
             raise FileNotFoundError(f"Input file not found: {input_path}")
-
         text = path.read_text(encoding="utf-8")
         return self.convert(text)
 
-    # -- internal methods --
-
     def _extract_title(self, text: str) -> str:
-        """Extract the first H1 title from Markdown text."""
         for line in text.split("\n"):
             stripped = line.strip()
             if stripped.startswith("# ") and not stripped.startswith("## "):
@@ -116,7 +73,6 @@ class WeChatConverter:
         return ""
 
     def _strip_h1(self, text: str) -> str:
-        """Remove H1 lines — WeChat has a separate title field."""
         lines = []
         for line in text.split("\n"):
             stripped = line.strip()
@@ -126,7 +82,6 @@ class WeChatConverter:
         return "\n".join(lines)
 
     def _markdown_to_html(self, text: str) -> str:
-        """Parse Markdown to HTML using python-markdown with extensions."""
         extensions = [
             "markdown.extensions.fenced_code",
             "markdown.extensions.tables",
@@ -138,14 +93,13 @@ class WeChatConverter:
             "codehilite": {
                 "linenums": False,
                 "guess_lang": True,
-                "noclasses": True,  # Inline syntax highlight styles
+                "noclasses": True,
             }
         }
         md = markdown.Markdown(extensions=extensions, extension_configs=extension_configs)
         return md.convert(text)
 
     def _enhance_code_blocks(self, html: str) -> str:
-        """Add data-lang attribute to <pre> elements for language labeling."""
         soup = BeautifulSoup(html, "html.parser")
         for pre in soup.find_all("pre"):
             code = pre.find("code")
@@ -157,7 +111,6 @@ class WeChatConverter:
         return str(soup)
 
     def _process_images(self, html: str) -> tuple[str, list[str]]:
-        """Extract image references and ensure responsive styling."""
         soup = BeautifulSoup(html, "html.parser")
         images = []
         for img in soup.find_all("img"):
@@ -171,65 +124,47 @@ class WeChatConverter:
         return str(soup), images
 
     def _apply_inline_styles(self, html: str) -> str:
-        """Apply theme CSS rules as inline styles on matching elements."""
         soup = BeautifulSoup(html, "html.parser")
-
         for selector, styles in self._css_rules.items():
             if selector.strip() == "body":
                 continue
-
             try:
                 elements = soup.select(selector)
             except Exception:
                 continue
-
             for elem in elements:
                 existing = elem.get("style", "")
                 style_dict = {}
-
                 if existing:
                     for item in existing.split(";"):
                         if ":" in item:
                             key, val = item.split(":", 1)
                             style_dict[key.strip()] = val.strip()
-
                 for prop, val in styles.items():
                     if prop not in style_dict:
                         style_dict[prop] = val
-
                 elem["style"] = "; ".join(f"{k}: {v}" for k, v in style_dict.items())
-
         return str(soup)
 
     def _apply_wechat_fixes(self, html: str) -> str:
-        """
-        Apply WeChat-specific compatibility fixes:
-        1. Force explicit color on every <p> tag
-        2. Ensure code blocks preserve whitespace
-        """
         soup = BeautifulSoup(html, "html.parser")
         text_color = self._theme.colors.get("text", "#333333")
-
         for p in soup.find_all("p"):
             style = p.get("style", "")
             if "color" not in style:
                 p["style"] = f"{style}; color: {text_color}" if style else f"color: {text_color}"
-
         for pre in soup.find_all("pre"):
             style = pre.get("style", "")
             if "white-space" not in style:
                 pre["style"] = f"{style}; white-space: pre-wrap; word-wrap: break-word" if style else "white-space: pre-wrap; word-wrap: break-word"
-
         return str(soup)
 
     def _fix_cjk_spacing(self, text: str) -> str:
         cjk = r'[\u4e00-\u9fff\u3400-\u4dbf\u3000-\u303f\uff00-\uffef]'
         latin = r'[A-Za-z0-9]'
-
         lines = text.split('\n')
         result = []
         in_code_block = False
-
         for line in lines:
             if line.strip().startswith('```'):
                 in_code_block = not in_code_block
@@ -238,22 +173,19 @@ class WeChatConverter:
             if in_code_block:
                 result.append(line)
                 continue
-
             line = re.sub(f'({cjk})({latin})', r'\1 \2', line)
             line = re.sub(f'({latin})({cjk})', r'\1 \2', line)
             result.append(line)
-
         return '\n'.join(result)
 
     def _fix_cjk_bold_punctuation(self, html: str) -> str:
-        pattern = r'(<strong>)(.*?)([\u3002\uff0c\uff01\uff1b\uff1a\u3001]+)(</strong>)'
+        pattern = r'(<strong>)(.*?)([，。！？；：、]+)(</strong>)'
         return re.sub(pattern, r'\1\2\4\3', html)
 
     def _convert_lists_to_sections(self, html: str) -> str:
         soup = BeautifulSoup(html, "html.parser")
         text_color = self._theme.colors.get("text", "#333333")
         primary = self._theme.colors.get("primary", "#2563eb")
-
         for ul in soup.find_all("ul"):
             section = soup.new_tag("section")
             for li in ul.find_all("li", recursive=False):
@@ -267,7 +199,6 @@ class WeChatConverter:
                 item.append(content)
                 section.append(item)
             ul.replace_with(section)
-
         for idx, ol in enumerate(soup.find_all("ol")):
             section = soup.new_tag("section")
             for num, li in enumerate(ol.find_all("li", recursive=False), 1):
@@ -281,7 +212,6 @@ class WeChatConverter:
                 item.append(content)
                 section.append(item)
             ol.replace_with(section)
-
         return str(soup)
 
     def _convert_links_to_footnotes(self, html: str) -> str:
@@ -289,22 +219,18 @@ class WeChatConverter:
         footnotes = []
         counter = 0
         primary = self._theme.colors.get("primary", "#2563eb")
-
         for a in soup.find_all("a"):
             href = a.get("href", "")
             if not href or href.startswith("#"):
                 continue
-
             counter += 1
             text = a.get_text()
             footnotes.append((counter, text, href))
-
             sup = soup.new_tag("sup")
             sup_link = soup.new_tag("span", style=f"color: {primary}; font-size: 12px")
             sup_link.string = f"[{counter}]"
             sup.append(sup_link)
             a.replace_with(text, sup)
-
         if footnotes:
             hr = soup.new_tag("hr", style="border: none; border-top: 1px solid #e5e5e5; margin: 32px 0 16px")
             soup.append(hr)
@@ -315,32 +241,26 @@ class WeChatConverter:
                 ref = soup.new_tag("p", style="font-size: 12px; color: #999999; margin: 2px 0; word-break: break-all")
                 ref.string = f"[{num}] {text}: {href}"
                 soup.append(ref)
-
         return str(soup)
 
     def _inject_darkmode(self, html: str) -> str:
         darkmode = self._theme.colors.get("darkmode", {})
         if not darkmode:
             return html
-
         soup = BeautifulSoup(html, "html.parser")
         dm_text = darkmode.get("text", "#c8c8c8")
-        dm_bg = darkmode.get("background", "#1e1e1e")
         dm_primary = darkmode.get("primary", "#6aadff")
-
         for tag_name in ("p", "span", "section"):
             for elem in soup.find_all(tag_name):
                 style = elem.get("style", "")
                 if "color" in style:
                     elem["data-darkmode-color"] = dm_text
                     elem["data-darkmode-bgcolor"] = "transparent"
-
         dm_heading = darkmode.get("text", "#e0e0e0")
         for tag_name in ("h1", "h2", "h3", "h4"):
             for elem in soup.find_all(tag_name):
                 elem["data-darkmode-color"] = dm_heading
                 elem["data-darkmode-bgcolor"] = "transparent"
-
         dm_code_bg = darkmode.get("code_bg", "#2d2d2d")
         dm_code_color = darkmode.get("code_color", "#d4d4d4")
         for pre in soup.find_all("pre"):
@@ -348,15 +268,12 @@ class WeChatConverter:
             pre["data-darkmode-color"] = dm_code_color
         for code in soup.find_all("code"):
             code["data-darkmode-color"] = dm_code_color
-
         dm_quote_bg = darkmode.get("quote_bg", "#2a2a2a")
         for bq in soup.find_all("blockquote"):
             bq["data-darkmode-bgcolor"] = dm_quote_bg
             bq["data-darkmode-color"] = dm_text
-
         for strong in soup.find_all("strong"):
             strong["data-darkmode-color"] = dm_primary
-
         return str(soup)
 
     def _preprocess_containers(self, text: str) -> str:
@@ -370,7 +287,6 @@ class WeChatConverter:
 
     def _process_dialogue(self, text: str) -> str:
         primary = self._theme.colors.get("primary", "#2563eb")
-
         def replace_dialogue(match):
             content = match.group(1).strip()
             bubbles = []
@@ -386,12 +302,10 @@ class WeChatConverter:
                     bubbles.append(f'<section style="display: flex; justify-content: flex-start; margin-bottom: 12px">'
                                    f'<section style="background: #f3f4f6; color: #333; padding: 10px 14px; border-radius: 12px 12px 12px 2px; max-width: 80%; font-size: 15px; line-height: 1.6">{line}</section></section>')
             return '\n'.join(bubbles)
-
         return re.sub(r':::dialogue\n(.*?)\n:::', replace_dialogue, text, flags=re.DOTALL)
 
     def _process_timeline(self, text: str) -> str:
         primary = self._theme.colors.get("primary", "#2563eb")
-
         def replace_timeline(match):
             content = match.group(1).strip()
             items = []
@@ -409,7 +323,6 @@ class WeChatConverter:
                     f'</section>'
                 )
             return '\n'.join(items)
-
         return re.sub(r':::timeline\n(.*?)\n:::', replace_timeline, text, flags=re.DOTALL)
 
     def _process_callout(self, text: str) -> str:
@@ -419,7 +332,6 @@ class WeChatConverter:
             "info": ("#2563eb", "#eff6ff", "\u2139\ufe0f"),
             "danger": ("#dc2626", "#fef2f2", "\U0001f6a8"),
         }
-
         def replace_callout(match):
             ctype = match.group(1).strip().lower()
             content = match.group(2).strip()
@@ -428,19 +340,16 @@ class WeChatConverter:
                     f'padding: 14px 16px; border-radius: 4px; margin: 16px 0; font-size: 15px; line-height: 1.7">'
                     f'<section style="font-weight: 700; color: {color}; margin-bottom: 6px">{icon} {ctype.upper()}</section>'
                     f'{content}</section>')
-
         return re.sub(r':::callout\s+(\w+)\n(.*?)\n:::', replace_callout, text, flags=re.DOTALL)
 
     def _process_quote_block(self, text: str) -> str:
         primary = self._theme.colors.get("primary", "#2563eb")
-
         def replace_quote(match):
             content = match.group(1).strip()
             return (f'<section style="margin: 24px 0; padding: 20px 24px; border-left: 4px solid {primary}; '
                     f'background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-radius: 0 8px 8px 0">'
                     f'<section style="font-size: 18px; line-height: 1.8; color: #333; font-style: italic">'
                     f'"{content}"</section></section>')
-
         return re.sub(r':::quote\n(.*?)\n:::', replace_quote, text, flags=re.DOTALL)
 
     def _append_aigc_footer(self, html: str) -> str:
@@ -451,64 +360,27 @@ class WeChatConverter:
 
     def _randomize_css(self, html: str) -> str:
         soup = BeautifulSoup(html, "html.parser")
-
         font_size_delta = random.choice([0, -1])
         line_height_delta = random.uniform(-0.1, 0.05)
-        letter_spacing_delta = random.uniform(-0.1, 0.2)
-        margin_delta = random.randint(-4, 4)
-
         for p in soup.find_all("p"):
             style = p.get("style", "")
             if not style:
                 continue
-            style = re.sub(
-                r'margin:\s*0\s+0\s+(\d+)px\s+0',
-                lambda m: f'margin: 0 0 {int(m.group(1)) + random.randint(-3, 3)}px 0',
-                style
-            )
-            style = re.sub(
-                r'font-size:\s*17px',
-                f'font-size: {17 + font_size_delta}px',
-                style
-            )
-            style = re.sub(
-                r'line-height:\s*1\.9',
-                f'line-height: {1.9 + line_height_delta:.2f}',
-                style
-            )
+            style = re.sub(r'margin:\s*0\s+0\s+(\d+)px\s+0', lambda m: f'margin: 0 0 {int(m.group(1)) + random.randint(-3, 3)}px 0', style)
+            style = re.sub(r'font-size:\s*17px', f'font-size: {17 + font_size_delta}px', style)
+            style = re.sub(r'line-height:\s*1\.9', f'line-height: {1.9 + line_height_delta:.2f}', style)
             p["style"] = style
-
         for h2 in soup.find_all("h2"):
             style = h2.get("style", "")
-            style = re.sub(
-                r'margin:\s*(\d+)px',
-                lambda m: f'margin: {int(m.group(1)) + random.randint(-3, 3)}px',
-                style
-            )
-            style = re.sub(
-                r'font-size:\s*22px',
-                f'font-size: {22 + random.choice([-1, 0, 1])}px',
-                style
-            )
+            style = re.sub(r'margin:\s*(\d+)px', lambda m: f'margin: {int(m.group(1)) + random.randint(-3, 3)}px', style)
+            style = re.sub(r'font-size:\s*22px', f'font-size: {22 + random.choice([-1, 0, 1])}px', style)
             h2["style"] = style
-
-        for section in soup.find_all("section", recursive=False):
-            style = section.get("style", "")
-            if "letter-spacing" in style:
-                style = re.sub(
-                    r'letter-spacing:\s*[\d.]+\.px',
-                    f'letter-spacing: {0.3 + letter_spacing_delta:.1f}px',
-                    style
-                )
-                section["style"] = style
-
         return str(soup)
 
     def _process_highlight(self, text: str) -> str:
         secondary = self._theme.colors.get("secondary", "#c4820e")
         highlight_bg = self._theme.colors.get("highlight_bg", "#fef7e8")
         highlight_border = self._theme.colors.get("highlight_border", "rgba(196,130,14,0.2)")
-
         def replace_highlight(match):
             content = match.group(1).strip()
             lines = content.split('\n', 1)
@@ -522,14 +394,12 @@ class WeChatConverter:
                 html += f'<p style="margin: 8px 0 0 0;">{body}</p>'
             html += '</section>'
             return html
-
         return re.sub(r':::highlight\n(.*?)\n:::', replace_highlight, text, flags=re.DOTALL)
 
     def _process_summary(self, text: str) -> str:
         primary = self._theme.colors.get("primary", "#1a6b5a")
         summary_bg = self._theme.colors.get("summary_bg", "#e8f5f0")
         summary_border = self._theme.colors.get("summary_border", "rgba(26,107,90,0.15)")
-
         def replace_summary(match):
             content = match.group(1).strip()
             lines = content.split('\n', 1)
@@ -542,38 +412,17 @@ class WeChatConverter:
                 html += f'<p style="margin: 8px 0 0 0;">{body}</p>'
             html += '</section>'
             return html
-
         return re.sub(r':::summary\n(.*?)\n:::', replace_summary, text, flags=re.DOTALL)
 
     def _generate_digest(self, html: str, max_bytes: int = 120) -> str:
         soup = BeautifulSoup(html, "html.parser")
         text = soup.get_text(separator=" ", strip=True)
         text = re.sub(r"\s+", " ", text).strip()
-
         ellipsis = "..."
         ellipsis_bytes = len(ellipsis.encode("utf-8"))
         target_bytes = max_bytes - ellipsis_bytes
-
         encoded = text.encode("utf-8")
         if len(encoded) <= max_bytes:
             return text
-
         truncated = encoded[:target_bytes].decode("utf-8", errors="ignore").rstrip()
         return truncated + ellipsis
-
-
-def preview_html(body_html: str, theme: Theme) -> str:
-    return f"""<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preview</title>
-    <style>
-{theme.base_css}
-    </style>
-</head>
-<body>
-    {body_html}
-</body>
-</html>"""

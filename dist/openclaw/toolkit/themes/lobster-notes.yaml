@@ -161,47 +161,4 @@ base_css: |
   th {
     color: #ffffff !important;
     font-weight: 700;
-    padding: 12px 14px;
-    text-align: left;
-    background: transparent;
-    font-size: 14px;
-    letter-spacing: 0.03em;
-  }
-
-  td {
-    padding: 10px 14px;
-    border-bottom: 1px solid #f0ebe8;
-    color: #2d2d2d;
-    font-size: 14px;
-  }
-
-  tr:nth-child(even) { background: #fdf9f7; }
-  tr:last-child td { border-bottom: none; }
-
-  hr {
-    border: none;
-    height: 3px;
-    background: linear-gradient(90deg, #e05a2b, #ffb347, transparent);
-    margin: 32px 0;
-    border-radius: 2px;
-  }
-
-  a {
-    color: #e05a2b;
-    text-decoration: none;
-    font-weight: 500;
-    border-bottom: 1px dashed #ffb347;
-  }
-
-  img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    margin: 24px auto;
-    border-radius: 10px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-  }
-
-  blockquote strong {
-    color: #e05a2b;
-  }
+    padding:

@@ -5,13 +5,13 @@ Single source of truth for config loading. Environment variables
 override config.yaml values for sensitive fields.
 
 Environment variable mapping:
-    WECHAT_APPID          → wechat.appid
-    WECHAT_SECRET         → wechat.secret
-    WECHAT_AUTHOR         → wechat.author
-    WEWRITE_IMAGE_PROVIDER → image.provider
-    WEWRITE_IMAGE_API_KEY  → image.api_key
-    WEWRITE_IMAGE_MODEL    → image.model
-    WEWRITE_THEME          → theme
+    WECHAT_APPID          \u2192 wechat.appid
+    WECHAT_SECRET         \u2192 wechat.secret
+    WECHAT_AUTHOR         \u2192 wechat.author
+    WEWRITE_IMAGE_PROVIDER \u2192 image.provider
+    WEWRITE_IMAGE_API_KEY  \u2192 image.api_key
+    WEWRITE_IMAGE_MODEL    \u2192 image.model
+    WEWRITE_THEME          \u2192 theme
 """
 
 import os
@@ -57,7 +57,6 @@ def load_config(force_reload: bool = False) -> dict:
             _cached_path = p
             break
 
-    # Apply environment variable overrides
     for keys, env_var in _ENV_OVERRIDES.items():
         val = os.environ.get(env_var)
         if val is None:

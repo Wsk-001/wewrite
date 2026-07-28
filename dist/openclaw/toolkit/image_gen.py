@@ -41,6 +41,7 @@ import yaml
 # --- Config ---
 
 def _load_config() -> dict:
+    """Load config via unified config module, with fallback to local search."""
     try:
         import sys as _sys
         _sys.path.insert(0, str(Path(__file__).parent))
@@ -90,60 +91,9 @@ SIZE_PRESETS = {
 MAX_FILE_SIZE = 5 * 1024 * 1024
 
 
-def _mask_key(key: str) -> str:
-    if not key or len(key) <= 8:
-        return "****"
-    return f"{key[:4]}...{key[-4:]}"
-
-
-def _sanitize_for_log(text: str) -> str:
-    import re
-    text = re.sub(r'(Bearer\s+)(\S{9,})', lambda m: m.group(1) + _mask_key(m.group(2)), text)
-    text = re.sub(r'(api[_-]key["\s:=]+)(\S{9,})', lambda m: m.group(1) + _mask_key(m.group(2)), text, flags=re.IGNORECASE)
-    return text
-
-
-def _compress_image(raw_bytes: bytes, max_size: int) -> bytes:
-    from io import BytesIO
-    from PIL import Image
-
-    img = Image.open(BytesIO(raw_bytes))
-    if img.mode == "RGBA":
-        img = img.convert("RGB")
-
-    for quality in (90, 80, 70, 60, 50):
-        buf = BytesIO()
-        img.save(buf, format="JPEG", quality=quality, optimize=True)
-        if buf.tell() <= max_size:
-            return buf.getvalue()
-
-    return buf.getvalue()
-
-
-def _size_to_aspect(size: str) -> str:
-    if ":" in size:
-        return size
-    try:
-        w, h = (int(x) for x in size.split("x", 1))
-    except ValueError:
-        return "16:9"
-    ratio = w / h
-    for ar, val in [("1:1", 1.0), ("16:9", 16/9), ("9:16", 9/16),
-                    ("4:3", 4/3), ("3:4", 3/4), ("3:2", 3/2), ("2:3", 2/3)]:
-        if abs(ratio - val) < 0.15:
-            return ar
-    return "16:9"
-
-
-def _download_image(url: str) -> bytes:
-    resp = requests.get(url, timeout=60)
-    resp.raise_for_status()
-    return resp.content
-
-
-# --- Provider abstraction ---
-
 class ImageProvider(abc.ABC):
+    """Base class for image generation providers."""
+
     @abc.abstractmethod
     def generate(self, prompt: str, size: str) -> bytes:
         ...
@@ -172,13 +122,17 @@ class DoubaoProvider(ImageProvider):
     def generate(self, prompt: str, size: str) -> bytes:
         resp = requests.post(
             f"{self._base_url}/images/generations",
-            headers={"Content-Type": "application/json", "Authorization": f"Bearer {self._api_key}"},
-            json={"model": self._model, "prompt": prompt, "response_format": "url", "size": size, "stream": False, "watermark": False},
+            headers={"Content-Type": "application/json",
+                     "Authorization": f"Bearer {self._api_key}"},
+            json={"model": self._model, "prompt": prompt,
+                  "response_format": "url", "size": size,
+                  "stream": False, "watermark": False},
             timeout=120,
         )
         data = resp.json()
         if resp.status_code != 200:
-            raise ValueError(f"Doubao error ({resp.status_code}): {data.get('error', {}).get('message', str(data))}")
+            raise ValueError(f"Doubao error ({resp.status_code}): "
+                             f"{data.get('error', {}).get('message', str(data))}")
         url = data.get("data", [{}])[0].get("url")
         if not url:
             raise ValueError(f"No image URL: {data}")
@@ -188,7 +142,8 @@ class DoubaoProvider(ImageProvider):
 class OpenAIProvider(ImageProvider):
     provider_key = "openai"
 
-    def __init__(self, api_key: str, model: str = "dall-e-3", base_url: str = "https://api.openai.com/v1", **_kw):
+    def __init__(self, api_key: str, model: str = "dall-e-3",
+                 base_url: str = "https://api.openai.com/v1", **_kw):
         self._api_key = api_key
         self._model = model
         self._base_url = base_url
@@ -196,13 +151,16 @@ class OpenAIProvider(ImageProvider):
     def generate(self, prompt: str, size: str) -> bytes:
         resp = requests.post(
             f"{self._base_url}/images/generations",
-            headers={"Content-Type": "application/json", "Authorization": f"Bearer {self._api_key}"},
-            json={"model": self._model, "prompt": prompt, "n": 1, "size": size, "response_format": "url"},
+            headers={"Content-Type": "application/json",
+                     "Authorization": f"Bearer {self._api_key}"},
+            json={"model": self._model, "prompt": prompt,
+                  "n": 1, "size": size, "response_format": "url"},
             timeout=120,
         )
         data = resp.json()
         if resp.status_code != 200:
-            raise ValueError(f"OpenAI error ({resp.status_code}): {data.get('error', {}).get('message', str(data))}")
+            raise ValueError(f"OpenAI error ({resp.status_code}): "
+                             f"{data.get('error', {}).get('message', str(data))}")
         url = data.get("data", [{}])[0].get("url")
         if not url:
             raise ValueError(f"No image URL: {data}")
@@ -224,8 +182,10 @@ class GeminiProvider(ImageProvider):
             prompt = f"{prompt}\n\nGenerate this image at {w}x{h} resolution."
         resp = requests.post(
             f"{self._base_url}/models/{self._model}:generateContent",
-            headers={"Content-Type": "application/json", "x-goog-api-key": self._api_key},
-            json={"contents": [{"parts": [{"text": prompt}]}], "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}},
+            headers={"Content-Type": "application/json",
+                     "x-goog-api-key": self._api_key},
+            json={"contents": [{"parts": [{"text": prompt}]}],
+                  "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}},
             timeout=120,
         )
         if resp.status_code != 200:
@@ -255,14 +215,19 @@ class DashScopeProvider(ImageProvider):
         ds_size = size.replace("x", "*")
         resp = requests.post(
             f"{self._base_url}/services/aigc/multimodal-generation/generation",
-            headers={"Content-Type": "application/json", "Authorization": f"Bearer {self._api_key}"},
-            json={"model": self._model, "input": {"messages": [{"role": "user", "content": [{"text": prompt}]}]},
-                  "parameters": {"prompt_extend": False, "size": ds_size, "watermark": False}},
+            headers={"Content-Type": "application/json",
+                     "Authorization": f"Bearer {self._api_key}"},
+            json={
+                "model": self._model,
+                "input": {"messages": [{"role": "user", "content": [{"text": prompt}]}]},
+                "parameters": {"prompt_extend": False, "size": ds_size, "watermark": False},
+            },
             timeout=120,
         )
         data = resp.json()
         if resp.status_code != 200:
-            raise ValueError(f"DashScope error ({resp.status_code}): {data.get('message', str(data))}")
+            raise ValueError(f"DashScope error ({resp.status_code}): "
+                             f"{data.get('message', str(data))}")
         output = data.get("output", {})
         img = output.get("result_image")
         if not img:
@@ -279,286 +244,12 @@ class DashScopeProvider(ImageProvider):
         return base64.b64decode(img)
 
 
-class MiniMaxProvider(ImageProvider):
-    provider_key = "minimax"
-
-    def __init__(self, api_key: str, model: str = "image-01", base_url: str = "https://api.minimax.io/v1", **_kw):
-        self._api_key = api_key
-        self._model = model
-        self._base_url = base_url
-
-    def generate(self, prompt: str, size: str) -> bytes:
-        w, h = 1024, 1024
-        try:
-            w, h = (int(x) for x in size.split("x", 1))
-        except ValueError:
-            pass
-        resp = requests.post(
-            f"{self._base_url}/image_generation",
-            headers={"Content-Type": "application/json", "Authorization": f"Bearer {self._api_key}"},
-            json={"model": self._model, "prompt": prompt, "response_format": "base64", "width": w, "height": h, "n": 1},
-            timeout=120,
-        )
-        data = resp.json()
-        if resp.status_code != 200:
-            raise ValueError(f"MiniMax error ({resp.status_code}): {data}")
-        b64_list = data.get("data", {}).get("image_base64", [])
-        if not b64_list:
-            raise ValueError(f"No image in MiniMax response: {data}")
-        return base64.b64decode(b64_list[0])
-
-
-class ReplicateProvider(ImageProvider):
-    provider_key = "replicate"
-    _POLL_INTERVAL = 2
-    _POLL_TIMEOUT = 300
-
-    def __init__(self, api_key: str, model: str = "google/nano-banana-pro",
-                 base_url: str = "https://api.replicate.com/v1", **_kw):
-        self._api_key = api_key
-        self._model = model
-        self._base_url = base_url
-
-    def generate(self, prompt: str, size: str) -> bytes:
-        aspect = _size_to_aspect(size)
-        headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self._api_key}", "Prefer": "wait=60"}
-        resp = requests.post(
-            f"{self._base_url}/models/{self._model}/predictions",
-            headers=headers,
-            json={"input": {"prompt": prompt, "aspect_ratio": aspect, "number_of_images": 1, "output_format": "png"}},
-            timeout=120,
-        )
-        data = resp.json()
-        if resp.status_code not in (200, 201):
-            raise ValueError(f"Replicate error ({resp.status_code}): {data}")
-
-        poll_url = data.get("urls", {}).get("get")
-        deadline = time.monotonic() + self._POLL_TIMEOUT
-        while data.get("status") not in ("succeeded", "failed", "canceled"):
-            if time.monotonic() > deadline:
-                raise ValueError("Replicate polling timeout")
-            time.sleep(self._POLL_INTERVAL)
-            data = requests.get(poll_url, headers=headers, timeout=30).json()
-
-        if data.get("status") != "succeeded":
-            raise ValueError(f"Replicate failed: {data.get('error')}")
-
-        output = data.get("output")
-        if isinstance(output, list):
-            output = output[0]
-        if isinstance(output, dict):
-            output = output.get("url", output.get("uri"))
-        if not output or not isinstance(output, str):
-            raise ValueError(f"No image URL in Replicate output: {data}")
-        return _download_image(output)
-
-
-class AzureOpenAIProvider(ImageProvider):
-    provider_key = "azure_openai"
-
-    def __init__(self, api_key: str, model: str = "dall-e-3",
-                 base_url: str = "", deployment: str = "", **_kw):
-        self._api_key = api_key
-        self._deployment = deployment or model
-        self._base_url = base_url.rstrip("/")
-
-    def generate(self, prompt: str, size: str) -> bytes:
-        if not self._base_url:
-            raise ValueError("Azure OpenAI requires base_url (e.g. https://YOUR-RESOURCE.openai.azure.com/openai)")
-        resp = requests.post(
-            f"{self._base_url}/deployments/{self._deployment}/images/generations?api-version=2025-04-01-preview",
-            headers={"Content-Type": "application/json", "api-key": self._api_key},
-            json={"prompt": prompt, "size": size, "n": 1, "quality": "medium"},
-            timeout=120,
-        )
-        data = resp.json()
-        if resp.status_code != 200:
-            raise ValueError(f"Azure OpenAI error ({resp.status_code}): {data}")
-        item = data.get("data", [{}])[0]
-        if item.get("url"):
-            return _download_image(item["url"])
-        if item.get("b64_json"):
-            return base64.b64decode(item["b64_json"])
-        raise ValueError(f"No image in Azure response: {data}")
-
-
-class OpenRouterProvider(ImageProvider):
-    provider_key = "openrouter"
-
-    def __init__(self, api_key: str, model: str = "google/gemini-3.1-flash-image-preview",
-                 base_url: str = "https://openrouter.ai/api/v1", **_kw):
-        self._api_key = api_key
-        self._model = model
-        self._base_url = base_url
-
-    def generate(self, prompt: str, size: str) -> bytes:
-        aspect = _size_to_aspect(size)
-        resp = requests.post(
-            f"{self._base_url}/chat/completions",
-            headers={"Content-Type": "application/json", "Authorization": f"Bearer {self._api_key}"},
-            json={"model": self._model, "messages": [{"role": "user", "content": prompt}],
-                  "modalities": ["image"], "stream": False, "image_config": {"aspect_ratio": aspect},
-                  "provider": {"require_parameters": True}},
-            timeout=120,
-        )
-        data = resp.json()
-        if resp.status_code != 200:
-            raise ValueError(f"OpenRouter error ({resp.status_code}): {data}")
-
-        choice = data.get("choices", [{}])[0].get("message", {})
-        images = choice.get("images", [])
-        if images:
-            img = images[0]
-            if img.startswith("http"):
-                return _download_image(img)
-            if img.startswith("data:"):
-                _, b64 = img.split(",", 1)
-                return base64.b64decode(b64)
-        content = choice.get("content", [])
-        if isinstance(content, list):
-            for item in content:
-                if isinstance(item, dict) and item.get("type") == "image":
-                    url = item.get("url") or item.get("image_url", {}).get("url")
-                    if url:
-                        if url.startswith("data:"):
-                            _, b64 = url.split(",", 1)
-                            return base64.b64decode(b64)
-                        return _download_image(url)
-        raise ValueError(f"No image in OpenRouter response: {data}")
-
-
-class JimengProvider(ImageProvider):
-    provider_key = "jimeng"
-    _POLL_INTERVAL = 2
-    _POLL_MAX_ATTEMPTS = 60
-
-    def __init__(self, api_key: str, secret_key: str = "",
-                 model: str = "jimeng_t2i_v40",
-                 base_url: str = "https://visual.volcengineapi.com", **_kw):
-        self._access_key = api_key
-        self._secret_key = secret_key
-        self._model = model
-        self._base_url = base_url
-
-    def _sign(self, method: str, path: str, query: str, headers: dict, payload: bytes) -> dict:
-        now = datetime.now(timezone.utc)
-        date_stamp = now.strftime("%Y%m%d")
-        amz_date = now.strftime("%Y%m%dT%H%M%SZ")
-
-        signed_headers_list = sorted(k.lower() for k in headers)
-        signed_headers_str = ";".join(signed_headers_list)
-
-        canonical = "\n".join([
-            method, path, query,
-            "".join(f"{k.lower()}:{headers[k]}\n" for k in sorted(headers)),
-            signed_headers_str,
-            hashlib.sha256(payload).hexdigest(),
-        ])
-
-        region = "cn-north-1"
-        service = "cv"
-        scope = f"{date_stamp}/{region}/{service}/request"
-        string_to_sign = "\n".join([
-            "HMAC-SHA256", amz_date, scope,
-            hashlib.sha256(canonical.encode()).hexdigest(),
-        ])
-
-        def _hmac(key: bytes, msg: str) -> bytes:
-            return hmac.new(key, msg.encode(), hashlib.sha256).digest()
-
-        k_date = _hmac(self._secret_key.encode(), date_stamp)
-        k_region = _hmac(k_date, region)
-        k_service = _hmac(k_region, service)
-        k_signing = _hmac(k_service, "request")
-        signature = hmac.new(k_signing, string_to_sign.encode(), hashlib.sha256).hexdigest()
-
-        auth = f"HMAC-SHA256 Credential={self._access_key}/{scope}, SignedHeaders={signed_headers_str}, Signature={signature}"
-        return {**headers, "Authorization": auth, "X-Date": amz_date}
-
-    def _request(self, action: str, body: dict) -> dict:
-        payload = json.dumps(body).encode()
-        path = "/"
-        query = f"Action={action}&Version=2022-08-31"
-        headers = {"Content-Type": "application/json", "Host": self._base_url.replace("https://", "").replace("http://", "")}
-        signed = self._sign("POST", path, query, headers, payload)
-        resp = requests.post(f"{self._base_url}/?{query}", headers=signed, data=payload, timeout=120)
-        data = resp.json()
-        if resp.status_code != 200:
-            raise ValueError(f"Jimeng error ({resp.status_code}): {data}")
-        return data
-
-    def generate(self, prompt: str, size: str) -> bytes:
-        if not self._secret_key:
-            raise ValueError("Jimeng requires both api_key (access_key_id) and secret_key (secret_access_key)")
-        w, h = 1024, 1024
-        try:
-            w, h = (int(x) for x in size.split("x", 1))
-        except ValueError:
-            pass
-
-        submit = self._request("CVSync2AsyncSubmitTask", {
-            "req_key": self._model, "prompt": prompt, "width": w, "height": h,
-        })
-        task_id = submit.get("data", {}).get("task_id")
-        if not task_id:
-            raise ValueError(f"No task_id from Jimeng: {submit}")
-
-        for _ in range(self._POLL_MAX_ATTEMPTS):
-            time.sleep(self._POLL_INTERVAL)
-            result = self._request("CVSync2AsyncGetResult", {"req_key": self._model, "task_id": task_id})
-            code = result.get("code")
-            if code == 10000:
-                data = result.get("data", {})
-                b64_list = data.get("binary_data_base64", [])
-                if b64_list:
-                    return base64.b64decode(b64_list[0])
-                urls = data.get("image_urls", [])
-                if urls:
-                    return _download_image(urls[0])
-                raise ValueError(f"No image data in Jimeng result: {result}")
-            if code and code != 10000:
-                status = result.get("data", {}).get("status")
-                if status in ("failed", "canceled"):
-                    raise ValueError(f"Jimeng task failed: {result}")
-
-        raise ValueError("Jimeng polling timeout")
-
-
 PROVIDERS = {
     "doubao": DoubaoProvider,
     "openai": OpenAIProvider,
     "gemini": GeminiProvider,
     "dashscope": DashScopeProvider,
-    "minimax": MiniMaxProvider,
-    "replicate": ReplicateProvider,
-    "azure_openai": AzureOpenAIProvider,
-    "openrouter": OpenRouterProvider,
-    "jimeng": JimengProvider,
 }
-
-
-def _build_provider_from_entry(entry: dict) -> ImageProvider:
-    provider_name = entry.get("provider", "doubao")
-    api_key = entry.get("api_key")
-
-    if not api_key:
-        raise ValueError(f"No api_key for provider '{provider_name}' (key not configured)")
-
-    provider_cls = PROVIDERS.get(provider_name)
-    if not provider_cls:
-        raise ValueError(f"Unknown provider: '{provider_name}'. Available: {', '.join(PROVIDERS.keys())}")
-
-    kwargs = {"api_key": api_key}
-    if entry.get("model"):
-        kwargs["model"] = entry["model"]
-    if entry.get("base_url"):
-        kwargs["base_url"] = entry["base_url"]
-    if entry.get("secret_key"):
-        kwargs["secret_key"] = entry["secret_key"]
-    if entry.get("deployment"):
-        kwargs["deployment"] = entry["deployment"]
-
-    return provider_cls(**kwargs)
 
 
 def _build_provider_chain(config: dict) -> list[ImageProvider]:
@@ -569,77 +260,86 @@ def _build_provider_chain(config: dict) -> list[ImageProvider]:
         chain = []
         for entry in providers_list:
             try:
-                chain.append(_build_provider_from_entry(entry))
+                provider_name = entry.get("provider", "doubao")
+                api_key = entry.get("api_key")
+                if not api_key:
+                    continue
+                provider_cls = PROVIDERS.get(provider_name)
+                if not provider_cls:
+                    continue
+                kwargs = {"api_key": api_key}
+                if entry.get("model"):
+                    kwargs["model"] = entry["model"]
+                if entry.get("base_url"):
+                    kwargs["base_url"] = entry["base_url"]
+                if entry.get("secret_key"):
+                    kwargs["secret_key"] = entry["secret_key"]
+                if entry.get("deployment"):
+                    kwargs["deployment"] = entry["deployment"]
+                chain.append(provider_cls(**kwargs))
             except ValueError:
                 continue
         if not chain:
-            raise ValueError("No valid providers in image.providers list. Each entry needs 'provider' and 'api_key'.")
+            raise ValueError("No valid providers in image.providers list.")
         return chain
 
     api_key = img_cfg.get("api_key")
     if not api_key:
-        raise ValueError("image.api_key not set in config.yaml. Configure your API key to enable image generation.")
-    return [_build_provider_from_entry(img_cfg)]
+        raise ValueError("image.api_key not set in config.yaml.")
+    provider_name = img_cfg.get("provider", "doubao")
+    provider_cls = PROVIDERS.get(provider_name)
+    if not provider_cls:
+        raise ValueError(f"Unknown provider: '{provider_name}'")
+    return [provider_cls(api_key=api_key, model=img_cfg.get("model", None))]
 
 
-def generate_image(prompt: str, output_path: str, size: str = "cover", config: dict = None) -> str:
+def generate_image(
+    prompt: str,
+    output_path: str,
+    size: str = "cover",
+    config: dict = None,
+) -> str:
     if config is None:
         config = _load_config()
 
     chain = _build_provider_chain(config)
     last_error = None
-    max_retries = 2
 
     for provider in chain:
         resolved_size = provider.resolve_size(size)
-        raw_bytes = None
-        for attempt in range(max_retries + 1):
-            try:
-                raw_bytes = provider.generate(prompt, resolved_size)
-                break
-            except requests.exceptions.HTTPError as e:
-                if e.response is not None and e.response.status_code == 429 and attempt < max_retries:
-                    wait = 2 ** (attempt + 1)
-                    print(f"Provider '{provider.provider_key}' rate limited, retrying in {wait}s (attempt {attempt + 1}/{max_retries})...", file=sys.stderr)
-                    time.sleep(wait)
-                    continue
-                last_error = e
-                print(_sanitize_for_log(f"Provider '{provider.provider_key}' failed: {e}. Trying next..."), file=sys.stderr)
-                break
-            except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-                if attempt < max_retries:
-                    wait = 2 ** (attempt + 1)
-                    print(f"Provider '{provider.provider_key}' network error, retrying in {wait}s...", file=sys.stderr)
-                    time.sleep(wait)
-                    continue
-                last_error = e
-                print(_sanitize_for_log(f"Provider '{provider.provider_key}' failed: {e}. Trying next..."), file=sys.stderr)
-                break
-            except Exception as e:
-                last_error = e
-                print(_sanitize_for_log(f"Provider '{provider.provider_key}' failed: {e}. Trying next..."), file=sys.stderr)
-                break
-
-        if raw_bytes is None:
+        try:
+            raw_bytes = provider.generate(prompt, resolved_size)
+        except Exception as e:
+            last_error = e
             continue
 
         if len(raw_bytes) > MAX_FILE_SIZE:
-            raw_bytes = _compress_image(raw_bytes, MAX_FILE_SIZE)
+            from io import BytesIO
+            from PIL import Image
+            img = Image.open(BytesIO(raw_bytes))
+            if img.mode == "RGBA":
+                img = img.convert("RGB")
+            for quality in (90, 80, 70, 60, 50):
+                buf = BytesIO()
+                img.save(buf, format="JPEG", quality=quality, optimize=True)
+                if buf.tell() <= MAX_FILE_SIZE:
+                    raw_bytes = buf.getvalue()
+                    break
 
         output = Path(output_path)
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_bytes(raw_bytes)
         return str(output)
 
-    raise ValueError(_sanitize_for_log(f"All providers failed. Last error: {last_error}"))
+    raise ValueError(f"All providers failed. Last error: {last_error}")
 
 
-def main():
+if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Generate images using AI")
     ap.add_argument("--prompt", required=True, help="Image generation prompt")
     ap.add_argument("--output", required=True, help="Output file path")
     ap.add_argument("--size", default="cover", help="Size: cover, article, vertical, square, or WxH")
-    ap.add_argument("--provider", default=None, help=f"Override provider ({', '.join(PROVIDERS)})")
+    ap.add_argument("--provider", default=None, help=f"Override provider")
     args = ap.parse_args()
 
     try:
@@ -651,7 +351,3 @@ def main():
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
-
-
-if __name__ == "__main__":
-    main()
