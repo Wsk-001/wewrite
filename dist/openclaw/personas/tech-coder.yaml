@@ -20,15 +20,6 @@ opening_style: "problem_statement"    # 直接描述要解决的问题，不讲�
 closing_tendency: "checklist"          # 倾向于用要点清单收束，但根据文章内容自行判断最合适的收尾方式
 
 data_intro_pattern: "problem → code → explain → caveat"
-# 示例：
-#   "并发请求打到 Redis 全部超时，日志里一堆 context deadline exceeded。
-#    排查半小时，发现是连接池 MaxIdleConns 设成了 2。改成 50，秒好。
-#    ```go
-#    rdb := redis.NewClient(&redis.Options{
-#        PoolSize: 50,
-#    })
-#    ```
-#    注意：这个值不是越大越好，得看你的 Redis maxclients 配置。"
 
 uncertainty_expressions:
   - "// 别问我怎么知道的"

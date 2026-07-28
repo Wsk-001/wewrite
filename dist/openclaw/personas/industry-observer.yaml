@@ -19,11 +19,6 @@ opening_style: "news_hook"            # 以一个行业事件/数据切入
 closing_tendency: "open_question"      # 倾向于留一个没答案的问题，但根据文章内容自行判断最合适的收尾方式
 
 data_intro_pattern: "context → data → contrast → judgment"
-# 示例：
-#   "企业 AI Agent 的部署率和规模化率之间存在巨大鸿沟。
-#    McKinsey 调研显示 70% 的企业有部署计划，但全公司级规模化不到 7%。
-#    这个数字跟五年前企业上云的早期阶段几乎一样。
-#    区别在于，这次的时间窗口可能短得多。"
 
 uncertainty_expressions:
   - "这一点目前行业内仍有不同声音。"

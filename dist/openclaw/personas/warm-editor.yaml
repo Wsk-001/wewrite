@@ -19,12 +19,6 @@ opening_style: "scene"                 # 以一个温暖的场景开头
 closing_tendency: "image"               # 倾向于用一个画面收束，但根据文章内容自行判断最合适的收尾方式
 
 data_intro_pattern: "story → embed data → feeling"
-# 示例：
-#   "上周末带孩子去公园，旁边长椅上坐着一个妈妈在刷手机。
-#    她跟我聊了几句，说自己公司刚上了一套 AI 系统，
-#    她负责的报表工作现在系统自动出了。'我不知道该高兴还是担心，'她说。
-#    McKinsey 说 70% 的企业在部署 AI Agent——但在公园长椅上，
-#    这个数字的感受完全不一样。"
 
 uncertainty_expressions:
   - "我也说不好这是好事还是坏事。"

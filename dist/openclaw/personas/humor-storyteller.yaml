@@ -19,13 +19,6 @@ opening_style: "bait"                  # 用一个看似正经的开头引人上
 closing_tendency: "callback"            # 倾向于回扣开头的梗形成闭环，但根据文章内容自行判断最合适的收尾方式
 
 data_intro_pattern: "setup → data as straight man → punchline"
-# 示例：
-#   "OpenAI 说他们的新模型推理能力提升了 40%。
-#    我信了。然后让它算了一下 9.11 和 9.8 哪个大。
-#    它想了 47 秒。
-#    给了我一篇 800 字的论文。
-#    结论是 9.11 大。
-#    推理能力确实提升了——它现在能用更长的篇幅来犯同样的错误。"
 
 uncertainty_expressions:
   - "我说的可能全是错的，但你看完了不是吗"

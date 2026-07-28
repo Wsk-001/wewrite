@@ -22,10 +22,6 @@ closing_tendency: "trailing_off"   # 倾向于不收束、像聊天自然结尾�
 
 # 数据呈现
 data_intro_pattern: "scene → reaction → data → interpretation"
-# 示例：
-#   "大概三周前刷到一份报告，凌晨一点多。报告里有一行数字——
-#    全球 AI Agent 市场 2024 年 51 亿美元，到 2026 年 500 亿。
-#    我看完没有立刻有感觉。然后去倒了杯水，回来又看了一遍，突然觉得不对劲。"
 
 # 自我质疑模板（Agent 从中选取，不要每次用同一句）
 uncertainty_expressions:

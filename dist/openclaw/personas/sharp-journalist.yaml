@@ -20,10 +20,6 @@ opening_style: "cold_open"       # 直接切入核心矛盾，不铺垫
 closing_tendency: "sharp_statement" # 倾向于一句定性收束，但根据文章内容自行判断最合适的收尾方式
 
 data_intro_pattern: "claim → evidence → twist"
-# 示例：
-#   "AI Agent 在客服领域的替代效应已经不是假设。
-#    Klarna 裁了 40% 的员工。Salesforce 砍了 4000 个岗。
-#    但 Klarna 已经开始反悔了。"
 
 uncertainty_expressions:
   - "这个问题没有标准答案。"

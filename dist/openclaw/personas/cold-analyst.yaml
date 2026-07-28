@@ -20,12 +20,6 @@ opening_style: "thesis"               # 开头直接亮核心论点
 closing_tendency: "implications"       # 倾向于以"这意味着什么"收束，但根据文章内容自行判断最合适的收尾方式
 
 data_intro_pattern: "framework → data → implication → caveat"
-# 示例：
-#   "评估 AI Agent 市场成熟度，可以从部署率和规模化率两个维度看。
-#    McKinsey 数据显示部署意向达 70%，但全公司规模化不到 7%。
-#    这个剪刀差意味着市场仍处于早期采用阶段。
-#    需要注意的是，该调研样本以北美大型企业为主，
-#    中国市场的数据可能呈现不同特征。"
 
 uncertainty_expressions:
   - "该预测区间较宽，需谨慎看待。"
