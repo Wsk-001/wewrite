@@ -49,7 +49,6 @@ def cmd_publish(args):
     cfg = load_config()
     wechat_cfg = cfg.get("wechat", {})
 
-    # Resolve from CLI args → config.yaml fallback
     appid = args.appid or wechat_cfg.get("appid")
     secret = args.secret or wechat_cfg.get("secret")
     theme_name = args.theme or cfg.get("theme", "professional-clean")
@@ -67,12 +66,9 @@ def cmd_publish(args):
     print(f"Digest: {result.digest}")
     print(f"Images found: {len(result.images)}")
 
-    # Get access token
     token = get_access_token(appid, secret)
     print("Access token obtained.")
 
-    # Upload images referenced in article and replace src
-    # Resolve relative paths against the markdown file's directory
     md_dir = Path(args.input).resolve().parent
     html = result.html
     for img_src in result.images:
@@ -80,7 +76,6 @@ def cmd_publish(args):
             print(f"Skipping remote image: {img_src}")
             continue
 
-        # Try: absolute → relative to CWD → relative to markdown file
         img_path = Path(img_src)
         if not img_path.is_absolute():
             if not img_path.exists():
@@ -94,14 +89,12 @@ def cmd_publish(args):
         else:
             print(f"Warning: image not found: {img_src} (searched {md_dir})")
 
-    # Upload cover image if provided
     thumb_media_id = None
     if args.cover:
         print(f"Uploading cover: {args.cover}")
         thumb_media_id = upload_thumb(token, args.cover)
         print(f"  -> media_id: {thumb_media_id}")
 
-    # Create draft
     title = args.title or result.title or Path(args.input).stem
     digest = args.digest or result.digest
     draft = create_draft(
@@ -125,7 +118,7 @@ def cmd_themes(args):
 
 
 def cmd_image_post(args):
-    """Create a WeChat image post (小绿书) from image files."""
+    """Create a WeChat image post (\u5c0f\u7eff\u4e66) from image files."""
     cfg = load_config()
     wechat_cfg = cfg.get("wechat", {})
 
@@ -177,14 +170,13 @@ def cmd_image_post(args):
     print(f"  media_id: {result.media_id}")
     print(f"  images: {result.image_count}")
     print(f"  title: {title}")
-    print(f"  请到公众号后台草稿箱检查并发布")
+    print(f"  \u8bf7\u5230\u516c\u4f17\u53f7\u540e\u53f0\u8349\u7a3f\u7bb1\u68c0\u67e5\u5e76\u53d1\u5e03")
 
 
 def cmd_gallery(args):
     """Render all themes side by side in a browser gallery."""
     from concurrent.futures import ThreadPoolExecutor
 
-    # Use provided markdown or a built-in sample
     if args.input:
         md_text = Path(args.input).read_text(encoding="utf-8")
     else:
@@ -199,12 +191,10 @@ def cmd_gallery(args):
         result = converter.convert(md_text)
         return name, theme.description, result.html
 
-    # Parallel rendering
     with ThreadPoolExecutor(max_workers=8) as pool:
         for name, desc, html in pool.map(lambda n: render_theme(n), names):
             results[name] = (desc, html)
 
-    # Build gallery HTML
     gallery_html = _build_gallery_html(results, names)
     output = args.output or "/tmp/wewrite-gallery.html"
     Path(output).write_text(gallery_html, encoding="utf-8")
@@ -224,45 +214,44 @@ def cmd_learn_theme(args):
 
 
 def _gallery_sample_markdown():
-    return """# 示例文章标题
+    return """# \u793a\u4f8b\u6587\u7ae0\u6807\u9898
 
-## 第一部分
+## \u7b2c\u4e00\u90e8\u5206
 
-这是一段正常的文章内容，用来展示不同主题的排版效果。WeWrite 支持多种排版主题，每种都有独特的视觉风格。
+\u8fd9\u662f\u4e00\u6bb5\u6b63\u5e38\u7684\u6587\u7ae0\u5185\u5bb9\uff0c\u7528\u6765\u5c55\u793a\u4e0d\u540c\u4e3b\u9898\u7684\u6392\u7248\u6548\u679c\u3002WeWrite \u652f\u6301\u591a\u79cd\u6392\u7248\u4e3b\u9898\uff0c\u6bcf\u79cd\u90fd\u6709\u72ec\u7279\u7684\u89c6\u89c9\u98ce\u683c\u3002
 
-说实话，选主题这件事——看截图永远不如看实际渲染效果。
+\u8bf4\u5b9e\u8bdd\uff0c\u9009\u4e3b\u9898\u8fd9\u4ef6\u4e8b\u2014\u2014\u770b\u622a\u56fe\u6c38\u8fdc\u4e0d\u5982\u770b\u5b9e\u9645\u6e32\u67d3\u6548\u679c\u3002
 
-## 关键数据
+## \u5173\u952e\u6570\u636e
 
-| 指标 | 数值 | 变化 |
+| \u6307\u6807 | \u6570\u503c | \u53d8\u5316 |
 |------|------|------|
-| 阅读量 | 12,580 | +23% |
-| 分享率 | 4.7% | +0.8% |
-| 完读率 | 68% | -2% |
+| \u9605\u8bfb\u91cf | 12,580 | +23% |
+| \u5206\u4eab\u7387 | 4.7% | +0.8% |
+| \u5b8c\u8bfb\u7387 | 68% | -2% |
 
-## 代码示例
+## \u4ee3\u7801\u793a\u4f8b
 
 ```python
 def hello():
     print("Hello, WeWrite!")
 ```
 
-> 好的排版不是让读者注意到设计，而是让读者忘记设计，只记住内容。
+> \u597d\u7684\u6392\u7248\u4e0d\u662f\u8ba9\u8bfb\u8005\u6ce8\u610f\u5230\u8bbe\u8ba1\uff0c\u800c\u662f\u8ba9\u8bfb\u8005\u5fd8\u8bb0\u8bbe\u8ba1\uff0c\u53ea\u8bb0\u4f4f\u5185\u5bb9\u3002
 
-## 列表展示
+## \u5217\u8868\u5c55\u793a
 
-- 第一个要点：简洁是设计的灵魂
-- 第二个要点：一致性比创意更重要
-- 第三个要点：移动端体验优先
+- \u7b2c\u4e00\u4e2a\u8981\u70b9\uff1a\u7b80\u6d01\u662f\u8bbe\u8ba1\u7684\u7075\u9b42
+- \u7b2c\u4e8c\u4e2a\u8981\u70b9\uff1a\u4e00\u81f4\u6027\u6bd4\u521b\u610f\u66f4\u91cd\u8981
+- \u7b2c\u4e09\u4e2a\u8981\u70b9\uff1a\u79fb\u52a8\u7aef\u4f53\u9a8c\u4f18\u5148
 
-**加粗文本**和*斜体文本*的样式也需要关注。
+**\u52a0\u7c97\u6587\u672c**\u548c*\u659c\u4f53\u6587\u672c*\u7684\u6837\u5f0f\u4e5f\u9700\u8981\u5173\u6ce8\u3002
 
-最后这段用来展示文章结尾的留白和间距效果。一篇好文章的结尾，应该像一首好歌的最后一个音符——恰到好处地收束。
+\u6700\u540e\u8fd9\u6bb5\u7528\u6765\u5c55\u793a\u6587\u7ae0\u7ed3\u5c3e\u7684\u7559\u767d\u548c\u95f4\u8ddd\u6548\u679c\u3002\u4e00\u7bc7\u597d\u6587\u7ae0\u7684\u7ed3\u5c3e\uff0c\u5e94\u8be5\u50cf\u4e00\u9996\u597d\u6b4c\u7684\u6700\u540e\u4e00\u4e2a\u97f3\u7b26\u2014\u2014\u6070\u5230\u597d\u5904\u5730\u6536\u675f\u3002
 """
 
 
 def _join_newline(items):
-    """Join items with comma + newline (workaround for f-string limitation)."""
     return ",\n".join(items)
 
 
@@ -270,7 +259,6 @@ def _build_gallery_html(results, names):
     cards = []
     for name in names:
         desc, html = results[name]
-        # Escape for embedding in JS
         escaped_html = html.replace('\\', '\\\\').replace('`', '\\`').replace('$', '\\$')
         cards.append(f"""
         <div class="theme-card" onclick="selectTheme('{name}')">
@@ -279,10 +267,9 @@ def _build_gallery_html(results, names):
           <div class="phone-frame">
             <div class="phone-content" id="preview-{name}">{html}</div>
           </div>
-          <button class="copy-btn" onclick="event.stopPropagation(); copyHTML('{name}')">复制 HTML</button>
+          <button class="copy-btn" onclick="event.stopPropagation(); copyHTML('{name}')">\u590d\u5236 HTML</button>
         </div>""")
 
-    # Store HTML data for copy
     data_entries = []
     for name in names:
         desc, html = results[name]
@@ -294,7 +281,7 @@ def _build_gallery_html(results, names):
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WeWrite 主题画廊</title>
+<title>WeWrite \u4e3b\u9898\u753b\u5eca</title>
 <style>
 * {{ margin: 0; padding: 0; box-sizing: border-box; }}
 body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f0f0f; color: #fff; }}
@@ -315,13 +302,13 @@ body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; 
 </head>
 <body>
 <div class="header">
-  <h1>WeWrite 主题画廊</h1>
-  <p>{len(names)} 个主题 · 点击卡片查看大图 · 点击「复制 HTML」直接粘贴到公众号编辑器</p>
+  <h1>WeWrite \u4e3b\u9898\u753b\u5eca</h1>
+  <p>{len(names)} \u4e2a\u4e3b\u9898 \u00b7 \u70b9\u51fb\u5361\u7247\u67e5\u770b\u5927\u56fe \u00b7 \u70b9\u51fb\u300c\u590d\u5236 HTML\u300d\u76f4\u63a5\u7c98\u8d34\u5230\u516c\u4f17\u53f7\u7f16\u8f91\u5668</p>
 </div>
 <div class="grid">
 {''.join(cards)}
 </div>
-<div class="toast" id="toast">已复制到剪贴板</div>
+<div class="toast" id="toast">\u5df2\u590d\u5236\u5230\u526a\u8d34\u677f</div>
 <script>
 const themeData = {{
 {_join_newline(data_entries)}
@@ -338,7 +325,6 @@ function copyHTML(name) {{
 }}
 function selectTheme(name) {{
   localStorage.setItem('wewrite-theme', name);
-  // Scroll to card for visual feedback
   const el = document.getElementById('preview-' + name);
   if (el) el.scrollIntoView({{ behavior: 'smooth', block: 'center' }});
 }}
@@ -354,14 +340,12 @@ def main():
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
-    # preview
     p_preview = sub.add_parser("preview", help="Generate HTML and open in browser")
     p_preview.add_argument("input", help="Markdown file path")
     p_preview.add_argument("-t", "--theme", default="professional-clean", help="Theme name")
     p_preview.add_argument("-o", "--output", help="Output HTML file path")
     p_preview.add_argument("--no-open", action="store_true", help="Don't open browser")
 
-    # publish
     p_publish = sub.add_parser("publish", help="Convert and publish as WeChat draft")
     p_publish.add_argument("input", help="Markdown file path")
     p_publish.add_argument("-t", "--theme", default=None, help="Theme name")
@@ -370,26 +354,22 @@ def main():
     p_publish.add_argument("--cover", help="Cover image file path")
     p_publish.add_argument("--title", help="Override article title")
     p_publish.add_argument("--author", default=None, help="Article author")
-    p_publish.add_argument("--digest", default=None, help="Override article digest (≤120 UTF-8 bytes)")
+    p_publish.add_argument("--digest", default=None, help="Override article digest (\u2264120 UTF-8 bytes)")
 
-    # themes
     sub.add_parser("themes", help="List available themes")
 
-    # image-post (小绿书)
-    p_imgpost = sub.add_parser("image-post", help="Create WeChat image post (小绿书)")
+    p_imgpost = sub.add_parser("image-post", help="Create WeChat image post (\u5c0f\u7eff\u4e66)")
     p_imgpost.add_argument("images", nargs="+", help="Image file paths (1-20, first = cover)")
     p_imgpost.add_argument("-t", "--title", required=True, help="Post title (max 32 chars)")
     p_imgpost.add_argument("-c", "--content", default="", help="Plain text description (max ~1000 chars)")
     p_imgpost.add_argument("--appid", default=None, help="WeChat AppID")
     p_imgpost.add_argument("--secret", default=None, help="WeChat AppSecret")
 
-    # gallery
     p_gallery = sub.add_parser("gallery", help="Open theme gallery in browser")
     p_gallery.add_argument("input", nargs="?", default=None, help="Markdown file (optional, uses sample if omitted)")
     p_gallery.add_argument("-o", "--output", help="Output HTML file path")
     p_gallery.add_argument("--no-open", action="store_true", help="Don't open browser")
 
-    # learn-theme
     p_learn = sub.add_parser("learn-theme", help="Learn formatting theme from a WeChat article URL")
     p_learn.add_argument("url", help="WeChat article URL")
     p_learn.add_argument("--name", required=True, help="Theme name")
