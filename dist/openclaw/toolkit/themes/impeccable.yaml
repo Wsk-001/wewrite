@@ -1,12 +1,5 @@
 name: "impeccable"
 description: "基于 Impeccable 设计语言，衬线正文+无衬线标题，深青+琥珀双色，反AI味排版"
-# --- 反模式清单 ---
-# ❌ 紫色/蓝色渐变（AI味太重）
-# ❌ 纯灰 #666 或纯黑 #000 文字
-# ❌ Inter / Arial / 系统默认字体做正文
-# ❌ 卡片套卡片嵌套
-# ❌ bounce / elastic 动画
-# ❌ 到处都是圆角卡片
 colors:
   primary: "#1a6b5a"
   secondary: "#c4820e"
@@ -37,7 +30,6 @@ colors:
     quote_bg: "#1e2e28"
     quote_border: "#3db897"
     highlight_bg: "#2a2518"
-# --- 特殊标记 ---
 aigc_footer: true
 css_randomize: true
 css_randomize_ranges:
