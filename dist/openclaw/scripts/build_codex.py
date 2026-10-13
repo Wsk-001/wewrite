@@ -24,9 +24,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 PROMPT_NAME = "wewrite"
 
-# Prepended to the transformed SKILL.md body. Tells Codex how args arrive and
-# what differs from the Claude Code runtime.
-CODEX_HEADER = """<!-- 由 scripts/build_codex.py 从 SKILL.md 自动生成，请勿直接编辑。改源在 SKILL.md。 -->
+CODEX_HEADER = """\
+<!-- 由 scripts/build_codex.py 从 SKILL.md 自动生成，请勿直接编辑。改源在 SKILL.md。 -->
 
 **本次写作需求**（在 `/wewrite` 后输入的内容）：$ARGUMENTS
 
@@ -54,10 +53,9 @@ def split_frontmatter(text: str) -> tuple[str, str]:
 
 def transform_body(body: str) -> str:
     """Convert the SKILL.md body into a Codex-flavored prompt body."""
-    # WebSearch → web_search (mirror build_openclaw's substitutions)
     body = re.sub(r"(?m)^WebSearch:", "web_search:", body)
-    body = re.sub(r'(?<![`/])WebSearch(?=[ "，）\uff0c])', "web_search", body)
-    body = re.sub(r"(?<=\uff08)WebSearch(?=\uff09)", "web_search", body)
+    body = re.sub(r'(?<![`/])WebSearch(?=[ "：，）])', "web_search", body)
+    body = re.sub(r"(?<=（)WebSearch(?=）)", "web_search", body)
     return body
 
 
@@ -67,11 +65,12 @@ def build_prompt() -> str:
     transformed = transform_body(body)
     leftovers = re.findall(r"(?m)^(TaskCreate|TaskUpdate):", transformed)
     if leftovers:
-        print(f"  \u26a0 \u8b66告：转换后正文仍含裸 task 调用行 {leftovers}（SKILL.md 可能未条件化，检查源文件）")
+        print(f"  \u26a0 警告：转换后正文仍含裸 task 调用行 {leftovers}（SKILL.md 可能未条件化，检查源文件）")
     return CODEX_HEADER + transformed.lstrip("\n")
 
 
-CODEX_README = """# WeWrite for Codex
+CODEX_README = """\
+# WeWrite for Codex
 
 由 `scripts/build_codex.py` 从 `SKILL.md` 生成的 Codex 自定义 prompt。
 
@@ -105,24 +104,21 @@ prompt 会执行 SKILL.md 的 Step 1-8 全流程。所有 `python3` 调用自动
 
 def build(output_dir: Path, install: bool):
     prompt = build_prompt()
-
     prompts_dir = output_dir / "prompts"
     prompts_dir.mkdir(parents=True, exist_ok=True)
     out_prompt = prompts_dir / f"{PROMPT_NAME}.md"
     out_prompt.write_text(prompt, encoding="utf-8")
-    print(f"  prompts/{PROMPT_NAME}.md → {out_prompt}")
-
+    print(f"  prompts/{PROMPT_NAME}.md \u2192 {out_prompt}")
     (output_dir / "README.md").write_text(CODEX_README, encoding="utf-8")
-    print(f"  README.md → {output_dir / 'README.md'}")
-
+    print(f"  README.md \u2192 {output_dir / 'README.md'}")
     if install:
         dest_dir = Path.home() / ".codex" / "prompts"
         dest_dir.mkdir(parents=True, exist_ok=True)
         resolved = prompt.replace("{skill_dir}", str(REPO_ROOT))
         dest = dest_dir / f"{PROMPT_NAME}.md"
         dest.write_text(resolved, encoding="utf-8")
-        print(f"\n✓ 已安装到 {dest}")
-        print(f"  {{skill_dir}} → {REPO_ROOT}")
+        print(f"\n\u2713 已安装到 {dest}")
+        print(f"  {{skill_dir}} \u2192 {REPO_ROOT}")
         print(f"  在 Codex 里用 /{PROMPT_NAME} 触发。")
     else:
         print(f"\nDone. Codex prompt at: {output_dir}")
@@ -131,15 +127,8 @@ def build(output_dir: Path, install: bool):
 
 def main():
     parser = argparse.ArgumentParser(description="Build Codex-compatible WeWrite prompt")
-    parser.add_argument(
-        "-o", "--output",
-        default=str(REPO_ROOT / "dist" / "codex"),
-        help="Output directory (default: dist/codex/)",
-    )
-    parser.add_argument(
-        "--install", action="store_true",
-        help="Also install the prompt to ~/.codex/prompts/ with {skill_dir} resolved.",
-    )
+    parser.add_argument("-o", "--output", default=str(REPO_ROOT / "dist" / "codex"), help="Output directory (default: dist/codex/)")
+    parser.add_argument("--install", action="store_true", help="Also install the prompt to ~/.codex/prompts/ with {skill_dir} resolved.")
     args = parser.parse_args()
     build(Path(args.output), args.install)
 

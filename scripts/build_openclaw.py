@@ -21,6 +21,7 @@ COPY_FILES = [
     "config.example.yaml",
     "style.example.yaml",
     "writing-config.example.yaml",
+    "install.sh",
     "VERSION",
 ]
 

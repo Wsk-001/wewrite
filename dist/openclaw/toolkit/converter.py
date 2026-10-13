@@ -1,10 +1,3 @@
-"""
-Markdown to WeChat-compatible HTML converter.
-
-Forked from wechat_article_skills/scripts/markdown_to_html.py,
-adapted for YAML-driven themes and agent integration.
-"""
-
 import random
 import re
 from dataclasses import dataclass, field
@@ -19,8 +12,6 @@ from theme import Theme, load_theme, get_inline_css_rules
 
 @dataclass
 class ConvertResult:
-    """Result of a Markdown to WeChat HTML conversion."""
-
     html: str
     title: str
     digest: str
@@ -28,8 +19,6 @@ class ConvertResult:
 
 
 class WeChatConverter:
-    """Convert Markdown to WeChat-compatible inline-style HTML."""
-
     def __init__(self, theme: Optional[Theme] = None, theme_name: str = "professional-clean"):
         if theme is not None:
             self._theme = theme
@@ -40,8 +29,10 @@ class WeChatConverter:
     def convert(self, markdown_text: str) -> ConvertResult:
         title = self._extract_title(markdown_text)
         markdown_text = self._strip_h1(markdown_text)
+
         markdown_text = self._preprocess_containers(markdown_text)
         markdown_text = self._fix_cjk_spacing(markdown_text)
+
         html = self._markdown_to_html(markdown_text)
         html = self._enhance_code_blocks(html)
         html, images = self._process_images(html)
@@ -51,10 +42,13 @@ class WeChatConverter:
         html = self._apply_inline_styles(html)
         html = self._apply_wechat_fixes(html)
         html = self._inject_darkmode(html)
+
         if self._theme.colors.get("css_randomize") or getattr(self._theme, '_raw_data', {}).get('css_randomize'):
             html = self._randomize_css(html)
+
         if self._theme.colors.get("aigc_footer") or getattr(self._theme, '_raw_data', {}).get('aigc_footer'):
             html = self._append_aigc_footer(html)
+
         digest = self._generate_digest(html)
         return ConvertResult(html=html, title=title, digest=digest, images=images)
 
@@ -179,7 +173,7 @@ class WeChatConverter:
         return '\n'.join(result)
 
     def _fix_cjk_bold_punctuation(self, html: str) -> str:
-        pattern = r'(<strong>)(.*?)([，。！？；：、]+)(</strong>)'
+        pattern = r'(<strong>)(.*?)([\u3001\u3002\uff0c\uff01\uff1f\uff1b\uff1a\u3001]+)(</strong>)'
         return re.sub(pattern, r'\1\2\4\3', html)
 
     def _convert_lists_to_sections(self, html: str) -> str:
@@ -244,11 +238,12 @@ class WeChatConverter:
         return str(soup)
 
     def _inject_darkmode(self, html: str) -> str:
-        darkmode = self._theme.colors.get("darkmode", {})
+        darkmode = self._theme.colors.get("darkmode") or getattr(self._theme, "_raw_data", {}).get("darkmode", {})
         if not darkmode:
             return html
         soup = BeautifulSoup(html, "html.parser")
         dm_text = darkmode.get("text", "#c8c8c8")
+        dm_bg = darkmode.get("background", "#1e1e1e")
         dm_primary = darkmode.get("primary", "#6aadff")
         for tag_name in ("p", "span", "section"):
             for elem in soup.find_all(tag_name):
@@ -334,22 +329,37 @@ class WeChatConverter:
         }
         def replace_callout(match):
             ctype = match.group(1).strip().lower()
-            content = match.group(2).strip()
-            color, bg, icon = colors_map.get(ctype, colors_map["info"])
+            content_raw = match.group(2).strip()
+            if ctype in colors_map:
+                color, bg, icon = colors_map[ctype]
+                header = f'<section style="font-weight: 700; color: {color}; margin-bottom: 6px">{icon} {ctype.upper()}</section>'
+            else:
+                color = "#2563eb"
+                bg = "#eff6ff"
+                header = f'<section style="font-weight: 700; color: {color}; margin-bottom: 6px">{match.group(1).strip()}</section>'
+            content_html = markdown.markdown(content_raw, extensions=[
+                "markdown.extensions.fenced_code",
+                "markdown.extensions.tables",
+                "markdown.extensions.nl2br",
+                "markdown.extensions.sane_lists",
+            ])
             return (f'<section style="background: {bg}; border-left: 4px solid {color}; '
                     f'padding: 14px 16px; border-radius: 4px; margin: 16px 0; font-size: 15px; line-height: 1.7">'
-                    f'<section style="font-weight: 700; color: {color}; margin-bottom: 6px">{icon} {ctype.upper()}</section>'
-                    f'{content}</section>')
-        return re.sub(r':::callout\s+(\w+)\n(.*?)\n:::', replace_callout, text, flags=re.DOTALL)
+                    f'{header}{content_html}</section>')
+        return re.sub(r':::callout\s+([^\n]+)\n(.*?)\n:::', replace_callout, text, flags=re.DOTALL)
 
     def _process_quote_block(self, text: str) -> str:
         primary = self._theme.colors.get("primary", "#2563eb")
         def replace_quote(match):
-            content = match.group(1).strip()
+            content_raw = match.group(1).strip()
+            content_html = markdown.markdown(content_raw, extensions=[
+                "markdown.extensions.fenced_code",
+                "markdown.extensions.nl2br",
+            ])
             return (f'<section style="margin: 24px 0; padding: 20px 24px; border-left: 4px solid {primary}; '
                     f'background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); border-radius: 0 8px 8px 0">'
                     f'<section style="font-size: 18px; line-height: 1.8; color: #333; font-style: italic">'
-                    f'"{content}"</section></section>')
+                    f'{content_html}</section></section>')
         return re.sub(r':::quote\n(.*?)\n:::', replace_quote, text, flags=re.DOTALL)
 
     def _append_aigc_footer(self, html: str) -> str:
@@ -362,19 +372,50 @@ class WeChatConverter:
         soup = BeautifulSoup(html, "html.parser")
         font_size_delta = random.choice([0, -1])
         line_height_delta = random.uniform(-0.1, 0.05)
+        letter_spacing_delta = random.uniform(-0.1, 0.2)
+        margin_delta = random.randint(-4, 4)
         for p in soup.find_all("p"):
             style = p.get("style", "")
             if not style:
                 continue
-            style = re.sub(r'margin:\s*0\s+0\s+(\d+)px\s+0', lambda m: f'margin: 0 0 {int(m.group(1)) + random.randint(-3, 3)}px 0', style)
-            style = re.sub(r'font-size:\s*17px', f'font-size: {17 + font_size_delta}px', style)
-            style = re.sub(r'line-height:\s*1\.9', f'line-height: {1.9 + line_height_delta:.2f}', style)
+            style = re.sub(
+                r'margin:\s*0\s+0\s+(\d+)px\s+0',
+                lambda m: f'margin: 0 0 {int(m.group(1)) + random.randint(-3, 3)}px 0',
+                style
+            )
+            style = re.sub(
+                r'font-size:\s*17px',
+                f'font-size: {17 + font_size_delta}px',
+                style
+            )
+            style = re.sub(
+                r'line-height:\s*1\.9',
+                f'line-height: {1.9 + line_height_delta:.2f}',
+                style
+            )
             p["style"] = style
         for h2 in soup.find_all("h2"):
             style = h2.get("style", "")
-            style = re.sub(r'margin:\s*(\d+)px', lambda m: f'margin: {int(m.group(1)) + random.randint(-3, 3)}px', style)
-            style = re.sub(r'font-size:\s*22px', f'font-size: {22 + random.choice([-1, 0, 1])}px', style)
+            style = re.sub(
+                r'margin:\s*(\d+)px',
+                lambda m: f'margin: {int(m.group(1)) + random.randint(-3, 3)}px',
+                style
+            )
+            style = re.sub(
+                r'font-size:\s*22px',
+                f'font-size: {22 + random.choice([-1, 0, 1])}px',
+                style
+            )
             h2["style"] = style
+        for section in soup.find_all("section", recursive=False):
+            style = section.get("style", "")
+            if "letter-spacing" in style:
+                style = re.sub(
+                    r'letter-spacing:\s*[\d.]+px',
+                    f'letter-spacing: {0.3 + letter_spacing_delta:.1f}px',
+                    style
+                )
+                section["style"] = style
         return str(soup)
 
     def _process_highlight(self, text: str) -> str:
@@ -384,14 +425,22 @@ class WeChatConverter:
         def replace_highlight(match):
             content = match.group(1).strip()
             lines = content.split('\n', 1)
-            title = lines[0].strip() if lines else ""
-            body = lines[1].strip() if len(lines) > 1 else ""
+            title_raw = lines[0].strip() if lines else ""
+            body_raw = lines[1].strip() if len(lines) > 1 else ""
+            title_html = markdown.markdown(title_raw, extensions=[
+                "markdown.extensions.nl2br",
+            ]).strip() if title_raw else ""
+            title_html = re.sub(r'^<p>(.*)</p>\n?$', r'\1', title_html) if title_html else ""
+            body_html = markdown.markdown(body_raw, extensions=[
+                "markdown.extensions.fenced_code",
+                "markdown.extensions.nl2br",
+            ]) if body_raw else ""
             html = (f'<section style="margin: 24px 0; padding: 20px 24px; background: {highlight_bg}; '
                     f'border: 1px solid {highlight_border}; border-radius: 6px;">')
-            if title:
-                html += f'<p style="margin: 0;"><strong style="color: {secondary};">{title}</strong></p>'
-            if body:
-                html += f'<p style="margin: 8px 0 0 0;">{body}</p>'
+            if title_html:
+                html += f'<p style="margin: 0;"><strong style="color: {secondary};">{title_html}</strong></p>'
+            if body_html:
+                html += body_html
             html += '</section>'
             return html
         return re.sub(r':::highlight\n(.*?)\n:::', replace_highlight, text, flags=re.DOTALL)
@@ -403,13 +452,21 @@ class WeChatConverter:
         def replace_summary(match):
             content = match.group(1).strip()
             lines = content.split('\n', 1)
-            title = lines[0].strip() if lines else "\u603b\u7ed3"
-            body = lines[1].strip() if len(lines) > 1 else ""
+            title_raw = lines[0].strip() if lines else "\u603b\u7ed3"
+            body_raw = lines[1].strip() if len(lines) > 1 else ""
+            title_html = markdown.markdown(title_raw, extensions=[
+                "markdown.extensions.nl2br",
+            ]).strip() if title_raw else "\u603b\u7ed3"
+            title_html = re.sub(r'^<p>(.*)</p>\n?$', r'\1', title_html)
+            body_html = markdown.markdown(body_raw, extensions=[
+                "markdown.extensions.fenced_code",
+                "markdown.extensions.nl2br",
+            ]) if body_raw else ""
             html = (f'<section style="margin: 24px 0; padding: 20px 24px; background: {summary_bg}; '
                     f'border: 1px solid {summary_border}; border-radius: 6px;">')
-            html += f'<p style="margin: 0;"><strong style="color: {primary};">{title}</strong></p>'
-            if body:
-                html += f'<p style="margin: 8px 0 0 0;">{body}</p>'
+            html += f'<p style="margin: 0;"><strong style="color: {primary};">{title_html}</strong></p>'
+            if body_html:
+                html += body_html
             html += '</section>'
             return html
         return re.sub(r':::summary\n(.*?)\n:::', replace_summary, text, flags=re.DOTALL)
@@ -426,3 +483,20 @@ class WeChatConverter:
             return text
         truncated = encoded[:target_bytes].decode("utf-8", errors="ignore").rstrip()
         return truncated + ellipsis
+
+
+def preview_html(body_html: str, theme: Theme) -> str:
+    return f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview</title>
+    <style>
+{theme.base_css}
+    </style>
+</head>
+<body>
+    {body_html}
+</body>
+</html>"""

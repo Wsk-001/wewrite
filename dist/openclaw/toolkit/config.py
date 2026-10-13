@@ -71,14 +71,12 @@ def load_config(force_reload: bool = False) -> dict:
 
 
 def get_config_path() -> Path | None:
-    """Return the path of the loaded config file (for diagnostics)."""
     if _cached_path is None:
         load_config()
     return _cached_path
 
 
 def get_wechat_credentials() -> tuple[str, str]:
-    """Return (appid, secret). Raises ValueError if missing."""
     cfg = load_config()
     wechat = cfg.get("wechat", {})
     appid = wechat.get("appid", "")

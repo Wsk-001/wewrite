@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""文本相似度闸门：字符 3-gram Jaccard，用于跨平台改写的去重检测。
+"""\u6587\u672c\u76f8\u4f3c\u5ea6\u95f8\u95e8\uff1a\u5b57\u7b26 3-gram Jaccard\uff0c\u7528\u4e8e\u8de8\u5e73\u53f0\u6539\u5199\u7684\u53bb\u91cd\u68c0\u6d4b\u3002
 
-用法：
-    python3 scripts/similarity_check.py a.md b.md [c.md ...]   # 两两最大相似度
-    python3 scripts/similarity_check.py a.md b.md --json       # agent 解析用
+\u7528\u6cd5\uff1a
+    python3 scripts/similarity_check.py a.md b.md [c.md ...]   # \u4e24\u4e24\u6700\u5927\u76f8\u4f3c\u5ea6
+    python3 scripts/similarity_check.py a.md b.md --json       # agent \u89e3\u6790\u7528
 """
 from __future__ import annotations
 
@@ -13,11 +13,10 @@ import re
 import sys
 from pathlib import Path
 
-_NORM = re.compile(r"[^\w一-鿿]+")
+_NORM = re.compile(r"[^\w\u4e00-\u9fff]+")
 
 
 def _normalize(text: str) -> str:
-    """去除 markdown 标记、空白、标点，只留字母数字与中日韩字，聚焦内容本身。"""
     return _NORM.sub("", text)
 
 
@@ -29,7 +28,6 @@ def char_ngrams(text: str, n: int = 3) -> set[str]:
 
 
 def similarity(a: str, b: str, n: int = 3) -> float:
-    """字符 n-gram 的 Jaccard 相似度，0-1。"""
     A, B = char_ngrams(a, n), char_ngrams(b, n)
     if not A and not B:
         return 1.0
@@ -47,16 +45,15 @@ def max_pairwise(texts: list[str], n: int = 3) -> float:
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description="字符 n-gram Jaccard 相似度闸门")
-    ap.add_argument("files", nargs="+", help="待比较的文本文件（≥2）")
-    ap.add_argument("--json", action="store_true", help="JSON 输出（agent 用）")
-    ap.add_argument("-n", type=int, default=3, help="n-gram 长度（默认 3）")
+    ap = argparse.ArgumentParser(description="\u5b57\u7b26 n-gram Jaccard \u76f8\u4f3c\u5ea6\u95f8\u95e8")
+    ap.add_argument("files", nargs="+", help="\u5f85\u6bd4\u8f83\u7684\u6587\u672c\u6587\u4ef6\uff08\u22652\uff09")
+    ap.add_argument("--json", action="store_true", help="JSON \u8f93\u51fa\uff08agent \u7528\uff09")
+    ap.add_argument("-n", type=int, default=3, help="n-gram \u957f\u5ea6\uff08\u9ed8\u8ba4 3\uff09")
     args = ap.parse_args(argv)
     texts = [Path(f).read_text(encoding="utf-8") for f in args.files]
     m = max_pairwise(texts, args.n) if len(texts) >= 2 else 0.0
     if args.json:
-        print(json.dumps({"max_similarity": round(m, 4),
-                          "param": "similarity_threshold"}, ensure_ascii=False))
+        print(json.dumps({"max_similarity": round(m, 4), "param": "similarity_threshold"}, ensure_ascii=False))
     else:
         print(f"max_similarity = {m:.4f}")
     return 0

@@ -2,7 +2,7 @@
 """
 Measure the doc-context load of a normal full WeWrite pipeline run (issue #16).
 
-Parses SKILL.md for happy-path `读取:` directives, sums the sizes of the
+Parses SKILL.md for happy-path `\u8bfb\u53d6:` directives, sums the sizes of the
 reference docs a normal generate-an-article run loads, and reports
 lines / chars / estimated tokens. Doubles as a CI regression guard so
 SKILL.md cannot silently re-bloat (e.g. re-adding wechat-constraints.md).
@@ -20,29 +20,24 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-# References NOT on the normal generate-an-article happy path
-# (auxiliary / conditional / fallback / dev-reference). Everything else
-# matched in a 读取 directive is treated as ON_PATH.
 AUXILIARY = {
-    "onboard.md",          # first-run / 重新设置风格 only
-    "learn-edits.md",      # 学习我的修改
-    "effect-review.md",    # 看看文章数据
-    "style-template.md",   # only referenced inside onboard.md
-    "exemplar-seeds.yaml",  # fallback when exemplar library empty
-    "commands.md",         # auxiliary command dispatch (created in a later task)
-    "compliance-seo.md",   # orphan / dev-reference
-    "cover-prompts.md",    # orphan / dev-reference
-    "wechat-constraints.md",  # demoted to dev-reference in a later task
+    "onboard.md",
+    "learn-edits.md",
+    "effect-review.md",
+    "style-template.md",
+    "exemplar-seeds.yaml",
+    "commands.md",
+    "compliance-seo.md",
+    "cover-prompts.md",
+    "wechat-constraints.md",
 }
 
-# Step 4.2 always loads exactly one persona; midnight-friend is the default.
 DEFAULT_PERSONA = "personas/midnight-friend.yaml"
 
-LOAD_RE = re.compile(r"读取:\s*\{skill_dir\}/(references/[\w./-]+\.(?:md|yaml))")
+LOAD_RE = re.compile(r"\u8bfb\u53d6:\s*\{skill_dir\}/(references/[\w./-]+\.(?:md|yaml))")
 
 
 def parse_onpath_refs(skill_md_text: str) -> list:
-    """Return ON_PATH reference relative paths (de-duped, order-preserving)."""
     seen = []
     for m in LOAD_RE.finditer(skill_md_text):
         rel = m.group(1)

@@ -11,15 +11,15 @@ colors:
   quote_border: "#d97706"
   quote_bg: "#fffbeb"
   border_radius: "8px"
-  darkmode:
-    background: "#1e1e1e"
-    text: "#d4c8b8"
-    text_light: "#a09080"
-    primary: "#f0a830"
-    code_bg: "#2a2520"
-    code_color: "#d4b896"
-    quote_bg: "#2a2418"
-    quote_border: "#d97706"
+darkmode:
+  background: "#1e1e1e"
+  text: "#d4c8b8"
+  text_light: "#a09080"
+  primary: "#f0a830"
+  code_bg: "#2a2520"
+  code_color: "#d4b896"
+  quote_bg: "#2a2418"
+  quote_border: "#d97706"
 base_css: |
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;

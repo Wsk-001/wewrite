@@ -48,7 +48,7 @@ description: |
 
 ```
 [1/8] 环境 + 配置   [2/8] 选题   [3/8] 框架 + 素材   [4/8] 写作
-[5/8] 反AI检测     [6/8] 配图   [7/8] 排版           [8/8] 发布
+[5/8] 反AI检测+合规 [6/8] 配图   [7/8] 排版         [8/8] 发布
 ```
 
 ---
@@ -108,12 +108,19 @@ description: |
 
 ---
 
-### [5/8] 反AI检测
+### [5/8] 反AI检测 + 合规扫描
 
 ```
 运行: python3 {baseDir}/scripts/humanness_score.py {baseDir}/output/{文章}.md --json
 读取: {baseDir}/references/realtime-check.md
-检查: humanness_score 是否 ≤ 45，若 > 45 则按 writing-guide.md 的「反AI检测清单」优化
+检查: humanness_score 是否落在账号校准区间——若 style.yaml 或 writing-config.yaml 定义了
+      humanness_range（如 [26, 40]），以该区间为准；未定义则默认 ≤ 45 通过
+注意: 分数语义为 0=人、100=AI。低于区间下限同样需复核（过度口语化会显得刻意）
+若超出区间则按 writing-guide.md 的「反AI检测清单」优化后重新评分
+
+运行: python3 {baseDir}/scripts/compliance_check.py {baseDir}/output/{文章}.md
+检查: 合规扫描是否通过（健康科普红线：疗效断言/绝对化用语/虚构病例/引流导诊/恐吓传播/标题党）
+若出现 error 级命中则按脚本输出的建议改写后重新扫描，扫描通过才允许进入 Step 6
 ```
 
 ---
@@ -124,7 +131,11 @@ description: |
 
 ```
 读取: {baseDir}/references/visual-prompts.md
-按 visual-prompts.md 生成配图
+按 visual-prompts.md 生成配图，并强制执行其中两节：
+- 「生成前：场景实况检索」——配图涉及真实场景/动作/流程/器物时，先 websearch 查清
+  真实细节（动作要领、器物方位、步骤顺序）写进提示词，再生成
+- 「生成后：视觉 bug 自检闭环」——每张图生成后必须读图自检（按清单逐项核对），
+  不通过则修订提示词重生成，全部通过才允许进入 Step 7
 ```
 
 ---
@@ -145,10 +156,28 @@ description: |
 
 如果 `skip_publish` 为 True，跳过此 Step。
 
+**发布前自检**（SEO error 未清零不建议推送）：
+
 ```
-读取: {baseDir}/references/wechat-constraints.md
-运行: python3 {baseDir}/toolkit/cli.py publish {baseDir}/output/{文章}.md --theme {theme} --author {author}
+运行: python3 {baseDir}/scripts/seo_check.py {baseDir}/output/{文章}.md --keywords "本文核心词" --history {baseDir}/output/history.yaml
+检查: error 项清零；根据脚本输出的「建议文末内链」把 1-2 条相关历史文章链接加到文末
 ```
+
+```
+运行: python3 {baseDir}/toolkit/cli.py publish {baseDir}/output/{文章}.md --theme {theme} --cover {封面图路径} --author {author}
+```
+
+**要点**：
+- `--cover` 必传（Step 6 生成的封面图文件路径），缺失则草稿无封面
+- 排版约束已由 converter 自动处理；发布报 errcode 40164 = 调用方 IP 不在公众号后台「设置与开发-IP 白名单」内，将出口 IP 加入白名单后重试（沙箱/容器环境出口 IP 变动后需重新添加）
+- **发布时间建议**：推送前告诉用户健康科普读者的活跃时段——早通勤 7-9 点、午休 12-14 点、晚 20-22 点；用户即时确认发布则直接推，否则建议在草稿箱留待活跃时段发布
+- 发布前确认草稿会勾选「声明原创」（搜一搜优先展示原创内容）；提醒用户在后台「搜索开放权限」已开启的前提下发布
+
+**发布成功后归档**（必须执行）：
+- 追加一条记录到 `{baseDir}/output/history.yaml`（不存在则创建），字段：`id`（日期-标题slug）、`date`、`title`、`topic`、`article`、`theme`、`humanness_score`、`cover`、`inline_images`、`status: draft`、`drafts`（每版含 `version`/`note`/`media_id`/`action`）
+- 同一文章重发新版本时，在 `drafts` 下追加新版本，旧版本 `action` 改为 `待删除`
+
+**草稿箱清理提醒**：微信 publish 每次新建草稿、不覆盖旧稿。提醒用户清理前，**先调 `draft/batchget` API 查询草稿箱实时列表**，只提醒本档案中 `action: 待删除` 且在实时列表中真实存在的旧版——档案可能与实际不同步，实时 API 为准；用户确认删除后，立即把对应版本的 `action` 更新为 `已删除`，避免重复提醒。
 
 ---
 

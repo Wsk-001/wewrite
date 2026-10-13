@@ -40,7 +40,6 @@ Close-up of hands typing on a mechanical keyboard, screen showing [具体内容]
 
 ## 色彩对齐 Impeccable 主题
 
-封面配色必须与文章主题色对齐：
 - **主色**：深青 #1a6b5a → prompt 中用 `teal`, `deep green`
 - **辅色**：琥珀 #c4820e → prompt 中用 `amber`, `gold`, `warm accent`
 - **禁止**：紫色渐变、蓝色霓虹、AI 典型审美

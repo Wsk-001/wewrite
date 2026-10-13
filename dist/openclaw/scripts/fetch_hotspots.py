@@ -20,9 +20,9 @@ import time
 
 import requests
 
-TIMEOUT = (10, 15)  # (connect_timeout, read_timeout)
+TIMEOUT = (10, 15)
 MAX_RETRIES = 3
-RETRY_BACKOFF = [1, 2, 4]  # seconds between retries
+RETRY_BACKOFF = [1, 2, 4]
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
                    "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -32,7 +32,6 @@ HEADERS = {
 
 
 def _request_with_retry(url: str, headers: dict = None, source: str = "unknown") -> requests.Response:
-    """GET request with exponential backoff retry on network errors."""
     hdrs = {**HEADERS, **(headers or {})}
     last_exc = None
     for attempt in range(MAX_RETRIES):
@@ -40,9 +39,7 @@ def _request_with_retry(url: str, headers: dict = None, source: str = "unknown")
             resp = requests.get(url, headers=hdrs, timeout=TIMEOUT)
             resp.raise_for_status()
             return resp
-        except (requests.exceptions.ConnectionError,
-                requests.exceptions.Timeout,
-                requests.exceptions.HTTPError) as e:
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout, requests.exceptions.HTTPError) as e:
             last_exc = e
             if attempt < MAX_RETRIES - 1:
                 wait = RETRY_BACKOFF[attempt]
@@ -52,26 +49,15 @@ def _request_with_retry(url: str, headers: dict = None, source: str = "unknown")
 
 
 def fetch_weibo() -> list[dict]:
-    """Fetch Weibo hot search."""
     try:
-        resp = _request_with_retry(
-            "https://weibo.com/ajax/side/hotSearch",
-            headers={"Referer": "https://weibo.com/"},
-            source="weibo",
-        )
+        resp = _request_with_retry("https://weibo.com/ajax/side/hotSearch", headers={"Referer": "https://weibo.com/"}, source="weibo")
         data = resp.json()
         items = []
         for entry in data.get("data", {}).get("realtime", []):
             note = entry.get("note", "")
             if not note:
                 continue
-            items.append({
-                "title": note,
-                "source": "\u5fae\u535a",
-                "hot": entry.get("num", 0),
-                "url": f"https://s.weibo.com/weibo?q=%23{note}%23",
-                "description": entry.get("label_name", ""),
-            })
+            items.append({"title": note, "source": "\u5fae\u535a", "hot": entry.get("num", 0), "url": f"https://s.weibo.com/weibo?q=%23{note}%23", "description": entry.get("label_name", "")})
         return items
     except Exception as e:
         print(f"[warn] weibo failed: {e}", file=sys.stderr)
@@ -79,25 +65,15 @@ def fetch_weibo() -> list[dict]:
 
 
 def fetch_toutiao() -> list[dict]:
-    """Fetch Toutiao hot board."""
     try:
-        resp = _request_with_retry(
-            "https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc",
-            source="toutiao",
-        )
+        resp = _request_with_retry("https://www.toutiao.com/hot-event/hot-board/?origin=toutiao_pc", source="toutiao")
         data = resp.json()
         items = []
         for entry in data.get("data", []):
             title = entry.get("Title", "")
             if not title:
                 continue
-            items.append({
-                "title": title,
-                "source": "\u4eca\u65e5\u5934\u6761",
-                "hot": int(entry.get("HotValue", 0) or 0),
-                "url": entry.get("Url", ""),
-                "description": "",
-            })
+            items.append({"title": title, "source": "\u4eca\u65e5\u5934\u6761", "hot": int(entry.get("HotValue", 0) or 0), "url": entry.get("Url", ""), "description": ""})
         return items
     except Exception as e:
         print(f"[warn] toutiao failed: {e}", file=sys.stderr)
@@ -105,15 +81,10 @@ def fetch_toutiao() -> list[dict]:
 
 
 def fetch_baidu() -> list[dict]:
-    """Fetch Baidu hot search."""
     try:
-        resp = _request_with_retry(
-            "https://top.baidu.com/api/board?platform=wise&tab=realtime",
-            source="baidu",
-        )
+        resp = _request_with_retry("https://top.baidu.com/api/board?platform=wise&tab=realtime", source="baidu")
         data = resp.json()
         items = []
-        # Baidu nests items inside cards[0].content[0].content
         for card in data.get("data", {}).get("cards", []):
             top_content = card.get("content", [])
             if not top_content:
@@ -123,13 +94,7 @@ def fetch_baidu() -> list[dict]:
                 word = entry.get("word", "")
                 if not word:
                     continue
-                items.append({
-                    "title": word,
-                    "source": "\u767e\u5ea6",
-                    "hot": int(entry.get("hotScore", 0) or 0),
-                    "url": entry.get("url", ""),
-                    "description": "",
-                })
+                items.append({"title": word, "source": "\u767e\u5ea6", "hot": int(entry.get("hotScore", 0) or 0), "url": entry.get("url", ""), "description": ""})
         return items
     except Exception as e:
         print(f"[warn] baidu failed: {e}", file=sys.stderr)
@@ -137,7 +102,6 @@ def fetch_baidu() -> list[dict]:
 
 
 def deduplicate(items: list[dict]) -> list[dict]:
-    """Remove duplicates by exact title match."""
     seen = set()
     result = []
     for item in items:
@@ -152,13 +116,10 @@ def main():
     parser = argparse.ArgumentParser(description="Fetch trending topics")
     parser.add_argument("--limit", type=int, default=20, help="Max items to return")
     args = parser.parse_args()
-
     from concurrent.futures import ThreadPoolExecutor, as_completed
-
     all_items = []
     sources_ok = []
     sources_fail = []
-
     fetchers = {"weibo": fetch_weibo, "toutiao": fetch_toutiao, "baidu": fetch_baidu}
     with ThreadPoolExecutor(max_workers=3) as pool:
         futures = {pool.submit(fn): name for name, fn in fetchers.items()}
@@ -174,37 +135,21 @@ def main():
                 all_items.extend(items)
             else:
                 sources_fail.append(name)
-
     all_items = deduplicate(all_items)
-
-    # Normalize hot values across platforms (different scales: toutiao ~10M, weibo ~1M, baidu ~100K)
-    # Strategy: within each source, rank-based score 0-100, so cross-platform sorting is fair
     by_source: dict[str, list[dict]] = {}
     for item in all_items:
         by_source.setdefault(item["source"], []).append(item)
-
     for source, items in by_source.items():
         items.sort(key=lambda x: int(x.get("hot", 0) or 0), reverse=True)
         n = len(items)
         for rank, item in enumerate(items):
-            # Top item = 100, linear decay to ~1 for last item
             item["hot_normalized"] = round(100 * (n - rank) / n, 1) if n > 0 else 0
-
     all_items.sort(key=lambda x: x.get("hot_normalized", 0), reverse=True)
     all_items = all_items[:args.limit]
-
     tz = timezone(timedelta(hours=8))
-    output = {
-        "timestamp": datetime.now(tz).isoformat(),
-        "sources": sources_ok,
-        "sources_failed": sources_fail,
-        "count": len(all_items),
-        "items": all_items,
-    }
-
+    output = {"timestamp": datetime.now(tz).isoformat(), "sources": sources_ok, "sources_failed": sources_fail, "count": len(all_items), "items": all_items}
     if not all_items:
         output["error"] = "All sources failed. SKILL.md should fall back to WebSearch."
-
     json.dump(output, sys.stdout, ensure_ascii=False, indent=2)
 
 
