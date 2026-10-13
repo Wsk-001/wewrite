@@ -79,7 +79,10 @@ def build(output_dir: Path):
         if src.is_dir():
             if dst.exists():
                 shutil.rmtree(dst)
-            shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo"))
+            shutil.copytree(src, dst, ignore=shutil.ignore_patterns(
+                "__pycache__", "*.pyc", "*.pyo",
+                "source_articles", "xiaokepuoao-style.md", "xiaokepuoao.yaml",
+            ))
             print(f"  {d}/ \u2192 {dst}")
     for f in COPY_FILES:
         src = REPO_ROOT / f

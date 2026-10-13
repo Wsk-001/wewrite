@@ -1,0 +1,98 @@
+# WeWrite 发布历史档案
+# 每次 preview / publish 后追加一条，由 Agent 自动维护
+# status: draft（草稿箱待发布）/ published（已在公众号发表）/ archived（放弃）
+# drafts.action 取值: 以此版发布 / 待删除 / 已删除。提醒删稿前先调 draft/batchget API 核对实时状态，用户确认删除后立即更新本档案
+
+publishes:
+  - id: 2026-10-10-xianxue-kongfu
+    date: "2026-10-10"
+    title: "献血前空腹血更干净？别再被骗了，饿着肚子去可能白跑一趟"
+    topic: "献血空腹谣言辟谣（热点抓取选题，综合评分 9.0，来源：科普中国 2026-10-07）"
+    article: "output/xianxue-kongfu.md"
+    theme: "warm-editorial"
+    humanness_score: 33.2
+    cover: "output/cover-xianxue.jpg"
+    inline_images:
+      - "output/xianxue-1.jpg"
+      - "output/xianxue-2.jpg"
+      - "output/xianxue-3.jpg"
+    status: draft
+    drafts:
+      - version: v1
+        note: "无内文配图，仅封面"
+        media_id: "q_zrQd1gVlCJUeajP8dHycglNMw6N6_T5IwaODJDtfWwl2UC8bm4tO5c33lcZRwq"
+        action: 已删除（2026-10-12 用户后台确认）
+      - version: v2
+        note: "加 3 张内文图，但献血场景图有 AI bug（血袋贴上臂、管路反向、游离针头）"
+        media_id: "q_zrQd1gVlCJUeajP8dHyXXbDAoePwyq8AJZZsUA6gpfeJJuOzpsm3iHWoLZbWok"
+        action: 已删除（2026-10-12 用户后台确认）
+      - version: v3
+        note: "献血场景图按真实采血流程重绘并自检通过，当前有效版本"
+        media_id: "q_zrQd1gVlCJUeajP8dHye4dgFwjLTbZEc53ZYmwrjgjkQGl1dw5YgcA4FSMnHWL"
+        action: 以此版发布
+
+  - id: 2026-10-12-fensuixing-guzhe
+    date: "2026-10-12"
+    title: "左膝粉碎性骨折冲上热搜，比\"碎\"更麻烦的，是后面三个月"
+    topic: "粉碎性骨折科普（热点抓取选题，周鸿祎左膝粉碎性骨折热搜 85.1 分，头条 2026-10-11）"
+    article: "output/fensuixing-guzhe.md"
+    theme: "warm-editorial"
+    humanness_score: 39.0
+    cover: "output/cover-fensuixing.jpg"
+    inline_images:
+      - "output/fensuixing-0.jpg"
+      - "output/fensuixing-1.jpg"
+      - "output/fensuixing-2.jpg"
+    status: draft
+    drafts:
+      - version: v1
+        note: "首次按 AI 配图 bug 自检流程执行：生成前先搜真实动作细节（直腿抬高要领），3 图读图自检一次通过"
+        media_id: "q_zrQd1gVlCJUeajP8dHyUkkL0ZEGY4OCuNXTlr2mB2mZ_fBzTZqV9kU8jowlnga"
+        action: 以此版发布
+
+  - id: 2026-10-12-jinshi-wangtuo
+    date: "2026-10-12"
+    title: "近视 200 度查出视网膜脱离，比度数更要命的是这四个信号"
+    topic: "视网膜脱离科普（热点抓取选题，近视200度查出视网膜脱离热搜 64.0 分，百度 2026-10-12）"
+    article: "output/jinshi-wangtuo.md"
+    theme: "warm-editorial"
+    humanness_score: 27.9
+    cover: "output/cover-jinshi.jpg"
+    inline_images:
+      - "output/jinshi-0.jpg"
+      - "output/jinshi-1.jpg"
+      - "output/jinshi-2.jpg"
+    status: draft
+    drafts:
+      - version: v1
+        note: "首次全程按更新后 SKILL.md 执行：humanness 45.3→45.1→45.3→54.0 四轮迭代至 27.9 入区间；配图前搜裂隙灯检查姿势，3 图自检一次通过"
+        media_id: "q_zrQd1gVlCJUeajP8dHyRljcFhv0LLBViNBl2i4TIakI6u4dlP-6inusoQiOPlc"
+        action: 以此版发布
+
+  - id: 2026-10-13-bazhen-anyazhi
+    date: "2026-10-13"
+    title: "拔针后手背青一块，多半是按压那几下没做对"
+    topic: "输液拔针按压护理科普（热点抓取选题，「儿子帮妈妈拔针步步做错」2026-10-13，评分 8.0，清单型框架）"
+    article: "output/bazhen-anyazhi.md"
+    theme: "warm-editorial"
+    humanness_score: 21.5
+    cover: "output/cover-bazhen.jpg"
+    inline_images:
+      - "output/bazhen-1.jpg"
+      - "output/bazhen-2.jpg"
+    status: draft
+    drafts:
+      - version: v1
+        note: "humanness 57.6→64.7→40.0→21.5；对齐达标样本（不用 --- 分隔 + 温度词 4/4 + 真实来源 9 处）。配图前搜真实按压手法，3 图自检：图2 首版双手交叠易误读为揉搓，重绘为单手平放后通过"
+        media_id: "q_zrQd1gVlCJUeajP8dHydRI_PRGbE1fdLXp6wabofERONVEzi0Pbim8s9KGGFq9"
+        action: 以此版发布
+
+style_sources:
+  - date: "2026-10-10"
+    note: "从账号 9 篇已发文章学习写作与配图风格"
+    articles: "references/source_articles/ref-01.md ~ ref-09.md"
+    exemplars: "references/exemplars/"
+    style_docs:
+      - "personas/xiaokepuoao.yaml"
+      - "writing-config.yaml"
+      - "references/xiaokepuoao-style.md"

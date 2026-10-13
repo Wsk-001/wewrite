@@ -28,7 +28,9 @@
 
 **第二部分：质量检查**（哪里还能改）
 1. `python3 {skill_dir}/scripts/humanness_score.py {article_path} --json`
-2. Agent 解读 JSON 各项得分，翻译成可操作建议：每条定位到具体段落/句子、给出具体改法、按影响度排序最多 5 条。
-3. 若各项得分都不错 → "这篇文章质量不错，建议在编辑锚点处加入你的个人内容就可以发了。"
+2. `python3 {skill_dir}/scripts/compliance_check.py {article_path} --json`——健康科普合规扫描（疗效断言/绝对化用语/虚构病例/引流/恐吓/标题党），error 级命中必须改
+3. `python3 {skill_dir}/scripts/seo_check.py {article_path} --keywords "本文核心词" --history {skill_dir}/output/history.yaml --json`——搜一搜结构自检与内链建议
+4. Agent 解读三项 JSON，翻译成可操作建议：每条定位到具体段落/句子、给出具体改法、按影响度排序最多 5 条；合规 error 优先级最高
+5. 若各项得分都不错 → "这篇文章质量不错，建议在编辑锚点处加入你的个人内容就可以发了。"
 
 **输出格式**：自然语言报告，不输出 JSON 或分数。

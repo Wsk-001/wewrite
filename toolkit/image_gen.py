@@ -100,24 +100,29 @@ class DoubaoProvider(ImageProvider):
 class OpenAIProvider(ImageProvider):
     provider_key = "openai"
     def __init__(self, api_key: str, model: str = "dall-e-3",
-                 base_url: str = "https://api.openai.com/v1", **_kw):
+                 base_url: str = "https://api.openai.com/v1", size_param: str = "size", **_kw):
         self._api_key = api_key
         self._model = model
         self._base_url = base_url
+        self._size_param = size_param
     def generate(self, prompt: str, size: str) -> bytes:
         resp = requests.post(
             f"{self._base_url}/images/generations",
             headers={"Content-Type": "application/json", "Authorization": f"Bearer {self._api_key}"},
-            json={"model": self._model, "prompt": prompt, "n": 1, "size": size, "response_format": "url"},
+            json={"model": self._model, "prompt": prompt, "n": 1, self._size_param: size, "response_format": "url"},
             timeout=120,
         )
         data = resp.json()
         if resp.status_code != 200:
             raise ValueError(f"OpenAI error ({resp.status_code}): {data.get('error', {}).get('message', str(data))}")
-        url = data.get("data", [{}])[0].get("url")
-        if not url:
-            raise ValueError(f"No image URL: {data}")
-        return requests.get(url, timeout=60).content
+        item = data.get("data", [{}])[0]
+        url = item.get("url")
+        if url:
+            return requests.get(url, timeout=60).content
+        b64 = item.get("b64_json")
+        if b64:
+            return base64.b64decode(b64)
+        raise ValueError(f"No image URL: {data}")
 
 
 class GeminiProvider(ImageProvider):
@@ -421,6 +426,8 @@ def _build_provider_chain(config: dict) -> list:
                 kwargs["model"] = entry["model"]
             if entry.get("base_url"):
                 kwargs["base_url"] = entry["base_url"]
+            if entry.get("size_param"):
+                kwargs["size_param"] = entry["size_param"]
             if entry.get("secret_key"):
                 kwargs["secret_key"] = entry["secret_key"]
             if entry.get("deployment"):
@@ -434,6 +441,40 @@ def _build_provider_chain(config: dict) -> list:
         raise ValueError("image.api_key not set in config.yaml")
     cls = PROVIDERS.get(img_cfg.get("provider", "doubao"), DoubaoProvider)
     return [cls(api_key=api_key, model=img_cfg.get("model", ""), base_url=img_cfg.get("base_url", ""))]
+
+
+def _center_crop_to_ratio(raw_bytes: bytes, size: str) -> bytes:
+    from io import BytesIO
+    from PIL import Image
+
+    try:
+        w, h = (int(x) for x in size.lower().split("x", 1))
+    except ValueError:
+        return raw_bytes
+    if w <= 0 or h <= 0:
+        return raw_bytes
+
+    img = Image.open(BytesIO(raw_bytes))
+    target_ratio = w / h
+    cur_w, cur_h = img.size
+    if abs(cur_w / cur_h - target_ratio) < 0.01:
+        return raw_bytes
+
+    if cur_w / cur_h > target_ratio:
+        new_w = max(1, int(cur_h * target_ratio))
+        left = (cur_w - new_w) // 2
+        img = img.crop((left, 0, left + new_w, cur_h))
+    else:
+        new_h = max(1, int(cur_w / target_ratio))
+        top = (cur_h - new_h) // 2
+        img = img.crop((0, top, cur_w, top + new_h))
+
+    buf = BytesIO()
+    fmt = "PNG" if img.mode == "RGBA" else "JPEG"
+    if fmt == "JPEG" and img.mode != "RGB":
+        img = img.convert("RGB")
+    img.save(buf, format=fmt, quality=90)
+    return buf.getvalue()
 
 
 def generate_image(prompt: str, output_path: str, size: str = "cover", config: dict = None) -> str:
@@ -454,6 +495,7 @@ def generate_image(prompt: str, output_path: str, size: str = "cover", config: d
                 break
         if raw_bytes is None:
             continue
+        raw_bytes = _center_crop_to_ratio(raw_bytes, resolved_size)
         if len(raw_bytes) > MAX_FILE_SIZE:
             from io import BytesIO
             from PIL import Image

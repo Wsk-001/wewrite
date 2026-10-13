@@ -13,8 +13,9 @@ writing-config.yaml
 optimization-results.tsv
 
 # Generated output
-output/
+output/*
 !output/.gitkeep
+!output/history.yaml
 
 # Exemplar library (user-specific content)
 references/exemplars/*.md
@@ -24,6 +25,14 @@ dist/openclaw/references/exemplars/
 
 # User-local reference/draft articles (external 爆款范文 collection, not part of the skill)
 example/
+
+# User-specific account data bundled locally (not part of the distributed skill)
+references/source_articles/
+references/xiaokepuoao-style.md
+personas/xiaokepuoao.yaml
+dist/openclaw/references/source_articles/
+dist/openclaw/references/xiaokepuoao-style.md
+dist/openclaw/personas/xiaokepuoao.yaml
 
 # Legacy client directories
 clients/

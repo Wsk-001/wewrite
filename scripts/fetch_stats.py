@@ -105,7 +105,19 @@ def update_history(stats_list: list[dict]):
             if title in title_to_idx:
                 idx = title_to_idx[title]
         if idx is not None:
-            articles[idx]["stats"] = {"read_count": stat.get("int_page_read_count", 0), "share_count": stat.get("share_count", 0), "like_count": stat.get("old_like_count", 0) + stat.get("like_count", 0), "read_rate": round(stat.get("int_page_read_count", 0) / max(stat.get("target_user", 1), 1) * 100, 1)}
+            reads = stat.get("int_page_read_count", 0)
+            fav = stat.get("add_to_fav_count", 0)
+            shares = stat.get("share_count", 0)
+            articles[idx]["stats"] = {
+                "read_count": reads,
+                "share_count": shares,
+                "like_count": stat.get("old_like_count", 0) + stat.get("like_count", 0),
+                "fav_count": fav,
+                "ori_read_count": stat.get("ori_page_read_count", 0),
+                "share_rate": round(shares / max(reads, 1) * 100, 1),
+                "fav_rate": round(fav / max(reads, 1) * 100, 1),
+                "read_rate": round(reads / max(stat.get("target_user", 1), 1) * 100, 1),
+            }
             updated += 1
     if updated > 0:
         history["articles"] = articles
@@ -142,7 +154,8 @@ def main():
         title = s.get("title", "unknown")
         reads = s.get("int_page_read_count", 0)
         shares = s.get("share_count", 0)
-        print(f"  [{reads} reads, {shares} shares] {title}")
+        favs = s.get("add_to_fav_count", 0)
+        print(f"  [{reads} reads, {shares} shares, {favs} favs] {title}")
 
 
 if __name__ == "__main__":

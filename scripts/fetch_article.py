@@ -128,6 +128,16 @@ def _elem_to_md(elem, depth: int = 0) -> str:
         return ""
     if "visibility:hidden" in style.replace(" ", "").lower():
         return ""
+    if tag == "img":
+        src = elem.get("data-src") or elem.get("src") or ""
+        alt = elem.get("alt", "")
+        if src:
+            return f"\n\n![{alt}]({src})\n\n"
+        return ""
+    if tag == "br":
+        return "\n"
+    if tag == "hr":
+        return "\n\n---\n\n"
     inner = ""
     for child in elem.children:
         inner += _elem_to_md(child, depth + 1)
@@ -139,8 +149,6 @@ def _elem_to_md(elem, depth: int = 0) -> str:
         return f"\n\n{'#' * level} {inner}\n\n"
     if tag == "p":
         return f"\n\n{inner}\n\n"
-    if tag == "br":
-        return "\n"
     if tag in ("strong", "b"):
         return f"**{inner}**"
     if tag in ("em", "i"):
@@ -150,12 +158,6 @@ def _elem_to_md(elem, depth: int = 0) -> str:
         if href and not href.startswith("javascript:"):
             return f"[{inner}]({href})"
         return inner
-    if tag == "img":
-        src = elem.get("data-src") or elem.get("src") or ""
-        alt = elem.get("alt", "")
-        if src:
-            return f"\n\n![{alt}]({src})\n\n"
-        return ""
     if tag == "blockquote":
         lines = inner.split("\n")
         quoted = "\n".join(f"> {line}" for line in lines if line.strip())
@@ -173,8 +175,6 @@ def _elem_to_md(elem, depth: int = 0) -> str:
         return f"`{inner}`"
     if tag == "pre":
         return f"\n\n```\n{inner}\n```\n\n"
-    if tag == "hr":
-        return "\n\n---\n\n"
     if tag in ("section", "div", "span", "article", "main", "figure", "figcaption", "table", "thead", "tbody", "tr"):
         return inner
     if tag in ("td", "th"):

@@ -238,7 +238,7 @@ class WeChatConverter:
         return str(soup)
 
     def _inject_darkmode(self, html: str) -> str:
-        darkmode = self._theme.colors.get("darkmode", {})
+        darkmode = self._theme.colors.get("darkmode") or getattr(self._theme, "_raw_data", {}).get("darkmode", {})
         if not darkmode:
             return html
         soup = BeautifulSoup(html, "html.parser")
