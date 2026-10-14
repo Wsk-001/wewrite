@@ -87,6 +87,43 @@ publishes:
         media_id: "q_zrQd1gVlCJUeajP8dHydRI_PRGbE1fdLXp6wabofERONVEzi0Pbim8s9KGGFq9"
         action: 以此版发布
 
+  - id: 2026-10-14-baoshi-yixian
+    date: "2026-10-14"
+    title: "吃播网红去世，暴饮暴食最可怕的不是撑，是这个"
+    topic: "暴饮暴食致急性胰腺炎科普（热点抓取选题，「吃播网红干饭莹去世」微博 90.2 分 + 双节饮食急症，痛点型框架，密度强化策略）"
+    article: "output/baoshi-yixian.md"
+    theme: "warm-editorial"
+    humanness_score: 29.3
+    cover: "output/cover-baoshi.jpg"
+    inline_images:
+      - "output/baoshi-1.jpg"
+      - "output/baoshi-2.jpg"
+    status: draft
+    drafts:
+      - version: v1
+        note: "humanness 39.7→28.4→39.2→29.3；温度词 4/4、真实来源 9 处、QSS 表为收藏锚点。配图自检修复 3 个 AI bug：胰腺被画成肝脏（两次，改用真实器物规避）、报告单出现乱码文字（改为空白纸+红圈）、乳糜血试管按真实分层重绘通过"
+        media_id: "q_zrQd1gVlCJUeajP8dHySLhLOOPLH0QJa3ruO222ywxtTrAHzppnkm5e89fkVth"
+        action: 以此版发布
+
+  - id: 2026-10-14-ruxian-jiejie
+    date: "2026-10-14"
+    title: "6毫米乳腺结节确诊乳腺癌，报告单别只盯着大小"
+    topic: "乳腺结节 BI-RADS 分级科普（热点抓取选题，「女子6毫米结节确诊乳腺癌」微博 100 分，痛点型框架，密度强化策略）"
+    article: "output/ruxian-jiejie.md"
+    theme: "warm-editorial"
+    humanness_score: 30.9
+    cover: "output/cover-ruxian.jpg"
+    inline_images:
+      - "output/ruxian-1.jpg"
+      - "output/ruxian-2.jpg"
+      - "output/ruxian-3.jpg"
+    status: draft
+    drafts:
+      - version: v1
+        note: "humanness 30.6→30.9；温度词 4/4、真实来源、BI-RADS 分级表为收藏锚点。首次用新配图规则（图内允许文字但须正确）：ruxian-3 的中文数字 0-6 渲染完全正确；封面报告单若带文字必乱码，改用无文字信息图规避"
+        media_id: "q_zrQd1gVlCJUeajP8dHyWFp-87gwNjZZfGuoF8iNALjkm-ypFENzJlqd6AOCqRe"
+        action: 以此版发布
+
 style_sources:
   - date: "2026-10-10"
     note: "从账号 9 篇已发文章学习写作与配图风格"

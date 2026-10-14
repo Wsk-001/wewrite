@@ -32,6 +32,21 @@ Entries discovered by the Agent during task execution should follow this format:
 ## Entries
 
 [User Instruction Summary]
+- Date: 2026-10-14
+- Context: 用户要求写文章时，Agent 每次发布前都停下来问是否推送，用户明确表示不需要
+- Instructions:
+  - 成文后不要每次询问是否发布，直接推送到公众号草稿箱
+  - 仅在真正出错或需要用户提供信息时才停下确认
+
+[User Instruction Summary]
+- Date: 2026-10-14
+- Context: 用户要求修改配图规则
+- Instructions:
+  - 图内**允许出现文字**，但必须清晰、正确、可读，准确表达图中含义
+  - **严禁**乱码、错字、乱拼字符、无意义英文串、伪文字；严禁文字与实际内容不符
+  - 拿不准就用提示词重生成或整图去掉文字——宁可整图不带文字，也不允许出现乱码
+
+[User Instruction Summary]
 - Date: 2026-10-10
 - Context: 献血科普文配图出现 AI bug（血袋贴上臂、采血管方向像输血、游离针头），用户要求建立检测流程
 - Instructions:
