@@ -103,6 +103,10 @@ publishes:
       - version: v1
         note: "humanness 39.7→28.4→39.2→29.3；温度词 4/4、真实来源 9 处、QSS 表为收藏锚点。配图自检修复 3 个 AI bug：胰腺被画成肝脏（两次，改用真实器物规避）、报告单出现乱码文字（改为空白纸+红圈）、乳糜血试管按真实分层重绘通过"
         media_id: "q_zrQd1gVlCJUeajP8dHySLhLOOPLH0QJa3ruO222ywxtTrAHzppnkm5e89fkVth"
+        action: 待删除（v1 漏传内文图，仅封面）
+      - version: v2
+        note: "补内文图重发：修复写作规范（配图以 Markdown 图片语法插入），2 张内文图经 cli 上传并替换为微信图床 URL"
+        media_id: "q_zrQd1gVlCJUeajP8dHydz_-CHlUxryRr2TbVKRCt6k1R0T0-kSWk0XSTTvA9cs"
         action: 以此版发布
 
   - id: 2026-10-14-ruxian-jiejie
@@ -122,6 +126,10 @@ publishes:
       - version: v1
         note: "humanness 30.6→30.9；温度词 4/4、真实来源、BI-RADS 分级表为收藏锚点。首次用新配图规则（图内允许文字但须正确）：ruxian-3 的中文数字 0-6 渲染完全正确；封面报告单若带文字必乱码，改用无文字信息图规避"
         media_id: "q_zrQd1gVlCJUeajP8dHyWFp-87gwNjZZfGuoF8iNALjkm-ypFENzJlqd6AOCqRe"
+        action: 待删除（v1 漏传内文图，仅封面）
+      - version: v2
+        note: "补内文图重发：修复写作规范（配图以 Markdown 图片语法插入），3 张内文图经 cli 上传并替换为微信图床 URL"
+        media_id: "q_zrQd1gVlCJUeajP8dHyXRzwmgiHqC3n5w4D9VBnI0G7Kf6plPwW3WoIzj1_kYM"
         action: 以此版发布
 
 style_sources:
