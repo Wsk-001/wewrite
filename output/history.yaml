@@ -132,6 +132,24 @@ publishes:
         media_id: "q_zrQd1gVlCJUeajP8dHyXRzwmgiHqC3n5w4D9VBnI0G7Kf6plPwW3WoIzj1_kYM"
         action: 以此版发布
 
+  - id: 2026-10-15-lengkongqi-xueya
+    date: "2026-10-15"
+    title: "新一轮冷空气来了，最该防的不是感冒，是血压"
+    topic: "冷空气/降温与心脑血管科普（热点抓取选题，「新一轮冷空气影响多大」头条 100 分 + 秋冬血压管理，痛点型框架，密度强化策略）"
+    article: "output/lengkongqi-xueya.md"
+    theme: "warm-editorial"
+    humanness_score: 31.1
+    cover: "output/cover-lengkongqi.jpg"
+    inline_images:
+      - "output/lengkongqi-1.jpg"
+      - "output/lengkongqi-2.jpg"
+    status: draft
+    drafts:
+      - version: v1
+        note: "humanness 42.1→31.1；温度词补到 2/4 类（WARM 老实说/说白了/讲真 + WILD 踩坑/翻车）、real_sources 0.80（据…研究/数据/报告 4 处）、真实数据（降温 10℃ 收缩压升 6.2mmHg、秋冬脑卒中占比约半/高 30%+、脑出血 1 月死亡率 35%-52%、溶栓黄金 4.5h、每分损失约 190 万神经元）。配图自检：封面首版血压计屏幕乱码、二版构图跑偏、三版误生成手机，第四版改「人物+冷暖对比无设备」通过；内文图 1 血压袖带图合格、内文图 2 起床图合格。合规/SEO 0/0"
+        media_id: "q_zrQd1gVlCJUeajP8dHyT3vpXC9j-agP5439dKZG8zol32tA5sU48pGQizGYI_p"
+        action: 以此版发布
+
 style_sources:
   - date: "2026-10-10"
     note: "从账号 9 篇已发文章学习写作与配图风格"
