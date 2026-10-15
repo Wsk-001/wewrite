@@ -1,0 +1,204 @@
+name: "fresh-health-green"
+description: "清新健康绿：清新自然、步骤化，适合饮食/运动/习惯养成类健康科普"
+colors:
+  primary: "#147d5a"
+  secondary: "#1c6b4e"
+  text: "#2f3a34"
+  text_light: "#6b7a72"
+  background: "#ffffff"
+  code_bg: "#eaf7f1"
+  code_color: "#147d5a"
+  quote_border: "#147d5a"
+  quote_bg: "#eaf7f1"
+  border_radius: "12px"
+  highlight_bg: "#eaf7f1"
+  highlight_border: "rgba(20,125,90,0.18)"
+  summary_bg: "#eaf7f1"
+  summary_border: "rgba(20,125,90,0.18)"
+darkmode:
+  background: "#0f1a15"
+  text: "#cfe0d7"
+  text_light: "#8fa89a"
+  primary: "#3fc79a"
+  code_bg: "#12241c"
+  code_color: "#8fe6c4"
+  quote_bg: "#12241c"
+  quote_border: "#147d5a"
+base_css: |
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 16px;
+    line-height: 1.9;
+    color: #2f3a34;
+    background: #ffffff;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px;
+    word-wrap: break-word;
+  }
+
+  h1 {
+    font-size: 23px;
+    font-weight: 800;
+    color: #147d5a;
+    margin: 32px 0 16px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #147d5a;
+    line-height: 1.45;
+  }
+
+  h2 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #147d5a;
+    margin: 28px 0 14px 0;
+    padding: 8px 16px;
+    background: #eaf7f1;
+    border-radius: 12px;
+    line-height: 1.5;
+  }
+
+  h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1c6b4e;
+    margin: 22px 0 12px 0;
+    padding-left: 12px;
+    border-left: 4px solid #147d5a;
+    line-height: 1.5;
+  }
+
+  h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1c6b4e;
+    margin: 20px 0 10px 0;
+    line-height: 1.5;
+  }
+
+  p {
+    font-size: 16px;
+    line-height: 1.9;
+    color: #2f3a34;
+    margin: 14px 0;
+  }
+
+  strong {
+    font-weight: 700;
+    color: #147d5a;
+  }
+
+  em {
+    font-style: italic;
+    color: #2f3a34;
+  }
+
+  code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 14px;
+    background: #eaf7f1;
+    color: #147d5a;
+    padding: 2px 6px;
+    border-radius: 6px;
+  }
+
+  pre {
+    background: #eaf7f1;
+    color: #147d5a;
+    padding: 16px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 16px 0;
+    line-height: 1.7;
+    border: 1px solid #c9ebdd;
+  }
+
+  pre code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    font-size: 14px;
+    background: none;
+    color: #147d5a;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  blockquote {
+    border-left: 4px solid #147d5a;
+    background: #eaf7f1;
+    margin: 16px 0;
+    padding: 14px 16px;
+    border-radius: 0 12px 12px 0;
+    color: #1c5c45;
+  }
+
+  blockquote p {
+    margin: 8px 0;
+    color: #1c5c45;
+  }
+
+  ul {
+    padding-left: 24px;
+    margin: 12px 0;
+  }
+
+  ol {
+    padding-left: 24px;
+    margin: 12px 0;
+  }
+
+  li {
+    font-size: 16px;
+    line-height: 1.9;
+    color: #2f3a34;
+    margin: 8px 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 15px;
+  }
+
+  thead {
+    background: #147d5a;
+  }
+
+  th {
+    background: #147d5a;
+    color: #ffffff;
+    font-weight: 700;
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid #147d5a;
+  }
+
+  td {
+    padding: 10px 14px;
+    border: 1px solid #c9ebdd;
+    color: #2f3a34;
+  }
+
+  tr {
+    background: #ffffff;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 24px auto;
+    border-radius: 12px;
+  }
+
+  a {
+    color: #147d5a;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  hr {
+    border: none;
+    border-top: 1px solid #c9ebdd;
+    margin: 24px 0;
+  }
