@@ -1,0 +1,59 @@
+name: "bg-rose-paper"
+description: "玫瑰粉笺底：浅玫瑰纸感背景，温润优雅，适合女性健康与心理内容"
+page_background: "#faf0f1"
+page_padding: "28px 22px"
+css_randomize: true
+colors:
+  primary: "#c25a7a"
+  secondary: "#a8466a"
+  text: "#4a3840"
+  text_light: "#987a86"
+  background: "#fffbfc"
+  code_bg: "#f6e2e8"
+  code_color: "#a8466a"
+  quote_border: "#c25a7a"
+  quote_bg: "#fdf2f5"
+  border_radius: "14px"
+  highlight_bg: "#fffbfc"
+  highlight_border: "rgba(194,90,122,0.2)"
+  summary_bg: "#fffbfc"
+  summary_border: "rgba(194,90,122,0.2)"
+darkmode:
+  background: "#241820"
+  text: "#e4cdd6"
+  text_light: "#ab8898"
+  primary: "#e08aa6"
+  code_bg: "#32232c"
+  code_color: "#f0aec4"
+  quote_bg: "#fdf2f5"
+  quote_border: "#c25a7a"
+base_css: |
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 16px;
+    line-height: 1.95;
+    color: #4a3840;
+  }
+
+  h1 { font-size: 23px; font-weight: 800; color: #4a3840; margin: 0 0 18px 0; line-height: 1.45; }
+  h2 { font-size: 19px; font-weight: 800; color: #a8466a; margin: 24px 0 14px 0; padding: 12px 16px; background: #fffbfc; border-radius: 14px; border-left: 5px solid #c25a7a; line-height: 1.5; }
+  h3 { font-size: 17px; font-weight: 700; color: #c25a7a; margin: 22px 0 12px 0; line-height: 1.5; }
+  h4 { font-size: 16px; font-weight: 700; color: #c25a7a; margin: 20px 0 10px 0; }
+  p { font-size: 16px; line-height: 1.95; color: #4a3840; margin: 14px 0; }
+  strong { font-weight: 700; color: #a8466a; }
+  em { font-style: italic; color: #8a6a78; }
+  code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; font-size: 14px; background: #f6e2e8; color: #a8466a; padding: 2px 6px; border-radius: 6px; }
+  pre { background: #fffbfc; color: #a8466a; padding: 16px; border-radius: 14px; overflow-x: auto; margin: 16px 0; line-height: 1.6; border: 1px solid rgba(194,90,122,0.18); }
+  pre code { background: none; color: #a8466a; padding: 0; }
+  blockquote { border-left: 4px solid #c25a7a; background: #fffbfc; margin: 16px 0; padding: 14px 16px; border-radius: 0 14px 14px 0; color: #7a4c5e; }
+  blockquote p { margin: 8px 0; color: #7a4c5e; }
+  ul, ol { padding-left: 24px; margin: 12px 0; }
+  li { font-size: 16px; line-height: 1.95; color: #4a3840; margin: 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; background: #fffbfc; border-radius: 14px; overflow: hidden; }
+  thead { background: #c25a7a; }
+  th { background: #c25a7a; color: #fff; font-weight: 700; padding: 10px 14px; text-align: left; border: 1px solid #c25a7a; }
+  td { padding: 10px 14px; border: 1px solid rgba(194,90,122,0.18); color: #4a3840; }
+  tr { background: #fffbfc; }
+  img { max-width: 100%; height: auto; display: block; margin: 24px auto; border-radius: 14px; }
+  a { color: #c25a7a; text-decoration: none; font-weight: 600; }
+  hr { border: none; border-top: 1px solid rgba(194,90,122,0.2); margin: 24px 0; }

@@ -49,6 +49,8 @@ class WeChatConverter:
         if self._theme.colors.get("aigc_footer") or getattr(self._theme, '_raw_data', {}).get('aigc_footer'):
             html = self._append_aigc_footer(html)
 
+        html = self._wrap_background(html)
+
         digest = self._generate_digest(html)
         return ConvertResult(html=html, title=title, digest=digest, images=images)
 
@@ -362,6 +364,18 @@ class WeChatConverter:
                     f'{content_html}</section></section>')
         return re.sub(r':::quote\n(.*?)\n:::', replace_quote, text, flags=re.DOTALL)
 
+    def _wrap_background(self, html: str) -> str:
+        page_bg = self._theme.colors.get("page_background")
+        if not page_bg:
+            page_bg = getattr(self._theme, "_raw_data", {}).get("page_background")
+        if not page_bg:
+            return html
+        padding = self._theme.colors.get("page_padding")
+        if not padding:
+            padding = getattr(self._theme, "_raw_data", {}).get("page_padding", "24px 20px")
+        return (f'<section style="background: {page_bg}; padding: {padding}; '
+                f'border-radius: 0;">{html}</section>')
+
     def _append_aigc_footer(self, html: str) -> str:
         footer = ('<p style="text-align: center; font-size: 13px; color: #9ca3af; '
                   'margin-top: 48px; padding-top: 24px; border-top: 1px solid #e5e7eb;">'
@@ -486,6 +500,7 @@ class WeChatConverter:
 
 
 def preview_html(body_html: str, theme: Theme) -> str:
+    page_bg = theme.colors.get("page_background") or getattr(theme, "_raw_data", {}).get("page_background", "#ffffff")
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -496,7 +511,7 @@ def preview_html(body_html: str, theme: Theme) -> str:
 {theme.base_css}
     </style>
 </head>
-<body>
+<body style="background: {page_bg};">
     {body_html}
 </body>
 </html>"""

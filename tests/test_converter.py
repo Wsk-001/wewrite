@@ -441,8 +441,13 @@ class TestPreviewHtml:
         body = "<p>Hello</p>"
         full = preview_html(body, pro_theme)
         assert "<!DOCTYPE html>" in full
-        assert "<body>" in full
+        assert "<body" in full
         assert body in full
+
+    def test_preview_applies_page_background(self):
+        theme = load_theme("bg-morandi-beige")
+        full = preview_html("<p>Hello</p>", theme)
+        assert "background: #f4efe8" in full
 
 
 class TestWeChatFixes:

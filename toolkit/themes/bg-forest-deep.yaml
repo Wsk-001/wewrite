@@ -1,0 +1,59 @@
+name: "bg-forest-deep"
+description: "森林墨绿底：深墨绿背景配浅绿点缀，自然沉稳，适合养生与自然疗法科普"
+page_background: "#16241e"
+page_padding: "28px 22px"
+css_randomize: true
+colors:
+  primary: "#6fc99a"
+  secondary: "#8fd9b0"
+  text: "#d6e4dc"
+  text_light: "#8aa395"
+  background: "#16241e"
+  code_bg: "#203229"
+  code_color: "#a8e0c0"
+  quote_border: "#6fc99a"
+  quote_bg: "#203229"
+  border_radius: "12px"
+  highlight_bg: "#203229"
+  highlight_border: "rgba(111,201,154,0.24)"
+  summary_bg: "#203229"
+  summary_border: "rgba(111,201,154,0.24)"
+darkmode:
+  background: "#16241e"
+  text: "#d6e4dc"
+  text_light: "#8aa395"
+  primary: "#6fc99a"
+  code_bg: "#203229"
+  code_color: "#a8e0c0"
+  quote_bg: "#203229"
+  quote_border: "#6fc99a"
+base_css: |
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 16px;
+    line-height: 1.95;
+    color: #d6e4dc;
+  }
+
+  h1 { font-size: 23px; font-weight: 800; color: #ffffff; margin: 0 0 18px 0; line-height: 1.45; }
+  h2 { font-size: 19px; font-weight: 800; color: #8fd9b0; margin: 26px 0 14px 0; padding: 10px 16px; background: #203229; border-radius: 12px; line-height: 1.5; }
+  h3 { font-size: 17px; font-weight: 700; color: #6fc99a; margin: 22px 0 12px 0; line-height: 1.5; }
+  h4 { font-size: 16px; font-weight: 700; color: #6fc99a; margin: 20px 0 10px 0; }
+  p { font-size: 16px; line-height: 1.95; color: #c4d4cb; margin: 14px 0; }
+  strong { font-weight: 700; color: #ffffff; }
+  em { font-style: italic; color: #a8bcb0; }
+  code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; font-size: 14px; background: #203229; color: #a8e0c0; padding: 2px 6px; border-radius: 6px; }
+  pre { background: #203229; color: #a8e0c0; padding: 16px; border-radius: 12px; overflow-x: auto; margin: 16px 0; line-height: 1.6; border: 1px solid rgba(111,201,154,0.2); }
+  pre code { background: none; color: #a8e0c0; padding: 0; }
+  blockquote { border-left: 4px solid #6fc99a; background: #203229; margin: 16px 0; padding: 14px 16px; border-radius: 0 12px 12px 0; color: #c4d4cb; }
+  blockquote p { margin: 8px 0; color: #c4d4cb; }
+  ul, ol { padding-left: 24px; margin: 12px 0; }
+  li { font-size: 16px; line-height: 1.95; color: #c4d4cb; margin: 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; }
+  thead { background: #203229; }
+  th { background: #203229; color: #8fd9b0; font-weight: 700; padding: 10px 14px; text-align: left; border: 1px solid rgba(111,201,154,0.24); }
+  td { padding: 10px 14px; border: 1px solid rgba(111,201,154,0.18); color: #c4d4cb; background: #1c2c24; }
+  tr { background: #1c2c24; }
+  img { max-width: 100%; height: auto; display: block; margin: 24px auto; border-radius: 12px; }
+  a { color: #6fc99a; text-decoration: none; font-weight: 600; }
+  hr { border: none; border-top: 1px solid rgba(111,201,154,0.2); margin: 24px 0; }

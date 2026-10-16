@@ -1,0 +1,59 @@
+name: "bg-deep-night"
+description: "深夜暗色底：深蓝黑背景配青绿点缀，护眼沉浸，适合睡前健康深读"
+page_background: "#141b26"
+page_padding: "28px 22px"
+css_randomize: true
+colors:
+  primary: "#37c2a0"
+  secondary: "#5fd4b8"
+  text: "#d7dee8"
+  text_light: "#8a97a8"
+  background: "#141b26"
+  code_bg: "#1e2a3a"
+  code_color: "#8fe6c4"
+  quote_border: "#37c2a0"
+  quote_bg: "#1e2a3a"
+  border_radius: "12px"
+  highlight_bg: "#1e2a3a"
+  highlight_border: "rgba(55,194,160,0.24)"
+  summary_bg: "#1e2a3a"
+  summary_border: "rgba(55,194,160,0.24)"
+darkmode:
+  background: "#141b26"
+  text: "#d7dee8"
+  text_light: "#8a97a8"
+  primary: "#37c2a0"
+  code_bg: "#1e2a3a"
+  code_color: "#8fe6c4"
+  quote_bg: "#1e2a3a"
+  quote_border: "#37c2a0"
+base_css: |
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 16px;
+    line-height: 1.95;
+    color: #d7dee8;
+  }
+
+  h1 { font-size: 23px; font-weight: 800; color: #ffffff; margin: 0 0 18px 0; line-height: 1.45; }
+  h2 { font-size: 19px; font-weight: 800; color: #37c2a0; margin: 26px 0 14px 0; padding: 10px 16px; background: #1e2a3a; border-radius: 12px; line-height: 1.5; }
+  h3 { font-size: 17px; font-weight: 700; color: #37c2a0; margin: 22px 0 12px 0; line-height: 1.5; }
+  h4 { font-size: 16px; font-weight: 700; color: #5fd4b8; margin: 20px 0 10px 0; }
+  p { font-size: 16px; line-height: 1.95; color: #c8d1dc; margin: 14px 0; }
+  strong { font-weight: 700; color: #ffffff; }
+  em { font-style: italic; color: #aab6c4; }
+  code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; font-size: 14px; background: #1e2a3a; color: #8fe6c4; padding: 2px 6px; border-radius: 6px; }
+  pre { background: #1e2a3a; color: #8fe6c4; padding: 16px; border-radius: 12px; overflow-x: auto; margin: 16px 0; line-height: 1.6; border: 1px solid rgba(55,194,160,0.2); }
+  pre code { background: none; color: #8fe6c4; padding: 0; }
+  blockquote { border-left: 4px solid #37c2a0; background: #1e2a3a; margin: 16px 0; padding: 14px 16px; border-radius: 0 12px 12px 0; color: #c8d1dc; }
+  blockquote p { margin: 8px 0; color: #c8d1dc; }
+  ul, ol { padding-left: 24px; margin: 12px 0; }
+  li { font-size: 16px; line-height: 1.95; color: #c8d1dc; margin: 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; }
+  thead { background: #1e2a3a; }
+  th { background: #1e2a3a; color: #37c2a0; font-weight: 700; padding: 10px 14px; text-align: left; border: 1px solid rgba(55,194,160,0.24); }
+  td { padding: 10px 14px; border: 1px solid rgba(55,194,160,0.18); color: #c8d1dc; background: #1a2330; }
+  tr { background: #1a2330; }
+  img { max-width: 100%; height: auto; display: block; margin: 24px auto; border-radius: 12px; }
+  a { color: #37c2a0; text-decoration: none; font-weight: 600; }
+  hr { border: none; border-top: 1px solid rgba(55,194,160,0.2); margin: 24px 0; }
