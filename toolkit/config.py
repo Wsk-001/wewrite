@@ -23,6 +23,7 @@ SKILL_DIR = Path(__file__).parent.parent
 TOOLKIT_DIR = Path(__file__).parent
 
 CONFIG_SEARCH_ORDER = [
+    SKILL_DIR / "config" / "config.yaml",
     SKILL_DIR / "config.yaml",
     TOOLKIT_DIR / "config.yaml",
     Path.home() / ".config" / "wewrite" / "config.yaml",

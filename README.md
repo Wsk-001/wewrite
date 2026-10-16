@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 ## 配置
 
-复制 `config.example.yaml` 为 `config.yaml`，填入你的微信 AppID 和 Secret。
+复制 `config/config.example.yaml` 为 `config/config.yaml`，填入你的微信 AppID 和 Secret。
 
 ## License
 

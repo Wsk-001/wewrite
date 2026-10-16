@@ -14,13 +14,14 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
-COPY_DIRS = ["references", "scripts", "toolkit", "personas"]
+COPY_DIRS = ["references", "scripts", "toolkit", "personas", "config"]
+
+COPY_EXAMPLE_ONLY = {
+    "config": ["config.example.yaml", "style.example.yaml", "writing-config.example.yaml"],
+}
 
 COPY_FILES = [
     "requirements.txt",
-    "config.example.yaml",
-    "style.example.yaml",
-    "writing-config.example.yaml",
     "install.sh",
     "VERSION",
 ]
@@ -80,10 +81,17 @@ def build(output_dir: Path):
         if src.is_dir():
             if dst.exists():
                 shutil.rmtree(dst)
-            shutil.copytree(src, dst, ignore=shutil.ignore_patterns(
-                "__pycache__", "*.pyc", "*.pyo",
-                "source_articles", "xiaokepuoao-style.md", "xiaokepuoao.yaml",
-            ))
+            if d in COPY_EXAMPLE_ONLY:
+                dst.mkdir(parents=True, exist_ok=True)
+                for name in COPY_EXAMPLE_ONLY[d]:
+                    f = src / name
+                    if f.is_file():
+                        shutil.copy2(f, dst / name)
+            else:
+                shutil.copytree(src, dst, ignore=shutil.ignore_patterns(
+                    "__pycache__", "*.pyc", "*.pyo",
+                    "source_articles", "xiaokepuoao-style.md", "xiaokepuoao.yaml",
+                ))
             print(f"  {d}/ \u2192 {dst}")
     for f in COPY_FILES:
         src = REPO_ROOT / f

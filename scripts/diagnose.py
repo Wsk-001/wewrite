@@ -20,6 +20,15 @@ import yaml
 
 SKILL_ROOT = Path(__file__).resolve().parent.parent
 
+
+def _find_config_file(name: str) -> Path | None:
+    """Locate a config file, preferring config/ but supporting legacy root layout."""
+    for p in (SKILL_ROOT / "config" / name, SKILL_ROOT / name):
+        if p.exists():
+            return p
+    return None
+
+
 REQUIRED_MODULES = [
     ("markdown", "markdown"),
     ("bs4", "beautifulsoup4"),
@@ -70,8 +79,8 @@ def check_dependencies():
 
 def check_config():
     checks = []
-    config_path = SKILL_ROOT / "config.yaml"
-    if not config_path.exists():
+    config_path = _find_config_file("config.yaml")
+    if config_path is None:
         checks.append(make_check("config", "config_file", "warn", "not found \u2192 publish and image generation disabled", impact="skip_publish,skip_image_gen"))
         checks.append(make_check("config", "wechat_credentials", "warn", "no config.yaml", impact="skip_publish"))
         checks.append(make_check("config", "image_api_key", "warn", "no config.yaml", impact="skip_image_gen"))
@@ -94,8 +103,8 @@ def check_config():
 
 def check_style():
     checks = []
-    style_path = SKILL_ROOT / "style.yaml"
-    if not style_path.exists():
+    style_path = _find_config_file("style.yaml")
+    if style_path is None:
         checks.append(make_check("style", "style_file", "fail", "not found \u2192 run onboard first"))
         return checks
     checks.append(make_check("style", "style_file", "pass", "found"))
@@ -117,7 +126,7 @@ def check_style():
 
 def check_enhancements():
     checks = []
-    if (SKILL_ROOT / "writing-config.yaml").exists():
+    if _find_config_file("writing-config.yaml") is not None:
         checks.append(make_check("enhancement", "writing_config", "pass", "found"))
     else:
         checks.append(make_check("enhancement", "writing_config", "warn", "not found \u2192 using defaults (say '\u4f18\u5316\u53c2\u6570' to tune)"))

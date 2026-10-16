@@ -68,17 +68,17 @@ allowed-tools:
 ### [1/8] 环境 + 配置
 
 ```
-读取: {skill_dir}/config.yaml（若不存在则从 config.example.yaml 复制）
+读取: {skill_dir}/config/config.yaml（若不存在则从 config/config.example.yaml 复制）
 检查: config.yaml 中 wechat.appid 和 wechat.secret 是否已填写
 检查: 图片生成配置是否已配置（至少一个 provider）
-检查: style.yaml 是否存在（若不存在则从 style.example.yaml 复制）
+检查: config/style.yaml 是否存在（若不存在则从 config/style.example.yaml 复制）
 ```
 
 **降级标记检测**（先检查再继续）：
 - `publish` 命令中 `--skip-publish` → 设 `skip_publish = True`（Step 8 跳过）
 - `publish` 命令中 `--skip-image-gen` → 设 `skip_image_gen = True`（Step 6 跳过）
 
-**首次使用**：如果 config.yaml 不存在（刚刚从 example 复制），进入 Onboard 流程：
+**首次使用**：如果 config/config.yaml 不存在（刚刚从 example 复制），进入 Onboard 流程：
 ```
 读取: {skill_dir}/references/onboard.md
 按 onboard.md 逐节执行，引导用户完成初始化
@@ -108,10 +108,10 @@ allowed-tools:
 ### [4/8] 写作
 
 ```
-读取: {skill_dir}/references/writing-guide.md
-读取: {skill_dir}/style.yaml
-读取: {skill_dir}/references/content-enhance.md
-读取: {skill_dir}/personas/{style.yaml 中 writing_persona}.yaml
+读取: {skill_dir}/references/writing/writing-guide.md
+读取: {skill_dir}/config/style.yaml
+读取: {skill_dir}/references/writing/content-enhance.md
+读取: {skill_dir}/personas/{config/style.yaml 中 writing_persona}.yaml
 按 writing-guide.md 的写作流程执行
 ```
 
