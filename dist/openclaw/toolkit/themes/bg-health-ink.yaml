@@ -1,0 +1,59 @@
+name: "bg-health-ink"
+description: "健康-水墨中医：宣纸灰白底配墨色与朱砂点缀，中医科普/经络养生气质典雅"
+page_background: "#f4f2ec"
+page_padding: "30px 24px"
+css_randomize: true
+colors:
+  primary: "#2b2b2b"
+  secondary: "#a8392a"
+  text: "#2e2e2e"
+  text_light: "#7a7a7a"
+  background: "#fdfcf8"
+  code_bg: "#e8e5dc"
+  code_color: "#2b2b2b"
+  quote_border: "#a8392a"
+  quote_bg: "#fdfcf8"
+  border_radius: "4px"
+  highlight_bg: "#fdfcf8"
+  highlight_border: "rgba(43,43,43,0.14)"
+  summary_bg: "#fdfcf8"
+  summary_border: "rgba(43,43,43,0.14)"
+darkmode:
+  background: "#161616"
+  text: "#dedad0"
+  text_light: "#9a968c"
+  primary: "#e0dcd2"
+  code_bg: "#222222"
+  code_color: "#d0ccc2"
+  quote_bg: "#fdfcf8"
+  quote_border: "#a8392a"
+base_css: |
+  body {
+    font-family: Georgia, "Songti SC", "STSong", "SimSun", serif;
+    font-size: 16px;
+    line-height: 2.0;
+    color: #2e2e2e;
+  }
+
+  h1 { font-size: 23px; font-weight: 700; color: #1a1a1a; margin: 0 0 16px 0; padding-bottom: 8px; border-bottom: 2px solid #2b2b2b; line-height: 1.5; letter-spacing: 1px; }
+  h2 { font-size: 19px; font-weight: 700; color: #2b2b2b; margin: 28px 0 14px 0; padding: 8px 0 8px 14px; border-left: 5px solid #a8392a; line-height: 1.5; }
+  h3 { font-size: 17px; font-weight: 700; color: #3a3a3a; margin: 22px 0 12px 0; line-height: 1.5; }
+  h4 { font-size: 16px; font-weight: 700; color: #a8392a; margin: 20px 0 10px 0; }
+  p { font-size: 16px; line-height: 2.0; color: #2e2e2e; margin: 14px 0; }
+  strong { font-weight: 700; color: #a8392a; }
+  em { font-style: italic; color: #2e2e2e; }
+  code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; font-size: 14px; background: #e8e5dc; color: #2b2b2b; padding: 2px 6px; border-radius: 3px; }
+  pre { background: #fdfcf8; color: #2b2b2b; padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; line-height: 1.6; border: 1px solid #ddd9ce; }
+  pre code { background: none; color: #2b2b2b; padding: 0; }
+  blockquote { border-left: 4px solid #a8392a; background: #fdfcf8; margin: 16px 0; padding: 16px 18px; border-radius: 0; color: #4a4a4a; }
+  blockquote p { margin: 8px 0; color: #4a4a4a; }
+  ul, ol { padding-left: 24px; margin: 12px 0; }
+  li { font-size: 16px; line-height: 2.0; color: #2e2e2e; margin: 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; background: #fdfcf8; }
+  thead { background: #2b2b2b; }
+  th { background: #2b2b2b; color: #fdfcf8; font-weight: 700; padding: 10px 14px; text-align: left; border: 1px solid #2b2b2b; }
+  td { padding: 10px 14px; border: 1px solid #ddd9ce; color: #2e2e2e; }
+  tr { background: #fdfcf8; }
+  img { max-width: 100%; height: auto; display: block; margin: 24px auto; border-radius: 4px; }
+  a { color: #a8392a; text-decoration: none; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #ddd9ce; margin: 24px 0; }

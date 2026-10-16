@@ -1,0 +1,59 @@
+name: "bg-health-autumn"
+description: "健康-暖冬养生：暖橘棕渐变底配白卡，秋冬进补/暖身养生季节性热门"
+page_background: "linear-gradient(165deg, #fbeedd 0%, #f7e6d0 55%, #fdf3e6 100%)"
+page_padding: "30px 24px"
+css_randomize: true
+colors:
+  primary: "#c56a2a"
+  secondary: "#a0521c"
+  text: "#453528"
+  text_light: "#947a64"
+  background: "#fffcf6"
+  code_bg: "#f6e6d0"
+  code_color: "#a0521c"
+  quote_border: "#c56a2a"
+  quote_bg: "#fffcf6"
+  border_radius: "12px"
+  highlight_bg: "#fffcf6"
+  highlight_border: "rgba(197,106,42,0.18)"
+  summary_bg: "#fffcf6"
+  summary_border: "rgba(197,106,42,0.18)"
+darkmode:
+  background: "#241a10"
+  text: "#e6d4c0"
+  text_light: "#ab9678"
+  primary: "#e09050"
+  code_bg: "#2e2214"
+  code_color: "#e8b884"
+  quote_bg: "#fffcf6"
+  quote_border: "#c56a2a"
+base_css: |
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 16px;
+    line-height: 1.95;
+    color: #453528;
+  }
+
+  h1 { font-size: 23px; font-weight: 800; color: #6a3f1c; margin: 0 0 18px 0; line-height: 1.45; }
+  h2 { font-size: 19px; font-weight: 800; color: #a0521c; margin: 24px 0 14px 0; padding: 12px 16px; background: #fffcf6; border-radius: 12px; border-left: 5px solid #c56a2a; line-height: 1.5; }
+  h3 { font-size: 17px; font-weight: 700; color: #c56a2a; margin: 22px 0 12px 0; line-height: 1.5; }
+  h4 { font-size: 16px; font-weight: 700; color: #c56a2a; margin: 20px 0 10px 0; }
+  p { font-size: 16px; line-height: 1.95; color: #453528; margin: 14px 0; }
+  strong { font-weight: 700; color: #a0521c; }
+  em { font-style: italic; color: #453528; }
+  code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; font-size: 14px; background: #f6e6d0; color: #a0521c; padding: 2px 6px; border-radius: 6px; }
+  pre { background: #fffcf6; color: #a0521c; padding: 16px; border-radius: 12px; overflow-x: auto; margin: 16px 0; line-height: 1.6; border: 1px solid rgba(197,106,42,0.16); }
+  pre code { background: none; color: #a0521c; padding: 0; }
+  blockquote { border-left: 4px solid #c56a2a; background: #fffcf6; margin: 16px 0; padding: 16px 18px; border-radius: 0 12px 12px 0; color: #5c4630; }
+  blockquote p { margin: 8px 0; color: #5c4630; }
+  ul, ol { padding-left: 24px; margin: 12px 0; }
+  li { font-size: 16px; line-height: 1.95; color: #453528; margin: 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; background: #fffcf6; border-radius: 12px; overflow: hidden; }
+  thead { background: #c56a2a; }
+  th { background: #c56a2a; color: #fff; font-weight: 700; padding: 10px 14px; text-align: left; border: 1px solid #c56a2a; }
+  td { padding: 10px 14px; border: 1px solid rgba(197,106,42,0.16); color: #453528; }
+  tr { background: #fffcf6; }
+  img { max-width: 100%; height: auto; display: block; margin: 24px auto; border-radius: 12px; }
+  a { color: #c56a2a; text-decoration: none; font-weight: 600; }
+  hr { border: none; border-top: 1px solid rgba(197,106,42,0.18); margin: 24px 0; }

@@ -1,0 +1,59 @@
+name: "bg-health-solarterm"
+description: "健康-节气国风：宣纸米黄水彩底配青绿描边，二十四节气养生高频"
+page_background: "linear-gradient(170deg, #f7efd8 0%, #f3ecd6 55%, #fbf6e6 100%)"
+page_padding: "30px 24px"
+css_randomize: true
+colors:
+  primary: "#3f7a5c"
+  secondary: "#b08a3a"
+  text: "#3c3524"
+  text_light: "#8a7a58"
+  background: "#fffdf5"
+  code_bg: "#efe6c8"
+  code_color: "#3f7a5c"
+  quote_border: "#3f7a5c"
+  quote_bg: "#fffdf5"
+  border_radius: "6px"
+  highlight_bg: "#fffdf5"
+  highlight_border: "rgba(63,122,92,0.18)"
+  summary_bg: "#fffdf5"
+  summary_border: "rgba(63,122,92,0.18)"
+darkmode:
+  background: "#211d12"
+  text: "#ded4b8"
+  text_light: "#a89a76"
+  primary: "#6fb890"
+  code_bg: "#2c2718"
+  code_color: "#a8d8c0"
+  quote_bg: "#fffdf5"
+  quote_border: "#3f7a5c"
+base_css: |
+  body {
+    font-family: Georgia, "Kaiti SC", "STKaiti", "Songti SC", serif;
+    font-size: 16px;
+    line-height: 2.0;
+    color: #3c3524;
+  }
+
+  h1 { font-size: 23px; font-weight: 700; color: #2f5c44; margin: 0 0 16px 0; padding-bottom: 8px; border-bottom: 2px solid #b08a3a; line-height: 1.5; }
+  h2 { font-size: 19px; font-weight: 700; color: #3f7a5c; margin: 28px 0 14px 0; padding: 10px 14px; background: #fffdf5; border-radius: 6px; border: 1px solid rgba(63,122,92,0.16); line-height: 1.5; }
+  h3 { font-size: 17px; font-weight: 700; color: #3f7a5c; margin: 22px 0 12px 0; padding-left: 12px; border-left: 4px solid #b08a3a; line-height: 1.5; }
+  h4 { font-size: 16px; font-weight: 700; color: #3f7a5c; margin: 20px 0 10px 0; }
+  p { font-size: 16px; line-height: 2.0; color: #3c3524; margin: 14px 0; }
+  strong { font-weight: 700; color: #b08a3a; }
+  em { font-style: italic; color: #3c3524; }
+  code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; font-size: 14px; background: #efe6c8; color: #3f7a5c; padding: 2px 6px; border-radius: 4px; }
+  pre { background: #fffdf5; color: #3f7a5c; padding: 16px; border-radius: 6px; overflow-x: auto; margin: 16px 0; line-height: 1.6; border: 1px solid rgba(63,122,92,0.16); }
+  pre code { background: none; color: #3f7a5c; padding: 0; }
+  blockquote { border-left: 4px solid #3f7a5c; background: #fffdf5; margin: 16px 0; padding: 16px 18px; border-radius: 0 6px 6px 0; color: #4a4430; }
+  blockquote p { margin: 8px 0; color: #4a4430; }
+  ul, ol { padding-left: 24px; margin: 12px 0; }
+  li { font-size: 16px; line-height: 2.0; color: #3c3524; margin: 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; background: #fffdf5; }
+  thead { background: #3f7a5c; }
+  th { background: #3f7a5c; color: #fffdf5; font-weight: 700; padding: 10px 14px; text-align: left; border: 1px solid #3f7a5c; }
+  td { padding: 10px 14px; border: 1px solid #e0d8bc; color: #3c3524; }
+  tr { background: #fffdf5; }
+  img { max-width: 100%; height: auto; display: block; margin: 24px auto; border-radius: 6px; }
+  a { color: #3f7a5c; text-decoration: none; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #b08a3a; margin: 24px 0; }

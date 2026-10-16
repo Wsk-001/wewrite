@@ -1,0 +1,59 @@
+name: "bg-health-food"
+description: "健康-食疗黄绿：米黄底配草绿点缀，手绘食疗/养生食谱热门"
+page_background: "#fbf5e0"
+page_padding: "30px 24px"
+css_randomize: true
+colors:
+  primary: "#5aa03a"
+  secondary: "#c9972a"
+  text: "#3f4228"
+  text_light: "#8a9268"
+  background: "#fffef8"
+  code_bg: "#f0ead0"
+  code_color: "#4c882e"
+  quote_border: "#5aa03a"
+  quote_bg: "#fffef8"
+  border_radius: "14px"
+  highlight_bg: "#fffef8"
+  highlight_border: "rgba(90,160,58,0.2)"
+  summary_bg: "#fffef8"
+  summary_border: "rgba(90,160,58,0.2)"
+darkmode:
+  background: "#1f2416"
+  text: "#dce4c0"
+  text_light: "#9aa884"
+  primary: "#8ec864"
+  code_bg: "#2a3018"
+  code_color: "#b8e08a"
+  quote_bg: "#fffef8"
+  quote_border: "#5aa03a"
+base_css: |
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 16px;
+    line-height: 1.95;
+    color: #3f4228;
+  }
+
+  h1 { font-size: 23px; font-weight: 800; color: #4a6a20; margin: 0 0 18px 0; line-height: 1.45; }
+  h2 { font-size: 19px; font-weight: 800; color: #4c882e; margin: 24px 0 14px 0; padding: 12px 16px; background: #fffef8; border-radius: 14px; border-left: 5px solid #5aa03a; line-height: 1.5; }
+  h3 { font-size: 17px; font-weight: 700; color: #5aa03a; margin: 22px 0 12px 0; line-height: 1.5; }
+  h4 { font-size: 16px; font-weight: 700; color: #5aa03a; margin: 20px 0 10px 0; }
+  p { font-size: 16px; line-height: 1.95; color: #3f4228; margin: 14px 0; }
+  strong { font-weight: 700; color: #c9972a; }
+  em { font-style: italic; color: #3f4228; }
+  code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; font-size: 14px; background: #f0ead0; color: #4c882e; padding: 2px 6px; border-radius: 6px; }
+  pre { background: #fffef8; color: #4c882e; padding: 16px; border-radius: 14px; overflow-x: auto; margin: 16px 0; line-height: 1.6; border: 1px solid rgba(90,160,58,0.18); }
+  pre code { background: none; color: #4c882e; padding: 0; }
+  blockquote { border-left: 4px solid #5aa03a; background: #fffef8; margin: 16px 0; padding: 16px 18px; border-radius: 0 14px 14px 0; color: #4f5a30; }
+  blockquote p { margin: 8px 0; color: #4f5a30; }
+  ul, ol { padding-left: 24px; margin: 12px 0; }
+  li { font-size: 16px; line-height: 1.95; color: #3f4228; margin: 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; background: #fffef8; border-radius: 14px; overflow: hidden; }
+  thead { background: #5aa03a; }
+  th { background: #5aa03a; color: #fff; font-weight: 700; padding: 10px 14px; text-align: left; border: 1px solid #5aa03a; }
+  td { padding: 10px 14px; border: 1px solid rgba(90,160,58,0.18); color: #3f4228; }
+  tr { background: #fffef8; }
+  img { max-width: 100%; height: auto; display: block; margin: 24px auto; border-radius: 14px; }
+  a { color: #5aa03a; text-decoration: none; font-weight: 600; }
+  hr { border: none; border-top: 1px solid rgba(90,160,58,0.2); margin: 24px 0; }
