@@ -71,7 +71,7 @@ Entries discovered by the Agent during task execution should follow this format:
 - Context: 微信公众号 API 调试
 - Category: Operations & Deployment
 - Instructions:
-  - 公众号「小科普oao」AppID wx9deec3eb05e1647e，凭据已写入 config.yaml（已 gitignore）
+  - 公众号「小科普oao」AppID wx9deec3eb05e1647e，凭据已写入 config/config.yaml（已 gitignore）
   - 微信 API 要求调用方 IP 在白名单内，沙箱出口 IP 123.56.157.253 需加入公众号后台白名单（errcode 40164 表示未加）
   - 发布流程：python3 toolkit/cli.py publish article.md --cover cover.jpg 推送草稿箱，后台人工确认发布
 
@@ -80,8 +80,8 @@ Entries discovered by the Agent during task execution should follow this format:
 - Context: 从账号 9 篇已发文章提炼写作与配图风格
 - Category: Workflow & Collaboration
 - Instructions:
-  - 「小科普oao」是健康科普账号，9 篇参考文章存于 references/source_articles/ref-01~09.md
-  - 写作人格 personas/xiaokepuoao.yaml，写作参数 writing-config.yaml 已按实测指纹校准
+  - 「小科普oao」是健康科普账号，9 篇参考文章存于 references/examples/source_articles/ref-01~09.md
+  - 写作人格 personas/xiaokepuoao.yaml，写作参数 config/writing-config.yaml 已按实测指纹校准
   - 配图风格规范（三条路线 + z-image-turbo prompt 模板）在 references/xiaokepuoao-style.md
   - scripts/fetch_article.py 曾有 img/br/hr void 元素被提前 return 吞掉的 bug，已修复；抓公众号文章先确认 md 里有图再分析
 
@@ -96,3 +96,14 @@ Entries discovered by the Agent during task execution should follow this format:
   - 搜一搜 SEO 关键阈值：核心词进标题前 12 字、关键词密度 2-3%、小标题 >=3、标题党词按作弊处理
   - 健康科普红线：不得虚构病例/疗效结果、禁用「保证根治」类断言；第一人称场景开场用泛化场景
   - datacube getarticletotal 有 add_to_fav_count（收藏）字段，fetch_stats.py 目前未采集
+
+[Project Knowledge Summary]
+- Date: 2026-10-16
+- Context: B 方案目录重构（配置/资料/脚本各归各位）
+- Category: Workflow & Collaboration
+- Instructions:
+  - 配置集中在 config/：config.yaml（微信/图片凭据，gitignore）、style.yaml（账号风格）、writing-config.yaml（写作参数），各带 .example；加载器 toolkit/config.py 与 scripts/diagnose.py 优先 config/，兼容旧根目录
+  - references/ 分 5 组：pipeline/（主管道文档）、compliance/（合规SEO）、guides/（指南命令）、examples/（范文库，gitignore 用户内容）；visual/ 已随孤儿文档删除
+  - scripts/ 保持扁平，索引见 scripts/README.md；不分子目录，避免 import 与调用路径回归
+  - dist/ 只跟踪 dist/openclaw、dist/codex 与两个发布 zip（dist/wewrite-*.zip）；改规则/主题后需重建 dist
+  - build_openclaw.py 的 config 目录只打包 *.example，不打包用户真实配置
