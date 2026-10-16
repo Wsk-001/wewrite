@@ -150,6 +150,26 @@ publishes:
         media_id: "q_zrQd1gVlCJUeajP8dHyT3vpXC9j-agP5439dKZG8zol32tA5sU48pGQizGYI_p"
         action: 以此版发布
 
+  - id: 2026-10-16-heshui-zhongdu
+    date: "2026-10-16"
+    title: "\"喝大水\"火了，但有人喝进了急诊：水不是越多越好"
+    topic: "水中毒/科学饮水科普（热点抓取选题，2026 年\"喝大水\"潮流 搜狐健康 2026-10-10 + 纽约时报，稀释性低钠血症科普）"
+    article: "output/heshui-zhongdu.md"
+    theme: "bg-health-clinic-clean"
+    humanness_score: 38.7
+    cover: "output/cover-heshui.jpg"
+    inline_images:
+      - "output/heshui-1.jpg"
+      - "output/heshui-2.jpg"
+      - "output/heshui-3.jpg"
+      - "output/heshui-4.jpg"
+    status: draft
+    drafts:
+      - version: v1
+        note: "humanness 38.7；关键数据（肾每分钟滤水 16ml、每小时排 0.8-1L/天 20-28L、血钠 <135mmol/L、膳食指南 2022 男 1700ml/女 1500ml、每次 200-300ml）；配图 5 张人工读图核验通过（封面水瓶玻璃杯软尺、内文图细胞吸水前后对比、肾脏注水、尿液比色、心肾人体轮廓），均无文字无乱码；合规/SEO 0/0"
+        media_id: "q_zrQd1gVlCJUeajP8dHyW2_nGwF0eZLtyEiBBb3LtObOTF5oslf_DKjjM1zKClG"
+        action: 以此版发布
+
 style_sources:
   - date: "2026-10-10"
     note: "从账号 9 篇已发文章学习写作与配图风格"
