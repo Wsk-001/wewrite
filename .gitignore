@@ -18,19 +18,19 @@ output/*
 !output/history.yaml
 
 # Exemplar library (user-specific content)
-references/exemplars/*.md
-references/exemplars/index.yaml
+references/examples/exemplars/*.md
+references/examples/exemplars/index.yaml
 # Build artifact: build_openclaw.py mirrors local exemplars into dist; never commit user content
-dist/openclaw/references/exemplars/
+dist/openclaw/references/examples/exemplars/
 
 # User-local reference/draft articles (external 爆款范文 collection, not part of the skill)
 example/
 
 # User-specific account data bundled locally (not part of the distributed skill)
-references/source_articles/
+references/examples/source_articles/
 references/xiaokepuoao-style.md
 personas/xiaokepuoao.yaml
-dist/openclaw/references/source_articles/
+dist/openclaw/references/examples/source_articles/
 dist/openclaw/references/xiaokepuoao-style.md
 dist/openclaw/personas/xiaokepuoao.yaml
 
