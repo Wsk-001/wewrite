@@ -38,7 +38,7 @@ description: |
 
 **Onboard 例外**：Onboard 是交互式的（需要问用户问题），不受"全自动"约束。Onboard 完成后回到全自动管道。
 
-**辅助功能 / 非管道命令**（按需加载）：用户发出"选题→发布"主流程之外的命令——重新设置风格 / 学习我的修改 / 学习排版 / 导入范文·学习这篇文章 / 查看范文库 / 看看文章数据 / 主题画廊 / 小绿书 / 更新 / 检查一下·自检——时 → `读取: {baseDir}/references/commands.md`，按其中「触发词 → 动作」表执行。
+**辅助功能 / 非管道命令**（按需加载）：用户发出"选题→发布"主流程之外的命令——重新设置风格 / 学习我的修改 / 学习排版 / 导入范文·学习这篇文章 / 查看范文库 / 看看文章数据 / 主题画廊 / 小绿书 / 更新 / 检查一下·自检——时 → `读取: {baseDir}/references/guides/commands.md`，按其中「触发词 → 动作」表执行。
 
 ---
 
@@ -56,19 +56,19 @@ description: |
 ### [1/8] 环境 + 配置
 
 ```
-读取: {baseDir}/config.yaml（若不存在则从 config.example.yaml 复制）
+读取: {baseDir}/config/config.yaml（若不存在则从 config/config.example.yaml 复制）
 检查: config.yaml 中 wechat.appid 和 wechat.secret 是否已填写
 检查: 图片生成配置是否已配置（至少一个 provider）
-检查: style.yaml 是否存在（若不存在则从 style.example.yaml 复制）
+检查: config/style.yaml 是否存在（若不存在则从 config/style.example.yaml 复制）
 ```
 
 **降级标记检测**（先检查再继续）：
 - `publish` 命令中 `--skip-publish` → 设 `skip_publish = True`（Step 8 跳过）
 - `publish` 命令中 `--skip-image-gen` → 设 `skip_image_gen = True`（Step 6 跳过）
 
-**首次使用**：如果 config.yaml 不存在（刚刚从 example 复制），进入 Onboard 流程：
+**首次使用**：如果 config/config.yaml 不存在（刚刚从 example 复制），进入 Onboard 流程：
 ```
-读取: {baseDir}/references/onboard.md
+读取: {baseDir}/references/guides/onboard.md
 按 onboard.md 逐节执行，引导用户完成初始化
 完成后回到 Step 2
 ```
@@ -78,7 +78,7 @@ description: |
 ### [2/8] 选题
 
 ```
-读取: {baseDir}/references/topic-selection.md
+读取: {baseDir}/references/pipeline/topic-selection.md
 按 topic-selection.md 中的选题流程执行
 ```
 
@@ -87,7 +87,7 @@ description: |
 ### [3/8] 框架 + 素材
 
 ```
-读取: {baseDir}/references/frameworks.md
+读取: {baseDir}/references/pipeline/frameworks.md
 按 frameworks.md 中的框架和素材流程执行
 ```
 
@@ -96,15 +96,15 @@ description: |
 ### [4/8] 写作
 
 ```
-读取: {baseDir}/references/writing-guide.md
-读取: {baseDir}/style.yaml
-读取: {baseDir}/references/content-enhance.md
-读取: {baseDir}/personas/{style.yaml 中 writing_persona}.yaml
+读取: {baseDir}/references/pipeline/writing-guide.md
+读取: {baseDir}/config/style.yaml
+读取: {baseDir}/references/pipeline/content-enhance.md
+读取: {baseDir}/personas/{config/style.yaml 中 writing_persona}.yaml
 按 writing-guide.md 的写作流程执行
 ```
 
 **写作时参照以下规范**：
-- **排版样式**：`读取: {baseDir}/references/formatting-styles.md`，按其中规则排版，不可偏离
+- **排版样式**：`读取: {baseDir}/references/pipeline/formatting-styles.md`，按其中规则排版，不可偏离
 
 ---
 
@@ -112,7 +112,7 @@ description: |
 
 ```
 运行: python3 {baseDir}/scripts/humanness_score.py {baseDir}/output/{文章}.md --json
-读取: {baseDir}/references/realtime-check.md
+读取: {baseDir}/references/pipeline/realtime-check.md
 检查: humanness_score 是否落在账号校准区间——若 style.yaml 或 writing-config.yaml 定义了
       humanness_range（如 [26, 40]），以该区间为准；未定义则默认 ≤ 45 通过
 注意: 分数语义为 0=人、100=AI。低于区间下限同样需复核（过度口语化会显得刻意）
@@ -130,7 +130,7 @@ description: |
 如果 `skip_image_gen` 为 True，跳过此 Step。
 
 ```
-读取: {baseDir}/references/visual-prompts.md
+读取: {baseDir}/references/pipeline/visual-prompts.md
 按 visual-prompts.md 生成配图，并强制执行其中两节：
 - 「生成前：场景实况检索」——配图涉及真实场景/动作/流程/器物时，先 websearch 查清
   真实细节（动作要领、器物方位、步骤顺序）写进提示词，再生成
@@ -145,7 +145,7 @@ description: |
 将 Markdown 转换为微信排版，应用主题和容器语法。
 
 ```
-读取: {baseDir}/references/formatting-styles.md
+读取: {baseDir}/references/pipeline/formatting-styles.md
 运行: python3 {baseDir}/toolkit/cli.py preview {baseDir}/output/{文章}.md --theme {style.yaml 中 theme}
 检查: 预览结果是否符合排版规范
 ```
@@ -186,5 +186,5 @@ description: |
 用户发出"选题→发布"之外命令时，读取 commands.md 并按表执行：
 
 ```
-读取: {baseDir}/references/commands.md
+读取: {baseDir}/references/guides/commands.md
 ```

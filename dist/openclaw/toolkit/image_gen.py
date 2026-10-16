@@ -21,6 +21,7 @@ def _load_config() -> dict:
         return load_config()
     except ImportError:
         for p in [
+            Path(__file__).parent.parent / "config" / "config.yaml",
             Path(__file__).parent.parent / "config.yaml",
             Path(__file__).parent / "config.yaml",
             Path.home() / ".config" / "wewrite" / "config.yaml",

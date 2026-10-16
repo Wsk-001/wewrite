@@ -53,9 +53,17 @@ def markdown_to_plaintext(md: str) -> str:
     return text.strip()
 
 
+def _find_config_file(name: str) -> "Path | None":
+    from pathlib import Path as _P
+    for p in (SKILL_DIR / "config" / name, SKILL_DIR / name):
+        if p.exists():
+            return p
+    return None
+
+
 def fetch_wechat_draft() -> tuple[str, str, str]:
-    config_path = SKILL_DIR / "config.yaml"
-    if not config_path.exists():
+    config_path = _find_config_file("config.yaml")
+    if config_path is None:
         raise FileNotFoundError("config.yaml not found \u2014 need WeChat API credentials")
     with open(config_path) as f:
         config = yaml.safe_load(f)

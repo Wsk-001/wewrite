@@ -27,8 +27,6 @@ AUXILIARY = {
     "style-template.md",
     "exemplar-seeds.yaml",
     "commands.md",
-    "compliance-seo.md",
-    "cover-prompts.md",
     "wechat-constraints.md",
 }
 

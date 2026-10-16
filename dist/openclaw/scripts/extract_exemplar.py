@@ -4,7 +4,7 @@ Extract style exemplars from human-written articles for SICO-style few-shot inje
 
 Takes a markdown article, analyzes it for style fingerprints, extracts key
 segments (opening hook, emotional peak, transition/self-correction, closing),
-and saves structured exemplar files to references/exemplars/.
+and saves structured exemplar files to references/examples/exemplars/.
 
 Usage:
     python3 scripts/extract_exemplar.py article.md
@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import humanness_score as hs
 
 SKILL_DIR = Path(__file__).parent.parent
-EXEMPLARS_DIR = SKILL_DIR / "references" / "exemplars"
+EXEMPLARS_DIR = SKILL_DIR / "references" / "examples" / "exemplars"
 INDEX_FILE = EXEMPLARS_DIR / "index.yaml"
 
 CATEGORIES = ["tech-opinion", "story-emotional", "list-practical", "hot-take", "general"]

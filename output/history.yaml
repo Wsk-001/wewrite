@@ -168,6 +168,10 @@ publishes:
       - version: v1
         note: "humanness 38.7；关键数据（肾每分钟滤水 16ml、每小时排 0.8-1L/天 20-28L、血钠 <135mmol/L、膳食指南 2022 男 1700ml/女 1500ml、每次 200-300ml）；配图 5 张人工读图核验通过（封面水瓶玻璃杯软尺、内文图细胞吸水前后对比、肾脏注水、尿液比色、心肾人体轮廓），均无文字无乱码；合规/SEO 0/0"
         media_id: "q_zrQd1gVlCJUeajP8dHyW2_nGwF0eZLtyEiBBb3LtObOTF5oslf_DKjjM1zKClG"
+        action: 待删除（B 方案重构后回归验证重发，内容一致）
+      - version: v2
+        note: "目录重构（config/ + references/ 分组）后端到端回归验证发布，全链路正常"
+        media_id: "q_zrQd1gVlCJUeajP8dHyXgiJ3yl-VD9VZrBFiPgWCMW7fgCOy6sNghdoNs5d9EB"
         action: 以此版发布
 
 style_sources:
