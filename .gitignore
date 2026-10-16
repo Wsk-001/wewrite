@@ -48,6 +48,8 @@ __pycache__/
 dist/*
 !dist/openclaw/
 !dist/codex/
+!dist/wewrite-skill.zip
+!dist/wewrite-codex.zip
 build/
 .venv/
 .venv
