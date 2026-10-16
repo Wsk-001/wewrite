@@ -1,0 +1,59 @@
+name: "bg-hot-business"
+description: "热门商务深蓝：深蓝渐变底配白卡，专业大气，企业/医疗/政企账号主流"
+page_background: "linear-gradient(160deg, #1b3a63 0%, #24507f 55%, #2c5f92 100%)"
+page_padding: "30px 24px"
+css_randomize: true
+colors:
+  primary: "#1b4a7a"
+  secondary: "#2c5f92"
+  text: "#2b3440"
+  text_light: "#6a7686"
+  background: "#ffffff"
+  code_bg: "#e8f0f8"
+  code_color: "#1b4a7a"
+  quote_border: "#2c5f92"
+  quote_bg: "#f2f7fc"
+  border_radius: "10px"
+  highlight_bg: "#ffffff"
+  highlight_border: "rgba(27,74,122,0.16)"
+  summary_bg: "#ffffff"
+  summary_border: "rgba(27,74,122,0.16)"
+darkmode:
+  background: "#0f1c2e"
+  text: "#cdd8e6"
+  text_light: "#8a98aa"
+  primary: "#5a9ae0"
+  code_bg: "#182a40"
+  code_color: "#a0c8f0"
+  quote_bg: "#f2f7fc"
+  quote_border: "#2c5f92"
+base_css: |
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 16px;
+    line-height: 1.9;
+    color: #2b3440;
+  }
+
+  h1 { font-size: 23px; font-weight: 800; color: #10233c; margin: 0 0 18px 0; padding-bottom: 12px; border-bottom: 2px solid #2c5f92; line-height: 1.45; }
+  h2 { font-size: 19px; font-weight: 800; color: #1b4a7a; margin: 24px 0 14px 0; padding: 12px 16px; background: #ffffff; border-radius: 10px; border-left: 5px solid #2c5f92; line-height: 1.5; }
+  h3 { font-size: 17px; font-weight: 700; color: #1b4a7a; margin: 22px 0 12px 0; line-height: 1.5; }
+  h4 { font-size: 16px; font-weight: 700; color: #2c5f92; margin: 20px 0 10px 0; }
+  p { font-size: 16px; line-height: 1.9; color: #2b3440; margin: 14px 0; }
+  strong { font-weight: 700; color: #1b4a7a; }
+  em { font-style: italic; color: #2b3440; }
+  code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; font-size: 14px; background: #e8f0f8; color: #1b4a7a; padding: 2px 6px; border-radius: 6px; }
+  pre { background: #ffffff; color: #1b4a7a; padding: 16px; border-radius: 10px; overflow-x: auto; margin: 16px 0; line-height: 1.6; border: 1px solid rgba(27,74,122,0.14); }
+  pre code { background: none; color: #1b4a7a; padding: 0; }
+  blockquote { border-left: 4px solid #2c5f92; background: #ffffff; margin: 16px 0; padding: 14px 16px; border-radius: 0 10px 10px 0; color: #324458; }
+  blockquote p { margin: 8px 0; color: #324458; }
+  ul, ol { padding-left: 24px; margin: 12px 0; }
+  li { font-size: 16px; line-height: 1.9; color: #2b3440; margin: 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; background: #ffffff; border-radius: 10px; overflow: hidden; }
+  thead { background: #1b4a7a; }
+  th { background: #1b4a7a; color: #fff; font-weight: 700; padding: 10px 14px; text-align: left; border: 1px solid #1b4a7a; }
+  td { padding: 10px 14px; border: 1px solid rgba(27,74,122,0.14); color: #2b3440; }
+  tr { background: #ffffff; }
+  img { max-width: 100%; height: auto; display: block; margin: 24px auto; border-radius: 10px; }
+  a { color: #1b4a7a; text-decoration: none; font-weight: 600; }
+  hr { border: none; border-top: 1px solid rgba(27,74,122,0.16); margin: 24px 0; }

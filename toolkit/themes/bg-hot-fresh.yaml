@@ -1,0 +1,59 @@
+name: "bg-hot-fresh"
+description: "热门清新风：天青绿渐变底配白卡，治愈通透，旅行/生活/健康类高频"
+page_background: "linear-gradient(165deg, #e9f5f1 0%, #eef7f4 55%, #f5fbf8 100%)"
+page_padding: "30px 24px"
+css_randomize: true
+colors:
+  primary: "#2e9a86"
+  secondary: "#1f7a6a"
+  text: "#2f3f3a"
+  text_light: "#7a928a"
+  background: "#ffffff"
+  code_bg: "#dcf0ea"
+  code_color: "#1f7a6a"
+  quote_border: "#2e9a86"
+  quote_bg: "#ffffff"
+  border_radius: "14px"
+  highlight_bg: "#ffffff"
+  highlight_border: "rgba(46,154,134,0.18)"
+  summary_bg: "#ffffff"
+  summary_border: "rgba(46,154,134,0.18)"
+darkmode:
+  background: "#12241f"
+  text: "#cfe4de"
+  text_light: "#8aaba2"
+  primary: "#5fc9b2"
+  code_bg: "#1c322c"
+  code_color: "#9fe0d0"
+  quote_bg: "#ffffff"
+  quote_border: "#2e9a86"
+base_css: |
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 16px;
+    line-height: 1.95;
+    color: #2f3f3a;
+  }
+
+  h1 { font-size: 23px; font-weight: 800; color: #214640; margin: 0 0 18px 0; line-height: 1.45; }
+  h2 { font-size: 19px; font-weight: 800; color: #1f7a6a; margin: 24px 0 14px 0; padding: 12px 16px; background: #ffffff; border-radius: 14px; border-left: 5px solid #2e9a86; line-height: 1.5; }
+  h3 { font-size: 17px; font-weight: 700; color: #2e9a86; margin: 22px 0 12px 0; line-height: 1.5; }
+  h4 { font-size: 16px; font-weight: 700; color: #2e9a86; margin: 20px 0 10px 0; }
+  p { font-size: 16px; line-height: 1.95; color: #2f3f3a; margin: 14px 0; }
+  strong { font-weight: 700; color: #1f7a6a; }
+  em { font-style: italic; color: #2f3f3a; }
+  code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; font-size: 14px; background: #dcf0ea; color: #1f7a6a; padding: 2px 6px; border-radius: 6px; }
+  pre { background: #ffffff; color: #1f7a6a; padding: 16px; border-radius: 14px; overflow-x: auto; margin: 16px 0; line-height: 1.6; border: 1px solid rgba(46,154,134,0.16); }
+  pre code { background: none; color: #1f7a6a; padding: 0; }
+  blockquote { border-left: 4px solid #2e9a86; background: #ffffff; margin: 16px 0; padding: 14px 16px; border-radius: 0 14px 14px 0; color: #3a5c52; }
+  blockquote p { margin: 8px 0; color: #3a5c52; }
+  ul, ol { padding-left: 24px; margin: 12px 0; }
+  li { font-size: 16px; line-height: 1.95; color: #2f3f3a; margin: 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; background: #ffffff; border-radius: 14px; overflow: hidden; }
+  thead { background: #2e9a86; }
+  th { background: #2e9a86; color: #fff; font-weight: 700; padding: 10px 14px; text-align: left; border: 1px solid #2e9a86; }
+  td { padding: 10px 14px; border: 1px solid rgba(46,154,134,0.16); color: #2f3f3a; }
+  tr { background: #ffffff; }
+  img { max-width: 100%; height: auto; display: block; margin: 24px auto; border-radius: 14px; }
+  a { color: #2e9a86; text-decoration: none; font-weight: 600; }
+  hr { border: none; border-top: 1px solid rgba(46,154,134,0.18); margin: 24px 0; }

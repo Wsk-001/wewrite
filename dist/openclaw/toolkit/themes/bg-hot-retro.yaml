@@ -1,0 +1,59 @@
+name: "bg-hot-retro"
+description: "热门复古风：做旧米黄底配砖红点缀，复古杂志感，文艺账号高频使用"
+page_background: "#f0e6d2"
+page_padding: "30px 24px"
+css_randomize: true
+colors:
+  primary: "#a8452e"
+  secondary: "#8a3a26"
+  text: "#3d3226"
+  text_light: "#8a7a5f"
+  background: "#fbf4e6"
+  code_bg: "#e9dcc2"
+  code_color: "#8a3a26"
+  quote_border: "#a8452e"
+  quote_bg: "#fbf4e6"
+  border_radius: "4px"
+  highlight_bg: "#fbf4e6"
+  highlight_border: "#dcc9a6"
+  summary_bg: "#fbf4e6"
+  summary_border: "#dcc9a6"
+darkmode:
+  background: "#231c14"
+  text: "#e0d0b4"
+  text_light: "#a89070"
+  primary: "#d4785c"
+  code_bg: "#2e2518"
+  code_color: "#e0b48c"
+  quote_bg: "#fbf4e6"
+  quote_border: "#a8452e"
+base_css: |
+  body {
+    font-family: Georgia, "Songti SC", "STSong", "SimSun", serif;
+    font-size: 16px;
+    line-height: 1.95;
+    color: #3d3226;
+  }
+
+  h1 { font-size: 23px; font-weight: 700; color: #5a3a20; margin: 0 0 16px 0; padding-bottom: 10px; border-bottom: 3px double #a8452e; line-height: 1.5; }
+  h2 { font-size: 19px; font-weight: 700; color: #8a3a26; margin: 28px 0 14px 0; padding: 4px 0 4px 14px; border-left: 4px solid #a8452e; line-height: 1.5; }
+  h3 { font-size: 17px; font-weight: 700; color: #a8452e; margin: 22px 0 12px 0; line-height: 1.5; }
+  h4 { font-size: 16px; font-weight: 700; color: #a8452e; margin: 20px 0 10px 0; }
+  p { font-size: 16px; line-height: 1.95; color: #3d3226; margin: 14px 0; }
+  strong { font-weight: 700; color: #8a3a26; }
+  em { font-style: italic; color: #3d3226; }
+  code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; font-size: 14px; background: #e9dcc2; color: #8a3a26; padding: 2px 6px; border-radius: 3px; }
+  pre { background: #fbf4e6; color: #8a3a26; padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; line-height: 1.6; border: 1px solid #dcc9a6; }
+  pre code { background: none; color: #8a3a26; padding: 0; }
+  blockquote { border-left: 4px solid #a8452e; background: #fbf4e6; margin: 16px 0; padding: 16px 18px; border-radius: 0 4px 4px 0; color: #5a4a34; }
+  blockquote p { margin: 8px 0; color: #5a4a34; }
+  ul, ol { padding-left: 24px; margin: 12px 0; }
+  li { font-size: 16px; line-height: 1.95; color: #3d3226; margin: 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; background: #fbf4e6; }
+  thead { background: #a8452e; }
+  th { background: #a8452e; color: #fbf4e6; font-weight: 700; padding: 10px 14px; text-align: left; border: 1px solid #a8452e; }
+  td { padding: 10px 14px; border: 1px solid #dcc9a6; color: #3d3226; }
+  tr { background: #fbf4e6; }
+  img { max-width: 100%; height: auto; display: block; margin: 24px auto; border-radius: 4px; }
+  a { color: #a8452e; text-decoration: none; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #dcc9a6; margin: 24px 0; }

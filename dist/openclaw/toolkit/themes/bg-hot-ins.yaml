@@ -1,0 +1,60 @@
+name: "bg-hot-ins"
+description: "热门 ins 风：极简米白底配大片留白与细线，高级简约，最受年轻账号欢迎"
+page_background: "#f7f6f3"
+page_padding: "30px 24px"
+css_randomize: true
+colors:
+  primary: "#1a1a1a"
+  secondary: "#555555"
+  text: "#1f1f1f"
+  text_light: "#8a8a8a"
+  background: "#ffffff"
+  code_bg: "#eeedea"
+  code_color: "#333333"
+  quote_border: "#1a1a1a"
+  quote_bg: "#ffffff"
+  border_radius: "4px"
+  highlight_bg: "#ffffff"
+  highlight_border: "rgba(26,26,26,0.12)"
+  summary_bg: "#ffffff"
+  summary_border: "rgba(26,26,26,0.12)"
+darkmode:
+  background: "#121212"
+  text: "#e8e8e8"
+  text_light: "#9a9a9a"
+  primary: "#f0f0f0"
+  code_bg: "#1e1e1e"
+  code_color: "#d0d0d0"
+  quote_bg: "#ffffff"
+  quote_border: "#1a1a1a"
+base_css: |
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    font-size: 16px;
+    line-height: 2.0;
+    color: #1f1f1f;
+    letter-spacing: 0.3px;
+  }
+
+  h1 { font-size: 23px; font-weight: 700; color: #111111; margin: 0 0 8px 0; line-height: 1.5; letter-spacing: 0.5px; }
+  h2 { font-size: 18px; font-weight: 700; color: #111111; margin: 34px 0 16px 0; padding: 0 0 8px 0; border-bottom: 1px solid #d8d6d0; line-height: 1.6; }
+  h3 { font-size: 16px; font-weight: 700; color: #1f1f1f; margin: 24px 0 12px 0; line-height: 1.6; }
+  h4 { font-size: 15px; font-weight: 700; color: #1f1f1f; margin: 20px 0 10px 0; }
+  p { font-size: 16px; line-height: 2.0; color: #1f1f1f; margin: 18px 0; }
+  strong { font-weight: 700; color: #111111; }
+  em { font-style: italic; color: #555555; }
+  code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; font-size: 14px; background: #eeedea; color: #333333; padding: 2px 6px; border-radius: 4px; }
+  pre { background: #ffffff; color: #333333; padding: 16px; border-radius: 4px; overflow-x: auto; margin: 16px 0; line-height: 1.6; border: 1px solid #e2e0da; }
+  pre code { background: none; color: #333333; padding: 0; }
+  blockquote { border-left: 2px solid #1a1a1a; background: #ffffff; margin: 20px 0; padding: 14px 18px; border-radius: 0; color: #444444; }
+  blockquote p { margin: 8px 0; color: #444444; }
+  ul, ol { padding-left: 22px; margin: 14px 0; }
+  li { font-size: 16px; line-height: 2.0; color: #1f1f1f; margin: 10px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; background: #ffffff; }
+  thead { background: #111111; }
+  th { background: #111111; color: #fff; font-weight: 600; padding: 10px 14px; text-align: left; border: 1px solid #111111; }
+  td { padding: 10px 14px; border: 1px solid #e2e0da; color: #1f1f1f; }
+  tr { background: #ffffff; }
+  img { max-width: 100%; height: auto; display: block; margin: 26px auto; border-radius: 4px; }
+  a { color: #1a1a1a; text-decoration: none; font-weight: 600; border-bottom: 1px solid #cfcdc7; }
+  hr { border: none; border-top: 1px solid #e2e0da; margin: 28px 0; }

@@ -1,0 +1,59 @@
+name: "bg-hot-guofeng"
+description: "热门国风渐变：青绿山水渐变底配描金点缀，国潮质感，节日与养生科普热门"
+page_background: "linear-gradient(165deg, #eef4ef 0%, #e3ede8 60%, #f3efe2 100%)"
+page_padding: "30px 24px"
+css_randomize: true
+colors:
+  primary: "#2f6a52"
+  secondary: "#9a7a2e"
+  text: "#2e3a33"
+  text_light: "#7a8a7e"
+  background: "#fbfdfb"
+  code_bg: "#e0ebe4"
+  code_color: "#2f6a52"
+  quote_border: "#2f6a52"
+  quote_bg: "#fbfdfb"
+  border_radius: "6px"
+  highlight_bg: "rgba(255,255,255,0.75)"
+  highlight_border: "rgba(47,106,82,0.2)"
+  summary_bg: "rgba(255,255,255,0.75)"
+  summary_border: "rgba(47,106,82,0.2)"
+darkmode:
+  background: "#15201b"
+  text: "#d0e0d6"
+  text_light: "#8aa396"
+  primary: "#5fc090"
+  code_bg: "#1e2d26"
+  code_color: "#a0d8be"
+  quote_bg: "#fbfdfb"
+  quote_border: "#2f6a52"
+base_css: |
+  body {
+    font-family: Georgia, "Songti SC", "STSong", "SimSun", serif;
+    font-size: 16px;
+    line-height: 2.0;
+    color: #2e3a33;
+  }
+
+  h1 { font-size: 23px; font-weight: 700; color: #26503e; margin: 0 0 16px 0; padding-bottom: 8px; border-bottom: 2px solid #9a7a2e; line-height: 1.5; }
+  h2 { font-size: 19px; font-weight: 700; color: #2f6a52; margin: 28px 0 14px 0; padding: 10px 16px; background: rgba(255,255,255,0.7); border-radius: 6px; border: 1px solid rgba(47,106,82,0.16); line-height: 1.5; }
+  h3 { font-size: 17px; font-weight: 700; color: #2f6a52; margin: 22px 0 12px 0; padding-left: 12px; border-left: 4px solid #2f6a52; line-height: 1.5; }
+  h4 { font-size: 16px; font-weight: 700; color: #2f6a52; margin: 20px 0 10px 0; }
+  p { font-size: 16px; line-height: 2.0; color: #2e3a33; margin: 14px 0; }
+  strong { font-weight: 700; color: #9a7a2e; }
+  em { font-style: italic; color: #2e3a33; }
+  code { font-family: "SFMono-Regular", Consolas, Menlo, monospace; font-size: 14px; background: #e0ebe4; color: #2f6a52; padding: 2px 6px; border-radius: 4px; }
+  pre { background: rgba(255,255,255,0.78); color: #2f6a52; padding: 16px; border-radius: 6px; overflow-x: auto; margin: 16px 0; line-height: 1.6; border: 1px solid rgba(47,106,82,0.18); }
+  pre code { background: none; color: #2f6a52; padding: 0; }
+  blockquote { border-left: 4px solid #2f6a52; background: rgba(255,255,255,0.7); margin: 16px 0; padding: 16px 18px; border-radius: 0 6px 6px 0; color: #3a5044; }
+  blockquote p { margin: 8px 0; color: #3a5044; }
+  ul, ol { padding-left: 24px; margin: 12px 0; }
+  li { font-size: 16px; line-height: 2.0; color: #2e3a33; margin: 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15px; background: rgba(255,255,255,0.75); }
+  thead { background: #2f6a52; }
+  th { background: #2f6a52; color: #fbfdfb; font-weight: 700; padding: 10px 14px; text-align: left; border: 1px solid #2f6a52; }
+  td { padding: 10px 14px; border: 1px solid rgba(47,106,82,0.18); color: #2e3a33; }
+  tr { background: transparent; }
+  img { max-width: 100%; height: auto; display: block; margin: 24px auto; border-radius: 6px; }
+  a { color: #2f6a52; text-decoration: none; font-weight: 600; }
+  hr { border: none; border-top: 1px solid #9a7a2e; margin: 24px 0; }
