@@ -59,7 +59,6 @@ venv/
 .artifacts/
 
 # Internal dev docs
-docs/
 CLAUDE.md
 
 # IDE
