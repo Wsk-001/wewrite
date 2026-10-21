@@ -69,6 +69,7 @@ allowed-tools:
 
 ```
 读取: {skill_dir}/config/config.yaml（若不存在则从 config/config.example.yaml 复制）
+检查: {skill_dir}/.venv/bin/python3 是否存在；不存在则运行 bash {skill_dir}/install.sh
 检查: config.yaml 中 wechat.appid 和 wechat.secret 是否已填写
 检查: 图片生成配置是否已配置（至少一个 provider）
 检查: config/style.yaml 是否存在（若不存在则从 config/style.example.yaml 复制）
@@ -91,7 +92,10 @@ allowed-tools:
 
 ```
 读取: {skill_dir}/references/pipeline/topic-selection.md
-按 topic-selection.md 中的选题流程执行
+运行: python3 {skill_dir}/scripts/fetch_hotspots.py --limit 20
+运行: python3 {skill_dir}/scripts/wechat_search.py "候选关键词" --days 90 --pages 3 --json
+按 topic-selection.md 中的「检索源分发」表分源取料，合并去重后再评分
+检查: wechat_search 若 exit 3 / blocked=true（搜狗反爬）→ WebSearch 兜底并在选题报告注明该源缺失
 ```
 
 ---
@@ -125,10 +129,16 @@ allowed-tools:
 ```
 运行: python3 {skill_dir}/scripts/humanness_score.py {skill_dir}/output/{文章}.md --json
 读取: {skill_dir}/references/pipeline/realtime-check.md
-检查: humanness_score 是否落在账号校准区间——若 style.yaml 或 writing-config.yaml 定义了
-      humanness_range（如 [26, 40]），以该区间为准；未定义则默认 ≤ 45 通过
+检查: humanness_score 是否落在账号校准区间——唯一来源是 config/writing-config.yaml 的
+      humanness_range（默认 [20, 38]）；脚本输出的 in_range 字段即为判定结果，
+      不要再使用其他硬编码阈值
 注意: 分数语义为 0=人、100=AI。低于区间下限同样需复核（过度口语化会显得刻意）
-若超出区间则按 writing-guide.md 的「反AI检测清单」优化后重新评分
+重点复核新增三项硬检测的命中明细（--verbose 可见）：
+      - flag_words（红旗词：因而/因此/旨在/值得注意/不可忽视/归根结底/由此可见/事实上…）应为 0
+      - negation_pairs（否定对举"不是X而是Y"）> 1 次即改写
+      - formulaic_rhetoric（三段式排比/虚假范围"从X到Y"）> 1 次即改写
+若超出区间或上述任一项命中超限，则按 writing-guide.md 的「反AI检测清单」与
+「红旗词与 AI 结构专项」优化后重新评分
 
 运行: python3 {skill_dir}/scripts/compliance_check.py {skill_dir}/output/{文章}.md
 检查: 合规扫描是否通过（健康科普红线：疗效断言/绝对化用语/虚构病例/引流导诊/恐吓传播/标题党）
@@ -176,11 +186,16 @@ allowed-tools:
 ```
 
 ```
-运行: python3 {skill_dir}/toolkit/cli.py publish {skill_dir}/output/{文章}.md --theme {theme} --cover {封面图路径} --author {author}
+运行: python3 {skill_dir}/toolkit/cli.py publish {skill_dir}/output/{文章}.md --theme {theme} --cover {封面图路径} --expect-images 4 --author {author}
 ```
 
+**推送前预检（publish 内置，先于任何网络调用）**：封面缺失、封面文件不存在、正文 `![](路径)`
+指向的本地图不存在、内文图数量 ≠ `--expect-images`、正文没有任何本地图引用——任一命中都会
+以 exit 2 停止并列出具体文件。修好再推；确需跳过用 `--force`。
+
 **要点**：
-- `--cover` 必传（Step 6 生成的封面图文件路径），缺失则草稿无封面
+- `--cover` 必传（Step 6 生成的封面图文件路径）；确实无封面时须显式加 `--no-cover`，否则直接报错（不再静默产出无封面草稿）
+- `--expect-images 4` 与排版规范的「每篇固定 4 张内文图（不含封面）」对齐，图数不对就别推
 - 排版约束已由 converter 自动处理；发布报 errcode 40164 = 调用方 IP 不在公众号后台「设置与开发-IP 白名单」内，将出口 IP 加入白名单后重试（沙箱/容器环境出口 IP 变动后需重新添加）
 - **发布时间建议**：推送前告诉用户健康科普读者的活跃时段——早通勤 7-9 点、午休 12-14 点、晚 20-22 点；**默认直接推送到草稿箱，不暂停询问**（除非处于交互模式或用户明确要求先确认），推完在结果里附上活跃时段建议
 - 发布前确认草稿会勾选「声明原创」（搜一搜优先展示原创内容）；提醒用户在后台「搜索开放权限」已开启的前提下发布

@@ -6,8 +6,9 @@ Three-tier evaluation aligned with writing-guide.md's anti-AI checklist:
 
   Tier 1 (Statistical, 50%): 6 checks measuring statistical properties
          that AI detectors analyze (burstiness, distribution, variance).
-  Tier 2 (Pattern, 30%):     5 checks for specific linguistic patterns
-         (banned words, broken sentences, real sources).
+  Tier 2 (Pattern, 30%):     8 checks for specific linguistic patterns
+         (banned words, broken sentences, real sources, word temperature,
+          self-correction, flag words, negation pairs, formulaic rhetoric).
   Tier 3 (LLM, 20%):        Semantic analysis done by the agent in SKILL.md
          (style drift, density waves, coherence). Passed via --tier3 flag.
 
@@ -48,6 +49,36 @@ WILD_WORDS = ["\u6574\u631a\u597d", "\u4e0d\u9760\u8c31", "\u778e\u6298\u817e", 
 SELF_CORRECTION_PATTERNS = [r'\u4e0d\u5bf9[\uff0c,]', r'\u51c6\u786e\u8bf4', r'\u7b97\u4e86', r'\u8bf4\u9519\u4e86', r'\u5176\u5b9e\u4e0d\u662f', r'\u6211\u8bb0\u6df7\u4e86', r'\u5e94\u8be5\u8bf4', r'\u66f4\u51c6\u786e\u5730\u8bf4', r'\uff08[^\uff09]{4,}\uff09']
 
 BROKEN_SENTENCE_PATTERNS = [r'\u2014\u2014(?!.*[\u3002\uff0c\uff01\uff1f])', r'\.{3,}|\u2026', r'\u4e0d\u5bf9[\uff0c,]', r'\u7b97\u4e86']
+
+# \u7ea2\u65d7\u8bcd\uff08AI \u9ad8\u9891\u4e66\u9762\u8bed/\u8fde\u63a5\u8bcd\uff09\u2014\u2014\u51fa\u73b0\u5373\u6263\u5206\u3002\u4e0e BANNED_WORDS
+# \u91cd\u5408\u65f6\u4ee5\u672c\u8868\u4e3a\u51c6\uff08\u672c\u8868\u9762\u5411\u201cAI \u5473\u5019\u9009\u66ff\u6362\u201d\uff0cBANNED_WORDS \u9762\u5411\u201c\u7a7a\u8bdd\u5957\u8bdd\u201d\uff09\u3002
+# \u6765\u6e90\uff1a\u7fd4\u5b87\u5de5\u4f5c\u6d41\u300cAI \u5473\u516b\u5927\u7279\u5f81\u300d\u7ea2\u65d7\u8bcd\u8868 + qu-ai-wei \u4e2d\u6587 AI \u5473\u7ed3\u6784\u6e05\u5355\u3002
+FLAG_WORDS = [
+    "\u56e0\u800c", "\u65e8\u5728", "\u56e0\u6b64", "\u4ece\u800c", "\u57fa\u4e8e\u6b64", "\u9274\u4e8e",
+    "\u56de\u770b\u5168\u8c8c", "\u503c\u5f97\u4e00\u63d0", "\u503c\u5f97\u4e00\u8bf4", "\u4e0d\u53ef\u5c0f\u89d1",
+    "\u4e0d\u5bb9\u5ffd\u89c6", "\u4e0d\u5bb9\u7f6e\u7591", "\u52a1\u5fc5", "\u5207\u8bb0", "\u8bf7\u8bb0\u4f4f",
+    "\u5f52\u6839\u7ed3\u5e95", "\u4ece\u672c\u8d28\u4e0a\u8bb2", "\u4e0d\u96be\u770b\u51fa", "\u53ef\u89c1", "\u8db3\u89c1",
+    "\u4e0d\u8a00\u800c\u55bb", "\u6bcd\u5eb8\u7f6e\u7591", "\u4e8b\u5b9e\u4e0a", "\u5b9e\u9645\u4e0a",
+    "\u65e0\u5f62\u4e2d", "\u6f5c\u79fb\u9ed8\u5316", "\u4e0e\u6b64\u540c\u65f6", "\u7efc\u4e0a\u6240\u8ff0",
+    "\u603b\u800c\u8a00\u4e4b", "\u5f52\u6839\u7ed3\u5e95", "\u4e0e\u5176\u8bf4", "\u5728\u5f53\u4e0b", "\u5728\u5f53\u4eca",
+    "\u4e0d\u5f97\u4e0d\u8bf4", "\u65e0\u7591", "\u663e\u800c\u6613\u89c1", "\u4e0e\u6b64\u76f8\u53cd",
+]
+
+# \u5426\u5b9a\u5bf9\u4e3e\uff1a\u201c\u4e0d\u662f X\uff0c\u800c\u662f Y\u201d\u7c7b\u7ed3\u6784\u3002AI \u4e2d\u6587\u6700\u5178\u578b\u75d5\u8ff9\u4e4b\u4e00\uff0c
+# \u5076\u5c14\u4e00\u6b21\u65e0\u59a8\uff0c\u53cd\u590d\u51fa\u73b0\u5373\u4e3a\u624b\u5370\u3002
+NEGATION_PAIR_PATTERNS = [
+    r'\u4e0d\u662f[^\u3002\uff0c\uff1b\uff01\uff1f]{1,30}\uff0c?\u800c\u662f',
+    r'\u4e0d\u5728\u4e8e[^\u3002\uff0c\uff1b]{1,30}\uff0c?\u800c\u5728\u4e8e',
+    r'\u4e0d\u662f[^\u3002\uff0c\uff1b\uff01\uff1f]{1,30}\uff0c?\u662f',
+    r'\u4e0d\u4ec5[^\u3002\uff0c\uff1b]{1,30}\uff0c?\u800c\u4e14',
+    r'\u4e0d\u4ec5[^\u3002\uff0c\uff1b]{1,30}\uff0c?\u66f4',
+]
+
+# \u4fee\u8f9e\u516c\u5f0f\u5316\uff1a\u4e09\u6bb5\u5f0f\u6392\u6bd4 / \u865a\u5047\u8303\u56f4\uff08\u4ece X \u5230 Y\uff09/ \u4e09\u91cd\u5f8b\u3002
+FORMULAIC_RHETORIC_PATTERNS = [
+    r'\u4e0d\u4ec5[^\u3002]{1,20}\uff0c?\u800c\u4e14[^\u3002]{1,20}\uff0c?\u66f4\u91cd\u8981\u7684\u662f',
+    r'\u4ece[^\u3002\uff0c]{1,15}\u5230[^\u3002\uff0c]{1,15}\uff0c\u4ece[^\u3002\uff0c]{1,15}\u5230[^\u3002\uff0c]{1,15}',
+]
 
 
 def _split_sentences(text):
@@ -191,9 +222,32 @@ def score_self_correction(text):
     return _make_result(score, f"{count} self-corrections/insertions (target \u22653)", "self_correction_rate")
 
 
+def score_flag_words(text):
+    found = [w for w in FLAG_WORDS if w in text]
+    score = max(0.0, 1.0 - len(found) * 0.25)
+    detail = "0 flag words" if not found else f"{len(found)} flag words: {found[:5]}"
+    return _make_result(score, detail, "flag_words")
+
+
+def score_negation_pairs(text):
+    count = 0
+    for pattern in NEGATION_PAIR_PATTERNS:
+        count += len(re.findall(pattern, text))
+    score = max(0.0, 1.0 - max(0, count - 1) * 0.4)
+    return _make_result(score, f"{count} negation-pair structures (target 0-1)", "negation_pairs")
+
+
+def score_formulaic_rhetoric(text):
+    count = 0
+    for pattern in FORMULAIC_RHETORIC_PATTERNS:
+        count += len(re.findall(pattern, text))
+    score = max(0.0, 1.0 - max(0, count - 1) * 0.5)
+    return _make_result(score, f"{count} formulaic-rhetoric structures (target 0-1)", "formulaic_rhetoric")
+
+
 TIER1_CHECKS = [("sentence_length_stddev", score_sentence_length_stddev), ("sentence_length_range", score_sentence_length_range), ("paragraph_length_variance", score_paragraph_length_variance), ("vocabulary_richness", score_vocabulary_richness), ("negative_emotion_ratio", score_negative_emotion_ratio), ("adverb_density", score_adverb_density)]
 
-TIER2_CHECKS = [("banned_words", score_banned_words), ("broken_sentences", score_broken_sentences), ("real_sources", score_real_sources), ("word_temperature_mix", score_word_temperature_mix), ("self_correction", score_self_correction)]
+TIER2_CHECKS = [("banned_words", score_banned_words), ("broken_sentences", score_broken_sentences), ("real_sources", score_real_sources), ("word_temperature_mix", score_word_temperature_mix), ("self_correction", score_self_correction), ("flag_words", score_flag_words), ("negation_pairs", score_negation_pairs), ("formulaic_rhetoric", score_formulaic_rhetoric)]
 
 
 def run_tier(checks, text):
@@ -328,7 +382,37 @@ def _print_verbose(result):
             print(f"  {param}: {score:.2f}")
 
 
-CALIBRATION_BASELINES = {"pure_ai": {"label": "Pure AI (typical ChatGPT output)", "expected_composite_min": 75, "expected_composite_max": 85}, "ai_with_editing": {"label": "AI draft + human editing", "expected_composite_min": 40, "expected_composite_max": 55}, "human_written": {"label": "Genuine human blog post", "expected_composite_min": 15, "expected_composite_max": 30}, "target_range": {"label": "WeWrite target range", "expected_composite_min": 25, "expected_composite_max": 45}}
+CALIBRATION_BASELINES = {"pure_ai": {"label": "Pure AI (typical ChatGPT output)", "expected_composite_min": 75, "expected_composite_max": 85}, "ai_with_editing": {"label": "AI draft + human editing", "expected_composite_min": 40, "expected_composite_max": 55}, "human_written": {"label": "Genuine human blog post", "expected_composite_min": 15, "expected_composite_max": 30}, "target_range": {"label": "WeWrite target range", "expected_composite_min": 20, "expected_composite_max": 38}}
+
+
+DEFAULT_HUMANNESS_RANGE = (20.0, 38.0)
+
+
+def load_humanness_range(start: Path = None) -> tuple:
+    """Read humanness_range from writing-config.yaml; fall back to the default.
+
+    Single source of truth: config/writing-config.yaml.
+    """
+    try:
+        import yaml
+    except ImportError:
+        return DEFAULT_HUMANNESS_RANGE
+    here = (start or Path(__file__)).resolve()
+    for base in [here.parent, *here.parents]:
+        for rel in ("config/writing-config.yaml", "writing-config.yaml"):
+            candidate = base / rel
+            if candidate.is_file():
+                try:
+                    cfg = yaml.safe_load(candidate.read_text(encoding="utf-8")) or {}
+                except Exception:
+                    continue
+                rng = cfg.get("humanness_range")
+                if isinstance(rng, (list, tuple)) and len(rng) == 2:
+                    try:
+                        return (float(rng[0]), float(rng[1]))
+                    except (TypeError, ValueError):
+                        pass
+    return DEFAULT_HUMANNESS_RANGE
 
 
 def main():
@@ -341,6 +425,9 @@ def main():
     args = parser.parse_args()
     text = Path(args.input).read_text(encoding="utf-8")
     result = score_article(text, verbose=args.verbose, tier3_score=args.tier3)
+    low, high = load_humanness_range(Path(args.input))
+    result["humanness_range"] = [low, high]
+    result["in_range"] = low <= result["composite_score"] <= high
     if args.calibrate:
         _print_calibration(result)
     if args.json:
@@ -348,7 +435,9 @@ def main():
             result["calibration"] = _calibration_verdict(result)
         print(json.dumps(result, ensure_ascii=False, indent=2))
     elif not args.verbose and not args.calibrate:
-        print(f"{result['composite_score']:.1f}")
+        score = result["composite_score"]
+        verdict = "PASS" if result["in_range"] else "OUT_OF_RANGE"
+        print(f"{score:.1f}  [{low:g}, {high:g}]  {verdict}")
 
 
 if __name__ == "__main__":

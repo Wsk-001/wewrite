@@ -107,3 +107,50 @@ Entries discovered by the Agent during task execution should follow this format:
   - scripts/ 保持扁平，索引见 scripts/README.md；不分子目录，避免 import 与调用路径回归
   - dist/ 只跟踪 dist/openclaw、dist/codex 与两个发布 zip（dist/wewrite-*.zip）；改规则/主题后需重建 dist
   - build_openclaw.py 的 config 目录只打包 *.example，不打包用户真实配置
+
+[User Instruction Summary]
+- Date: 2026-10-17
+- Context: 用户要求联网调研「AI 味」资料并对比自身写作提示词，明确选择 C 档改造
+- Instructions:
+  - 反 AI 检测走 C 档：脚本硬检测 + 提示词规则 + 结构打破清单，三管齐下
+  - 破折号（——）尽量少用，全篇控制在 0-2 处
+  - 红旗词（AI 高频书面语/连接词）必须加进脚本硬检测，不能只做提示
+
+[Project Knowledge Summary]
+- Date: 2026-10-17
+- Context: 实现 C 档反 AI 改造（漏洞：红旗词/humanizer 三项）
+- Category: Testing Methods
+- Instructions:
+  - humanness_score.py Tier2 由 5 项扩为 8 项：新增 flag_words（红旗词，每命中扣 0.25，目标 0）、negation_pairs（否定对举"不是X而是Y"，容差 1 次，超出每次扣 0.4）、formulaic_rhetoric（三段式排比/虚假范围"从X到Y"，容差 1 次，超出每次扣 0.5）
+  - 三项新检测为「负向检查」（0 命中=得分高=更人），不加 bell-curve 中心（加中心会反转成"越干净越像 AI"，是错的）
+  - 新增三项后整体刻度下调约 5-7 分，humanness_range 由 [26,40] 重新校准为 [20,38]（9 篇历史实测 21-33）
+  - composite = (1 - humanness)*100，分数越低越人；Tier2 检查数变化会平移 absolute 刻度，改动检测项后必须用历史文章重新校准区间
+  - 新增 tests/test_humanness_score.py（7 例）；全量 pytest 81 passed
+  - 破折号中断句法同时计入 broken_sentences，过度依赖会让节奏刻意
+
+[Project Knowledge Summary]
+- Date: 2026-10-20
+- Context: 发布链路加固（venv 引导 / 发布前预检 / 人味区间单一来源）
+- Category: Operations & Deployment
+- Instructions:
+  - SKILL.md Step 1 增加 .venv 存在性检查，缺失则跑 install.sh；install.sh 建 venv 失败时提示安装 python3-venv（Debian/Ubuntu）
+  - toolkit/cli.py publish 新增 _validate_publish_inputs 预检，先于任何网络调用：文章不存在、--cover 与 --no-cover 冲突、缺封面（须显式 --no-cover）、封面文件不存在、正文 ![]() 本地图不存在、引用数 ≠ --expect-images、正文无本地图引用 → 一律 exit 2 并列出文件；--force 跳过图片检查
+  - 图片路径解析兼容三种写法：原样相对路径、相对文章目录、仅文件名回退（文章已在 output/ 时 output/x.jpg 可直接命中）
+  - humanness_range 单一来源收敛到 config/writing-config.yaml（默认 [20,38]），humanness_score.py 输出 humanness_range 与 in_range 字段，SKILL 不再用硬编码阈值
+  - SKILL Step 8 发布命令固定带 --expect-images 4，与「每篇固定 4 张内文图」对齐；formatting-styles.md / visual-prompts.md 同步说明「缺图不再静默出稿，直接拒推」
+  - 新增 tests/test_cli_publish_validation.py（10 例）；全量 pytest 91 passed；context_budget PEAK ~4095 tok（<12500 上限）
+  - 改 SKILL/references 后需 python3 scripts/build_openclaw.py 重建 dist/openclaw；dist/*.zip 是发布归档，不随日常改动重建
+
+[Project Knowledge Summary]
+- Date: 2026-10-21
+- Context: 借鉴 AI-Search-Hub「一个问题分发多个搜索源」思路，给选题加公众号检索源
+- Category: Operations & Deployment
+- Instructions:
+  - 新增 scripts/wechat_search.py（搜狗微信搜索 weixin.sogou.com/weixin?type=2）：唯一公开可用、无需登录/浏览器的公众号文章检索途径，WebSearch 与热搜榜都覆盖不到
+  - 搜狗按相关度排序、结果混着 2016 年的老文；时间参数 tsn=1/2/3/4 在本沙箱返回 0 条或 302，不可用 → 近期筛选靠「多翻页 + 客户端按 days_ago 过滤」（--days 90 --pages 3）
+  - 结果页结构：ul.news-list > li，标题 h3 a、摘要 p.txt-info、公众号 span.all-time-y2、时间 script timeConvert('epoch')；引号/&amp; 需 unescape
+  - 真实链接需同 session 二次请求 /link?url=...，页面用 `url += '...'` 分片拼接（@ 为占位符要删），--resolve 才追；不加则给的是搜狗跳转链
+  - 反爬识别：页面含 antispider/请输入验证码 → 脚本 exit 3、blocked=true，流程须退化为 WebSearch 并注明该源缺失
+  - references/pipeline/topic-selection.md 新增「检索源分发」表：公众号生态→wechat_search.py、热点→fetch_hotspots.py、公开网页/文献→WebSearch；SKILL Step 2 同步加运行命令
+  - 新增 tests/test_wechat_search.py（7 例，离线解析）；全量 pytest 98 passed
+  - 沙箱直连搜狗可用（HTTP 200），无需代理；但高频调用会触发验证码，选题阶段每个候选只查一次

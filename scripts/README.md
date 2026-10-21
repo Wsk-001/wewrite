@@ -14,7 +14,7 @@ python3 {skill_dir}/scripts/<脚本名>.py [参数]
 
 | 脚本 | 用途 |
 |------|------|
-| `humanness_score.py` | 反 AI 检测评分（0=人 / 100=AI），主管道 Step 5 调用 |
+| `humanness_score.py` | 反 AI 检测评分（0=人 / 100=AI），主管道 Step 5 调用；含红旗词/否定对举/修辞公式化三项硬检测 |
 | `compliance_check.py` | 健康科普合规扫描（疗效断言/绝对化/虚构病例/引流/恐吓/标题党） |
 | `seo_check.py` | 搜一搜结构自检与文末内链建议 |
 | `seo_keywords.py` | 关键词提取与建议 |
@@ -26,7 +26,8 @@ python3 {skill_dir}/scripts/<脚本名>.py [参数]
 
 | 脚本 | 用途 |
 |------|------|
-| `fetch_hotspots.py` | 热点/热搜抓取（选题来源） |
+| `fetch_hotspots.py` | 热点/热搜抓取（选题来源：微博/头条/百度） |
+| `wechat_search.py` | 搜狗微信搜索，按关键词搜公众号文章（选题来源：公众号生态；`--days`/`--pages` 控近期，`--resolve` 追真实链接） |
 | `fetch_article.py` | 按 URL 抓取文章正文 |
 | `fetch_stats.py` | 公众号文章数据抓取（需微信凭据） |
 

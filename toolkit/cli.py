@@ -9,6 +9,7 @@ Usage:
 """
 
 import argparse
+import re
 import sys
 import webbrowser
 from pathlib import Path
@@ -18,6 +19,105 @@ from theme import load_theme, list_themes
 from wechat_api import get_access_token, upload_image, upload_thumb
 from publisher import create_draft, create_image_post
 from config import load_config
+
+
+IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"}
+MD_IMAGE_RE = re.compile(r"!\[[^\]]*\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
+
+
+def _local_image_refs(md_text: str):
+    """Return image sources in the markdown that point to local files."""
+    refs = []
+    for m in MD_IMAGE_RE.finditer(md_text):
+        src = m.group(1).strip()
+        if src.startswith(("http://", "https://", "data:", "//")):
+            continue
+        refs.append(src)
+    return refs
+
+
+def _image_files_in_dir(directory: Path):
+    return sorted(
+        p.name for p in directory.iterdir()
+        if p.is_file() and p.suffix.lower() in IMAGE_EXTS
+    )
+
+
+def _resolve_image_path(src: str, md_path: Path) -> Path:
+    """Resolve a markdown image source the same way publish does, plus a
+    filename-only fallback so refs like `output/x.jpg` work when the article
+    itself already lives in `output/`."""
+    p = Path(src)
+    if p.is_absolute():
+        return p
+    for candidate in (p, md_path.parent / p, md_path.parent / p.name):
+        if candidate.is_file():
+            return candidate
+    return p
+
+
+def _validate_publish_inputs(args) -> None:
+    """Fail fast before any network call when publish inputs are incomplete."""
+    md_path = Path(args.input).resolve()
+    if not md_path.is_file():
+        print(f"Error: 文章文件不存在: {args.input}", file=sys.stderr)
+        sys.exit(2)
+
+    no_cover = getattr(args, "no_cover", False)
+    if no_cover and args.cover:
+        print("Error: --cover 与 --no-cover 不能同时使用。", file=sys.stderr)
+        sys.exit(2)
+    if not no_cover:
+        if not args.cover:
+            print(
+                "Error: publish 需要封面图，请传 --cover <路径>；"
+                "确无封面请在命令中显式加 --no-cover。",
+                file=sys.stderr,
+            )
+            sys.exit(2)
+        if not Path(args.cover).is_file():
+            print(f"Error: 封面文件不存在: {args.cover}", file=sys.stderr)
+            sys.exit(2)
+
+    if getattr(args, "force", False):
+        return
+
+    md_text = md_path.read_text(encoding="utf-8")
+    refs = _local_image_refs(md_text)
+    missing = []
+    for src in refs:
+        if not _resolve_image_path(src, md_path).is_file():
+            missing.append(src)
+    if missing:
+        print("Error: 正文引用了不存在的图片文件:", file=sys.stderr)
+        for src in missing:
+            print(f"  - {src}", file=sys.stderr)
+        print("请修正路径，或加 --force 跳过本检查。", file=sys.stderr)
+        sys.exit(2)
+
+    expect = getattr(args, "expect_images", None)
+    if expect is not None and len(refs) != expect:
+        print(
+            f"Error: 期望 {expect} 张内文图，正文实际引用 {len(refs)} 张。",
+            file=sys.stderr,
+        )
+        print("请补全 ![](路径) 引用，或加 --force 跳过本检查。", file=sys.stderr)
+        sys.exit(2)
+
+    if not refs:
+        prefix = md_path.stem.split("-")[0]
+        candidates = [
+            n for n in _image_files_in_dir(md_path.parent)
+            if not n.lower().startswith("cover") and n.startswith(prefix)
+        ]
+        print("Error: 正文没有任何本地图片引用，草稿将不含内文图。", file=sys.stderr)
+        if candidates:
+            print(f"疑似本文配图: {candidates}", file=sys.stderr)
+        print(
+            "请在正文合适位置插入 ![](output/<文件名>)，或加 --force 跳过本检查。",
+            file=sys.stderr,
+        )
+        sys.exit(2)
 
 
 def cmd_preview(args):
@@ -46,6 +146,8 @@ def cmd_preview(args):
 
 def cmd_publish(args):
     """Convert, upload images, and create WeChat draft."""
+    _validate_publish_inputs(args)
+
     cfg = load_config()
     wechat_cfg = cfg.get("wechat", {})
 
@@ -352,6 +454,22 @@ def main():
     p_publish.add_argument("--appid", default=None, help="WeChat AppID (or set in config.yaml)")
     p_publish.add_argument("--secret", default=None, help="WeChat AppSecret (or set in config.yaml)")
     p_publish.add_argument("--cover", help="Cover image file path")
+    p_publish.add_argument(
+        "--no-cover",
+        action="store_true",
+        help="Explicitly publish without a cover image",
+    )
+    p_publish.add_argument(
+        "--expect-images",
+        type=int,
+        default=None,
+        help="Fail if the number of local inline image references differs",
+    )
+    p_publish.add_argument(
+        "--force",
+        action="store_true",
+        help="Skip inline-image reference validation",
+    )
     p_publish.add_argument("--title", help="Override article title")
     p_publish.add_argument("--author", default=None, help="Article author")
     p_publish.add_argument("--digest", default=None, help="Override article digest (\u2264120 UTF-8 bytes)")
