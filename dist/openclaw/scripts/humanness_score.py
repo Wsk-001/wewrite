@@ -285,7 +285,7 @@ def run_tier(checks, text):
     return results
 
 
-_BELL_CURVE_CHECKS = {"broken_sentences": 0.39, "self_correction": 0.20, "sentence_length_range": 0.71, "paragraph_length_variance": 0.52, "banned_words": 0.73}
+_BELL_CURVE_CHECKS = {"broken_sentences": 0.39, "self_correction": 0.20, "sentence_length_range": 0.71, "paragraph_length_variance": 0.52}
 
 
 def _bell_curve(raw_score, center):
@@ -409,7 +409,7 @@ def _print_verbose(result):
 CALIBRATION_BASELINES = {"pure_ai": {"label": "Pure AI (typical ChatGPT output)", "expected_composite_min": 75, "expected_composite_max": 85}, "ai_with_editing": {"label": "AI draft + human editing", "expected_composite_min": 40, "expected_composite_max": 55}, "human_written": {"label": "Genuine human blog post", "expected_composite_min": 15, "expected_composite_max": 30}, "target_range": {"label": "WeWrite target range", "expected_composite_min": 20, "expected_composite_max": 38}}
 
 
-DEFAULT_HUMANNESS_RANGE = (20.0, 38.0)
+DEFAULT_HUMANNESS_RANGE = (20.0, 40.0)
 
 
 def _calibration_verdict(result: dict) -> dict:

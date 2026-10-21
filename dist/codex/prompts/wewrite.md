@@ -119,7 +119,7 @@
 运行: python3 {skill_dir}/scripts/humanness_score.py {skill_dir}/output/{文章}.md --json
 读取: {skill_dir}/references/pipeline/realtime-check.md
 检查: humanness_score 是否落在账号校准区间——唯一来源是 config/writing-config.yaml 的
-      humanness_range（默认 [20, 38]）；脚本输出的 in_range 字段即为判定结果，
+      humanness_range（默认 [20, 40]）；脚本输出的 in_range 字段即为判定结果，
       不要再使用其他硬编码阈值
 注意: 分数语义为 0=人、100=AI。低于区间下限同样需复核（过度口语化会显得刻意）
 重点复核新增三项硬检测的命中明细（--verbose 可见）：

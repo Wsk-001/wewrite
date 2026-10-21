@@ -32,11 +32,14 @@ def _load_config() -> dict:
         return {}
 
 
+# 封面用微信首图比例 2.35:1，各 provider 只差分辨率，不要改动比例。
+# 若改用官方 OpenAI dall-e-3（只支持 1024x1024 / 1792x1024 / 1024x1792），
+# 请显式传 --size 1792x1024，不要用 cover 预设。
 SIZE_PRESETS = {
     "cover": {
-        "doubao": "2952x1256", "openai": "1792x1024", "gemini": "1792x1024",
-        "dashscope": "1792x1024", "minimax": "1792x1024", "replicate": "1792x1024",
-        "azure_openai": "1792x1024", "openrouter": "1792x1024", "jimeng": "1792x1024",
+        "doubao": "2952x1256", "openai": "1920x816", "gemini": "1920x816",
+        "dashscope": "1920x816", "minimax": "1920x816", "replicate": "1920x816",
+        "azure_openai": "1920x816", "openrouter": "1920x816", "jimeng": "1920x816",
     },
     "article": {
         "doubao": "2560x1440", "openai": "1792x1024", "gemini": "1792x1024",
@@ -107,10 +110,22 @@ class OpenAIProvider(ImageProvider):
         self._base_url = base_url
         self._size_param = size_param
     def generate(self, prompt: str, size: str) -> bytes:
+        body = {"model": self._model, "prompt": prompt, "n": 1, "response_format": "url"}
+        if self._size_param == "width_height":
+            # 部分聚合网关（如 moark 的 z-image-turbo）只认 width/height 两个字段，
+            # 传单个 "1792x1024" 字符串会被静默忽略并返回方图。
+            try:
+                w, h = (int(x) for x in size.lower().split("x", 1))
+            except ValueError:
+                raise ValueError(f"size_param=width_height 需要 WxH 格式，收到: {size}")
+            body["width"] = w
+            body["height"] = h
+        else:
+            body[self._size_param] = size
         resp = requests.post(
             f"{self._base_url}/images/generations",
             headers={"Content-Type": "application/json", "Authorization": f"Bearer {self._api_key}"},
-            json={"model": self._model, "prompt": prompt, "n": 1, self._size_param: size, "response_format": "url"},
+            json=body,
             timeout=120,
         )
         data = resp.json()
@@ -478,6 +493,51 @@ def _center_crop_to_ratio(raw_bytes: bytes, size: str) -> bytes:
     return buf.getvalue()
 
 
+def _warn_size_mismatch(raw_bytes: bytes, size: str, provider_key: str) -> None:
+    """provider 静默忽略尺寸参数时，裁切会切掉构图。这里显式告警，避免无声产出残图。"""
+    from io import BytesIO
+    from PIL import Image
+
+    try:
+        w, h = (int(x) for x in size.lower().split("x", 1))
+        got = Image.open(BytesIO(raw_bytes)).size
+    except Exception:
+        return
+    requested_ratio = w / h
+    actual_ratio = got[0] / got[1]
+    if abs(actual_ratio - requested_ratio) / requested_ratio > 0.02:
+        print(
+            f"[警告] provider '{provider_key}' 返回 {got[0]}x{got[1]}，"
+            f"与请求 {w}x{h} 的比例不一致；已中心裁切，构图可能被切边。"
+            f"请检查 size_param 是否被该接口支持（部分网关需 width/height 双字段）。",
+            file=sys.stderr,
+        )
+
+
+def _ensure_output_format(raw_bytes: bytes, output_path: str) -> bytes:
+    """让落盘字节与文件扩展名一致。
+
+    provider 常返回 PNG；比例正好匹配时裁切函数会原样返回，于是 PNG 字节被写进
+    .jpg 文件，导致扩展名、实际内容、上传时的 MIME 三者不一致（微信侧靠嗅探能
+    勉强显示，但部分平台会直接拒收）。
+    """
+    from io import BytesIO
+    from PIL import Image
+
+    ext = Path(output_path).suffix.lower()
+    want = {".jpg": "JPEG", ".jpeg": "JPEG", ".png": "PNG", ".webp": "WEBP"}.get(ext)
+    if not want:
+        return raw_bytes
+    img = Image.open(BytesIO(raw_bytes))
+    if img.format == want or (want == "JPEG" and img.format in ("JPEG", "MPO")):
+        return raw_bytes
+    if want == "JPEG" and img.mode != "RGB":
+        img = img.convert("RGB")
+    buf = BytesIO()
+    img.save(buf, format=want, **({"quality": 92, "optimize": True} if want == "JPEG" else {}))
+    return buf.getvalue()
+
+
 def generate_image(prompt: str, output_path: str, size: str = "cover", config: dict = None) -> str:
     if config is None:
         config = _load_config()
@@ -496,6 +556,7 @@ def generate_image(prompt: str, output_path: str, size: str = "cover", config: d
                 break
         if raw_bytes is None:
             continue
+        _warn_size_mismatch(raw_bytes, resolved_size, provider.provider_key)
         raw_bytes = _center_crop_to_ratio(raw_bytes, resolved_size)
         if len(raw_bytes) > MAX_FILE_SIZE:
             from io import BytesIO
@@ -509,6 +570,7 @@ def generate_image(prompt: str, output_path: str, size: str = "cover", config: d
                 if buf.tell() <= MAX_FILE_SIZE:
                     raw_bytes = buf.getvalue()
                     break
+        raw_bytes = _ensure_output_format(raw_bytes, output_path)
         output = Path(output_path)
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_bytes(raw_bytes)
