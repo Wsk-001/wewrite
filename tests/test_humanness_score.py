@@ -92,3 +92,16 @@ def test_calibration_helpers_exist():
     assert verdict["composite_score"] == 30.0
     assert verdict["baselines"]["target_range"]["in_expected"] is True
     _print_calibration(result)  # 不应抛异常
+
+
+def test_banned_words_score_is_monotonic_after_calibration():
+    """禁用词越少分越高——0 命中曾被钟形校准压成 0 分，比 1 命中还低。"""
+    from humanness_score import score_banned_words, calibrate_tiers
+
+    clean = {"banned_words": score_banned_words("这句话用了禁词的替代写法。"), "_summary": {}}
+    dirty = {"banned_words": score_banned_words("首先，其次，总之，综上所述，值得注意的是，毋庸置疑。"), "_summary": {}}
+    assert clean["banned_words"]["score"] > dirty["banned_words"]["score"]
+
+    calibrate_tiers(clean, dirty)
+    assert clean["banned_words"]["score"] > dirty["banned_words"]["score"]
+    assert clean["banned_words"]["score"] == 1.0
