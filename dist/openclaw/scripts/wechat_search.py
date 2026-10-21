@@ -17,12 +17,11 @@ Exit codes:
 """
 
 import argparse
-import html as html_lib
 import json
 import re
 import sys
+import time
 from datetime import datetime, timedelta, timezone
-from urllib.parse import quote
 
 import requests
 from bs4 import BeautifulSoup
@@ -43,26 +42,30 @@ HEADERS = {
 }
 
 BLOCK_MARKERS = ("antispider", "请输入验证码", "请输入图片中的验证码", "访问过于频繁")
+PAGE_DELAY = 1.0  # 翻页间隔，避免高频请求触发验证码
 TZ = timezone(timedelta(hours=8))
 
 
 def detect_block(html: str) -> str:
-    """Return a reason string when Sogou serves its anti-spider page."""
+    """Return a reason string when Sogou serves its anti-spider page.
+
+    只有确认命中反爬标记才算 blocked——「没有结果列表」既可能是真的 0 结果，
+    也可能是限流，不能一律当成反爬去降级。
+    """
     for marker in BLOCK_MARKERS:
         if marker in html:
             return marker
-    if "news-list" not in html and "no-result" not in html:
-        return "unexpected page (no result list)"
     return ""
 
 
+def has_result_list(html: str) -> bool:
+    """Whether the page carries a result list container (may still be empty)."""
+    return "news-list" in html or "no-result" in html or "没有找到" in html
+
+
 def _clean(text: str) -> str:
-    return re.sub(r"\s+", " ", html_lib.unescape(text or "")).strip()
-
-
-def _epoch_from(block) -> int | None:
-    m = re.search(r"timeConvert\('(\d+)'\)", block.decode() if hasattr(block, "decode") else str(block))
-    return int(m.group(1)) if m else None
+    """Normalise whitespace. bs4 already decodes HTML entities, so no unescape."""
+    return re.sub(r"\s+", " ", text or "").strip()
 
 
 def parse_results(html: str, base: str = BASE) -> list[dict]:
@@ -99,7 +102,7 @@ def parse_results(html: str, base: str = BASE) -> list[dict]:
             "title": title,
             "account": _clean(account_el.get_text()) if account_el else "",
             "summary": _clean(summary_el.get_text())[:120] if summary_el else "",
-            "url": html_lib.unescape(href),
+            "url": href,
         }
         if epoch:
             dt = datetime.fromtimestamp(epoch, TZ)
@@ -145,7 +148,9 @@ def fetch(query: str, page: int = 1, session: requests.Session | None = None) ->
         params["page"] = page
     resp = sess.get(SEARCH_URL, params=params, headers=HEADERS, timeout=TIMEOUT)
     resp.raise_for_status()
-    resp.encoding = resp.apparent_encoding or "utf-8"
+    # 只在服务端没声明 charset（或声明了不可靠的 ISO-8859-1）时才猜，避免覆盖正确的 utf-8
+    if not resp.encoding or resp.encoding.lower() in ("iso-8859-1", "ascii"):
+        resp.encoding = "utf-8"
     return resp.text, sess
 
 
@@ -158,14 +163,18 @@ def search(query: str, limit: int = 10, days: int | None = None,
     sess = requests.Session()
     collected: list[dict] = []
     seen: set[str] = set()
+    warning = ""
 
     for page in range(1, max(1, pages) + 1):
+        if page > 1:
+            time.sleep(PAGE_DELAY)
         try:
             html, sess = fetch(query, page=page, session=sess)
         except requests.RequestException as e:
             if page == 1:
                 raise
             print(f"[warn] page {page} failed: {e}", file=sys.stderr)
+            warning = f"page {page} failed: {e}"
             break
 
         blocked = detect_block(html)
@@ -180,6 +189,12 @@ def search(query: str, limit: int = 10, days: int | None = None,
                     "items": [],
                 }
             print(f"[warn] anti-spider on page {page}, stopping", file=sys.stderr)
+            warning = f"anti-spider hit on page {page}"
+            break
+
+        if not has_result_list(html):
+            # 没列表又没验证码：可能是 0 结果，也可能是限流，如实告知而不是谎报反爬
+            warning = "结果页没有列表容器（可能是真的 0 结果，也可能被限流）"
             break
 
         page_items = parse_results(html)
@@ -204,7 +219,7 @@ def search(query: str, limit: int = 10, days: int | None = None,
             if real:
                 item["resolved_url"] = real
 
-    return {
+    result = {
         "timestamp": datetime.now(TZ).isoformat(),
         "query": query,
         "source": "sogou_wechat",
@@ -212,6 +227,9 @@ def search(query: str, limit: int = 10, days: int | None = None,
         "count": len(items),
         "items": items,
     }
+    if warning:
+        result["warning"] = warning
+    return result
 
 
 def _print_table(result: dict) -> None:

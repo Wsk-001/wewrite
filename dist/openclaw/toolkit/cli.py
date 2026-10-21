@@ -13,6 +13,7 @@ import re
 import sys
 import webbrowser
 from pathlib import Path
+from urllib.parse import unquote
 
 from converter import WeChatConverter, preview_html
 from theme import load_theme, list_themes
@@ -29,7 +30,7 @@ def _local_image_refs(md_text: str):
     """Return image sources in the markdown that point to local files."""
     refs = []
     for m in MD_IMAGE_RE.finditer(md_text):
-        src = m.group(1).strip()
+        src = unquote(m.group(1).strip())
         if src.startswith(("http://", "https://", "data:", "//")):
             continue
         refs.append(src)
@@ -44,9 +45,13 @@ def _image_files_in_dir(directory: Path):
 
 
 def _resolve_image_path(src: str, md_path: Path) -> Path:
-    """Resolve a markdown image source the same way publish does, plus a
-    filename-only fallback so refs like `output/x.jpg` work when the article
-    itself already lives in `output/`."""
+    """Resolve a markdown image source for both validation and upload.
+
+    Tried in order: absolute path, cwd-relative, article-dir-relative, and a
+    filename-only fallback (so `output/x.jpg` works when the article itself
+    already lives in `output/`). Validation and upload MUST share this, or
+    pre-flight passes while the real upload silently skips the image.
+    """
     p = Path(src)
     if p.is_absolute():
         return p
@@ -178,12 +183,9 @@ def cmd_publish(args):
             print(f"Skipping remote image: {img_src}")
             continue
 
-        img_path = Path(img_src)
-        if not img_path.is_absolute():
-            if not img_path.exists():
-                img_path = md_dir / img_src
+        img_path = _resolve_image_path(unquote(img_src), Path(args.input).resolve())
 
-        if img_path.exists():
+        if img_path.is_file():
             print(f"Uploading image: {img_src}")
             wechat_url = upload_image(token, str(img_path))
             html = html.replace(img_src, wechat_url)
@@ -268,11 +270,11 @@ def cmd_image_post(args):
         open_comment=True,
     )
 
-    print(f"\nImage post draft created!")
+    print("\nImage post draft created!")
     print(f"  media_id: {result.media_id}")
     print(f"  images: {result.image_count}")
     print(f"  title: {title}")
-    print(f"  \u8bf7\u5230\u516c\u4f17\u53f7\u540e\u53f0\u8349\u7a3f\u7bb1\u68c0\u67e5\u5e76\u53d1\u5e03")
+    print("  \u8bf7\u5230\u516c\u4f17\u53f7\u540e\u53f0\u8349\u7a3f\u7bb1\u68c0\u67e5\u5e76\u53d1\u5e03")
 
 
 def cmd_gallery(args):
@@ -361,7 +363,6 @@ def _build_gallery_html(results, names):
     cards = []
     for name in names:
         desc, html = results[name]
-        escaped_html = html.replace('\\', '\\\\').replace('`', '\\`').replace('$', '\\$')
         cards.append(f"""
         <div class="theme-card" onclick="selectTheme('{name}')">
           <div class="theme-name">{name}</div>

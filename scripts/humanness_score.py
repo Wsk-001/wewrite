@@ -25,12 +25,13 @@ Usage:
 """
 
 import argparse
+import contextlib
 import json
 import re
 import sys
 from pathlib import Path
 
-BANNED_WORDS = ["\u9996\u5148", "\u5176\u6b21", "\u518d\u8005", "\u6700\u540e", "\u603b\u4e4b", "\u7efc\u4e0a\u6240\u8ff0", "\u603b\u800c\u8a00\u4e4b", "\u6b64\u5916", "\u53e6\u5916", "\u4e0e\u6b64\u540c\u65f6", "\u4e0d\u4ec5\u5982\u6b64", "\u66f4\u91cd\u8981\u7684\u662f", "\u5728\u6b64\u57fa\u7840\u4e0a", "\u4f5c\u4e3a\u4e00\u4e2a", "\u8ba9\u6211\u4eec", "\u503c\u5f97\u6ce8\u610f\u7684\u662f", "\u9700\u8981\u6307\u51fa\u7684\u662f", "\u4e0d\u53ef\u5426\u8ba4", "\u83ab\u5eb8\u7f6e\u7591", "\u4f17\u6240\u5468\u77e5", "\u4e8b\u5b9e\u4e0a", "\u663e\u800c\u6613\u89c1", "\u53ef\u4ee5\u8bf4", "\u4ece\u67d0\u79cd\u610f\u4e49\u4e0a\u8bf4", "\u975e\u5e38\u91cd\u8981", "\u81f3\u5173\u91cd\u8981", "\u4e0d\u8a00\u800c\u55bb", "\u5177\u6709\u91cd\u8981\u610f\u4e49", "\u53d1\u6325\u7740\u91cd\u8981\u4f5c\u7528", "\u610f\u4e49\u6df1\u8fdc", "\u5f71\u54cd\u6df1\u8fdc", "\u5f15\u53d1\u4e86\u5e7f\u6cdb\u5173\u6ce8", "\u5f15\u8d77\u4e86\u70ed\u70c8\u8ba8\u8bba", "\u603b\u7684\u6765\u8bf4", "\u7efc\u5408\u6765\u770b", "\u7531\u6b64\u53ef\u89c1", "\u4e0d\u96be\u53d1\u73b0", "\u901a\u8fc7\u4ee5\u4e0a\u5206\u6790", "\u6b63\u5982\u6211\u4eec\u6240\u770b\u5230\u7684"]
+BANNED_WORDS = ["\u9996\u5148", "\u5176\u6b21", "\u518d\u8005", "\u6700\u540e", "\u603b\u4e4b", "\u7efc\u4e0a\u6240\u8ff0", "\u603b\u800c\u8a00\u4e4b", "\u6b64\u5916", "\u53e6\u5916", "\u4e0e\u6b64\u540c\u65f6", "\u4e0d\u4ec5\u5982\u6b64", "\u66f4\u91cd\u8981\u7684\u662f", "\u5728\u6b64\u57fa\u7840\u4e0a", "\u4f5c\u4e3a\u4e00\u4e2a", "\u8ba9\u6211\u4eec", "\u503c\u5f97\u6ce8\u610f\u7684\u662f", "\u9700\u8981\u6307\u51fa\u7684\u662f", "\u4e0d\u53ef\u5426\u8ba4", "\u6bcb\u5eb8\u7f6e\u7591", "\u4f17\u6240\u5468\u77e5", "\u4e8b\u5b9e\u4e0a", "\u663e\u800c\u6613\u89c1", "\u53ef\u4ee5\u8bf4", "\u4ece\u67d0\u79cd\u610f\u4e49\u4e0a\u8bf4", "\u975e\u5e38\u91cd\u8981", "\u81f3\u5173\u91cd\u8981", "\u4e0d\u8a00\u800c\u55bb", "\u5177\u6709\u91cd\u8981\u610f\u4e49", "\u53d1\u6325\u7740\u91cd\u8981\u4f5c\u7528", "\u610f\u4e49\u6df1\u8fdc", "\u5f71\u54cd\u6df1\u8fdc", "\u5f15\u53d1\u4e86\u5e7f\u6cdb\u5173\u6ce8", "\u5f15\u8d77\u4e86\u70ed\u70c8\u8ba8\u8bba", "\u603b\u7684\u6765\u8bf4", "\u7efc\u5408\u6765\u770b", "\u7531\u6b64\u53ef\u89c1", "\u4e0d\u96be\u53d1\u73b0", "\u901a\u8fc7\u4ee5\u4e0a\u5206\u6790", "\u6b63\u5982\u6211\u4eec\u6240\u770b\u5230\u7684"]
 
 REAL_SOURCE_PATTERNS = [r'[A-Z][a-z]+\s+[A-Z][a-z]+', r'[\u4e00-\u9fff]{2,4}(?:\u8868\u793a|\u6307\u51fa|\u8ba4\u4e3a|\u5199\u9053|\u63d0\u5230|\u8bf4\u8fc7)', r'(?:\u636e|\u6839\u636e|\u6765\u81ea)\s*[\u4e00-\u9fff]+(?:\u62a5\u544a|\u6570\u636e|\u7814\u7a76|\u8c03\u67e5)', r'20[12]\d\s*\u5e74', r'\d+(?:\.\d+)?%', r'(?:\u4ebf|\u4e07)\s*(?:\u7f8e\u5143|\u5143|\u4eba\u6c11\u5e01)']
 
@@ -55,12 +56,13 @@ BROKEN_SENTENCE_PATTERNS = [r'\u2014\u2014(?!.*[\u3002\uff0c\uff01\uff1f])', r'\
 # \u6765\u6e90\uff1a\u7fd4\u5b87\u5de5\u4f5c\u6d41\u300cAI \u5473\u516b\u5927\u7279\u5f81\u300d\u7ea2\u65d7\u8bcd\u8868 + qu-ai-wei \u4e2d\u6587 AI \u5473\u7ed3\u6784\u6e05\u5355\u3002
 FLAG_WORDS = [
     "\u56e0\u800c", "\u65e8\u5728", "\u56e0\u6b64", "\u4ece\u800c", "\u57fa\u4e8e\u6b64", "\u9274\u4e8e",
-    "\u56de\u770b\u5168\u8c8c", "\u503c\u5f97\u4e00\u63d0", "\u503c\u5f97\u4e00\u8bf4", "\u4e0d\u53ef\u5c0f\u89d1",
-    "\u4e0d\u5bb9\u5ffd\u89c6", "\u4e0d\u5bb9\u7f6e\u7591", "\u52a1\u5fc5", "\u5207\u8bb0", "\u8bf7\u8bb0\u4f4f",
+    "\u503c\u5f97\u6ce8\u610f", "\u503c\u5f97\u4e00\u63d0", "\u503c\u5f97\u4e00\u8bf4",
+    "\u4e0d\u5bb9\u5ffd\u89c6", "\u4e0d\u53ef\u5ffd\u89c6", "\u4e0d\u53ef\u5c0f\u89d1",
+    "\u4e0d\u5bb9\u7f6e\u7591", "\u6bcb\u5eb8\u7f6e\u7591", "\u52a1\u5fc5", "\u5207\u8bb0", "\u8bf7\u8bb0\u4f4f",
     "\u5f52\u6839\u7ed3\u5e95", "\u4ece\u672c\u8d28\u4e0a\u8bb2", "\u4e0d\u96be\u770b\u51fa", "\u53ef\u89c1", "\u8db3\u89c1",
-    "\u4e0d\u8a00\u800c\u55bb", "\u6bcd\u5eb8\u7f6e\u7591", "\u4e8b\u5b9e\u4e0a", "\u5b9e\u9645\u4e0a",
+    "\u4e0d\u8a00\u800c\u55bb", "\u4e8b\u5b9e\u4e0a", "\u5b9e\u9645\u4e0a",
     "\u65e0\u5f62\u4e2d", "\u6f5c\u79fb\u9ed8\u5316", "\u4e0e\u6b64\u540c\u65f6", "\u7efc\u4e0a\u6240\u8ff0",
-    "\u603b\u800c\u8a00\u4e4b", "\u5f52\u6839\u7ed3\u5e95", "\u4e0e\u5176\u8bf4", "\u5728\u5f53\u4e0b", "\u5728\u5f53\u4eca",
+    "\u603b\u800c\u8a00\u4e4b", "\u4e0e\u5176\u8bf4", "\u5728\u5f53\u4e0b", "\u5728\u5f53\u4eca",
     "\u4e0d\u5f97\u4e0d\u8bf4", "\u65e0\u7591", "\u663e\u800c\u6613\u89c1", "\u4e0e\u6b64\u76f8\u53cd",
 ]
 
@@ -229,18 +231,40 @@ def score_flag_words(text):
     return _make_result(score, detail, "flag_words")
 
 
+def _count_structure_spans(text, patterns):
+    """Count distinct structures, merging overlapping pattern matches.
+
+    多条 pattern 会命中同一段文本（如 `不是A而是B` 同时命中
+    `不是...而是` 与 `不是...是`），直接累加会把一处结构记成两次，
+    让「容差 1 次」变成「一次就罚」。
+    """
+    spans = []
+    for pattern in patterns:
+        for match in re.finditer(pattern, text):
+            if match.end() > match.start():
+                spans.append((match.start(), match.end()))
+    if not spans:
+        return 0
+    spans.sort()
+    count = 1
+    current_end = spans[0][1]
+    for start, end in spans[1:]:
+        if start >= current_end:
+            count += 1
+            current_end = end
+        else:
+            current_end = max(current_end, end)
+    return count
+
+
 def score_negation_pairs(text):
-    count = 0
-    for pattern in NEGATION_PAIR_PATTERNS:
-        count += len(re.findall(pattern, text))
+    count = _count_structure_spans(text, NEGATION_PAIR_PATTERNS)
     score = max(0.0, 1.0 - max(0, count - 1) * 0.4)
     return _make_result(score, f"{count} negation-pair structures (target 0-1)", "negation_pairs")
 
 
 def score_formulaic_rhetoric(text):
-    count = 0
-    for pattern in FORMULAIC_RHETORIC_PATTERNS:
-        count += len(re.findall(pattern, text))
+    count = _count_structure_spans(text, FORMULAIC_RHETORIC_PATTERNS)
     score = max(0.0, 1.0 - max(0, count - 1) * 0.5)
     return _make_result(score, f"{count} formulaic-rhetoric structures (target 0-1)", "formulaic_rhetoric")
 
@@ -371,13 +395,13 @@ def _print_verbose(result):
         print(f"\nTier 3 \u2014 LLM (weight {t3_weight:.0%})")
         print(f"  Score: {t3['score']:.2f} (source: {t3['source']})")
     else:
-        print(f"\nTier 3 \u2014 LLM: not available (standalone mode)")
+        print("\nTier 3 \u2014 LLM: not available (standalone mode)")
     print(f"\nComposite: {composite:.1f} (0=\u5b8c\u7f8e\u4eba\u7c7b, 100=\u660e\u663eAI)")
     print(f"Weights: {result['weights']}")
     param_scores = result["param_scores"]
     if param_scores:
         sorted_params = sorted(param_scores.items(), key=lambda x: x[1])
-        print(f"\nLowest-scoring parameters (optimize these first):")
+        print("\nLowest-scoring parameters (optimize these first):")
         for param, score in sorted_params[:3]:
             print(f"  {param}: {score:.2f}")
 
@@ -386,6 +410,32 @@ CALIBRATION_BASELINES = {"pure_ai": {"label": "Pure AI (typical ChatGPT output)"
 
 
 DEFAULT_HUMANNESS_RANGE = (20.0, 38.0)
+
+
+def _calibration_verdict(result: dict) -> dict:
+    """Compare the composite score against the calibration baselines."""
+    score = result["composite_score"]
+    baselines = {}
+    for key, base in CALIBRATION_BASELINES.items():
+        lo = base["expected_composite_min"]
+        hi = base["expected_composite_max"]
+        baselines[key] = {
+            "label": base["label"],
+            "expected_range": [lo, hi],
+            "in_expected": lo <= score <= hi,
+        }
+    return {"composite_score": score, "baselines": baselines}
+
+
+def _print_calibration(result: dict) -> None:
+    data = _calibration_verdict(result)
+    score = data["composite_score"]
+    print(f"\nCalibration \u2014 composite {score:.1f}")
+    for base in data["baselines"].values():
+        lo, hi = base["expected_range"]
+        mark = "\u2713" if base["in_expected"] else "\u00b7"
+        tail = "" if base["in_expected"] else "  (outside)"
+        print(f"  {mark} {base['label']}: {lo}-{hi}{tail}")
 
 
 def load_humanness_range(start: Path = None) -> tuple:
@@ -424,12 +474,21 @@ def main():
     parser.add_argument("--calibrate", action="store_true", help="Compare scores against calibration baselines")
     args = parser.parse_args()
     text = Path(args.input).read_text(encoding="utf-8")
-    result = score_article(text, verbose=args.verbose, tier3_score=args.tier3)
+    if args.json and args.verbose:
+        # --json 要求 stdout 只有 JSON；把 verbose 报告改道到 stderr
+        with contextlib.redirect_stdout(sys.stderr):
+            result = score_article(text, verbose=True, tier3_score=args.tier3)
+    else:
+        result = score_article(text, verbose=args.verbose, tier3_score=args.tier3)
     low, high = load_humanness_range(Path(args.input))
     result["humanness_range"] = [low, high]
     result["in_range"] = low <= result["composite_score"] <= high
     if args.calibrate:
-        _print_calibration(result)
+        if args.json:
+            with contextlib.redirect_stdout(sys.stderr):
+                _print_calibration(result)
+        else:
+            _print_calibration(result)
     if args.json:
         if args.verbose or args.calibrate:
             result["calibration"] = _calibration_verdict(result)

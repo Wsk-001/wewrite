@@ -136,3 +136,35 @@ def test_local_refs_ignore_remote_and_data_uris():
         "![](data:image/png;base64,AAAA)\n"
     )
     assert _local_image_refs(text) == ["local.jpg"]
+
+
+def test_local_refs_decode_percent_encoding():
+    # 文件名带空格时编辑器可能写成 %20，未解码会导致「文件不存在」误报
+    assert _local_image_refs("![](a%20b.jpg)") == ["a b.jpg"]
+
+
+def test_accepts_ref_with_encoded_space(article_dir):
+    (article_dir / "a b.jpg").write_bytes(b"x")
+    md = article_dir / "post.md"
+    md.write_text("# 标题\n\n![](a%20b.jpg)\n", encoding="utf-8")
+    _validate_publish_inputs(
+        _args(input=str(md), cover=str(article_dir / "cover.jpg"), expect_images=1)
+    )
+
+
+def test_resolve_matches_upload_resolution(article_dir):
+    """预检与真实上传必须用同一套解析，否则预检通过、上传却静默丢图。"""
+    from cli import _resolve_image_path
+
+    (article_dir / "sub").mkdir()
+    (article_dir / "sub" / "pic.jpg").write_bytes(b"x")
+    (article_dir / "top.jpg").write_bytes(b"x")
+    md = article_dir / "post.md"
+    md.write_text("", encoding="utf-8")
+
+    # 相对文章目录
+    assert _resolve_image_path("sub/pic.jpg", md).is_file()
+    # 仅文件名回退：正文写成别的目录前缀时，仍按文件名在同目录找到
+    assert _resolve_image_path("output/top.jpg", md).is_file()
+    # 找不到时原样返回，交给调用方判缺失
+    assert not _resolve_image_path("ghost.jpg", md).is_file()

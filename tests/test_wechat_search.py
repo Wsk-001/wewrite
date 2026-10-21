@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
 from wechat_search import (  # noqa: E402
     detect_block,
+    has_result_list,
     filter_items,
     join_redirect_parts,
     parse_results,
@@ -73,7 +74,18 @@ def test_parse_results_dedupes_and_skips_empty_titles():
 def test_detect_block_flags_antispider():
     assert detect_block("<html>请输入验证码</html>")
     assert detect_block('<div id="seccodeImage"></div> antispider')
-    assert detect_block("<html>something unrelated</html>")
+    assert detect_block("<html>访问过于频繁</html>")
+
+
+def test_detect_block_does_not_flag_pages_without_markers():
+    # 没有列表也没验证码 → 可能是 0 结果或被限流，不能谎报反爬
+    assert detect_block("<html>something unrelated</html>") == ""
+
+
+def test_has_result_list():
+    assert has_result_list(FIXTURE)
+    assert has_result_list('<div class="no-result">没有找到相关的微信公众号文章</div>')
+    assert not has_result_list("<html>something unrelated</html>")
 
 
 def test_detect_block_allows_result_and_empty_pages():

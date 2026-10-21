@@ -53,3 +53,42 @@ def test_tier2_includes_new_checks():
     assert "negation_pairs" in names
     assert "formulaic_rhetoric" in names
     assert r["tier2"]["_summary"]["count"] == 8
+
+
+def test_flag_words_table_has_no_duplicates():
+    from humanness_score import FLAG_WORDS
+
+    assert len(FLAG_WORDS) == len(set(FLAG_WORDS))
+    # 这个词曾重复出现，导致一处命中被扣两次
+    assert FLAG_WORDS.count("归根结底") == 1
+
+
+def test_flag_words_catches_words_named_in_writing_guide():
+    """writing-guide/SKILL 点名要求 0 命中的词，必须真的能被检测到。"""
+    from humanness_score import score_flag_words
+
+    for word in ("值得注意", "值得注意的是", "不可忽视", "毋庸置疑", "归根结底", "由此可见"):
+        assert score_flag_words(f"讲真，{word}这事没那么简单。")["score"] < 1.0, word
+
+
+def test_overlapping_patterns_count_one_structure():
+    """同一句只算一处结构——两条 pattern 命中同段文本不应各记一次。"""
+    r = score_negation_pairs("这不是懒而是病。")
+    assert r["detail"].startswith("1 negation-pair")
+    assert r["score"] == 1.0
+
+
+def test_distinct_structures_still_count_separately():
+    r = score_negation_pairs("不是A而是B，也不是C而是D。")
+    assert r["detail"].startswith("2 negation-pair")
+
+
+def test_calibration_helpers_exist():
+    """这两个函数曾被调用但从未定义，--calibrate 与 --json --verbose 直接崩。"""
+    from humanness_score import _calibration_verdict, _print_calibration
+
+    result = {"composite_score": 30.0}
+    verdict = _calibration_verdict(result)
+    assert verdict["composite_score"] == 30.0
+    assert verdict["baselines"]["target_range"]["in_expected"] is True
+    _print_calibration(result)  # 不应抛异常

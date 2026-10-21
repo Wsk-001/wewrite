@@ -154,3 +154,18 @@ Entries discovered by the Agent during task execution should follow this format:
   - references/pipeline/topic-selection.md 新增「检索源分发」表：公众号生态→wechat_search.py、热点→fetch_hotspots.py、公开网页/文献→WebSearch；SKILL Step 2 同步加运行命令
   - 新增 tests/test_wechat_search.py（7 例，离线解析）；全量 pytest 98 passed
   - 沙箱直连搜狗可用（HTTP 200），无需代理；但高频调用会触发验证码，选题阶段每个候选只查一次
+
+[Project Knowledge Summary]
+- Date: 2026-10-21
+- Context: 全量 BUG 排查（静态检查 + 边界用例 + 计分逻辑复核）
+- Category: Troubleshooting & Debugging
+- Instructions:
+  - humanness_score.py 的 _print_calibration / _calibration_verdict 从建库起就只有调用没有定义 → `--calibrate` 与 `--json --verbose` 必崩 NameError；已补实现（基于 CALIBRATION_BASELINES 输出期望区间与实际判定）
+  - `--json` 必须做到 stdout 纯 JSON：verbose 报告与 --calibrate 表格改道 stderr（contextlib.redirect_stdout），否则 SKILL Step 5 的 `--json` 无法解析
+  - 否定对举/排比原来逐 pattern 累加：`不是A而是B` 同时命中 `不是…而是` 与 `不是…是` 被计 2 次，把「容差 1 次」变成「一次就罚」；改用 _count_structure_spans 合并重叠 span 后计数
+  - FLAG_WORDS 曾重复收录「归根结底」（一处命中扣两次），并有错字「母庸置疑」；BANNED_WORDS 同类错字「莫庸置疑」「值得注意的 是」；均已修正并补入值得注意/不可忽视
+  - 修完检测逻辑必须重跑 13 篇历史文章复核区间：现 21.2-35.6，全部落在 [20,38]，与 history.yaml 记录的差异来自去掉重复扣分
+  - cli publish 预检与真实上传必须共用 _resolve_image_path（含仅文件名回退），否则预检通过、上传静默丢图；图片引用要 unquote 百分号编码
+  - wechat_search：只有命中 antispider/验证码标记才算 blocked；「无结果列表」不能谎报反爬（改为 warning 字段）；翻页间隔 1s；不要用 apparent_encoding 覆盖已声明的 utf-8
+  - 搜狗会因连续查询把出口 IP 打入验证码状态（blocked 持续一段时间），此时脚本 exit 3 并提示退化为 WebSearch
+  - 改 SKILL.md 后要同时重建两个 dist：build_openclaw.py 与 build_codex.py，只重建一个会导致 dist 不一致
