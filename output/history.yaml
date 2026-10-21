@@ -174,6 +174,86 @@ publishes:
         media_id: "q_zrQd1gVlCJUeajP8dHyXgiJ3yl-VD9VZrBFiPgWCMW7fgCOy6sNghdoNs5d9EB"
         action: 以此版发布
 
+  - id: 2026-10-16-jiuzuo-shanghai
+    date: "2026-10-16"
+    title: "久坐的伤，到底怎么抵消？答案不是\"多站起来\""
+    topic: "久坐危害与步数抵消科普（悉尼大学 BMJ 研究 72,174 人；2200/9000-10500/4000-4500 步数据；经济舱综合征/深静脉血栓；华中科技大学 33 万人队列；CCTV生活圈 2025-08-20 热点）"
+    article: "output/jiuzuo-shanghai.md"
+    theme: "warm-editorial"
+    humanness_score: 30.9
+    cover: "output/cover-jiuzuo.jpg"
+    inline_images:
+      - "output/jiuzuo-1.jpg"
+      - "output/jiuzuo-2.jpg"
+      - "output/jiuzuo-3.jpg"
+      - "output/jiuzuo-4.jpg"
+    status: draft
+    drafts:
+      - version: v1
+        note: "humanness 30.9；关键数据（每日>2200 步降风险、9000-10500 步最低死亡风险、4000-4500 步约 50% 益处、久坐>10h 走够 9000 步、坐满 4h 血栓风险）均可核实；配图 5 张人工读图核验通过（封面站起来走动、内文图下肢血液回流/绿色进度条/办公桌伸展/小腿肿胀疼痛），内文图2 首次生成出现乱码标题已重绘为无文字版；合规/SEO 0/0"
+        media_id: "q_zrQd1gVlCJUeajP8dHycjSA0uf0IpgmHr_s0ZxOmTUVFxYcoM8A8wmuyPaHh_C"
+        action: 以此版发布
+
+  - id: 2026-10-17-bujue-shuimianzhai
+    date: "2026-10-17"
+    title: "熬夜欠的\"睡眠债\"，周末真的能补回来吗"
+    topic: "熬夜后周末补觉科普（南京医科大学观察性研究 3400 人：工作日<6h+周末补觉>2h 心血管风险降 70%、补觉>1h 降 63%、工作日>8h 再补觉反而升；复旦 BMC Public Health 周末补 1-2h 降抑郁风险；中新网 2025-09-10 热点）"
+    article: "output/bujue-shuimianzhai.md"
+    theme: "warm-editorial"
+    humanness_score: 35.6
+    cover: "output/cover-bujue.jpg"
+    inline_images:
+      - "output/bujue-1.jpg"
+      - "output/bujue-2.jpg"
+      - "output/bujue-3.jpg"
+      - "output/bujue-4.jpg"
+    status: draft
+    drafts:
+      - version: v1
+        note: "humanness 35.6（首次用新增三项硬检测评分：flag_words 0 命中、negation_pairs 1 次、formulaic_rhetoric 0 次，均达标）；关键数据均可核实；配图 5 张人工读图核验通过（封面周末赖床、内文图疲惫→睡眠对比/生物钟曲线/起床伸展/睡眠债），内文图1 首次生成顶部文字截断不清已重绘为无文字版，内文图4'睡眠债'三字清晰正确保留；合规 0/0、SEO 0 error"
+        media_id: "q_zrQd1gVlCJUeajP8dHyQU6RCYm42RqKil9164K_tkYP9B8-kN3B04HpFKKVTDw"
+        action: 以此版发布
+
+  - id: 2026-10-18-dahulu-shuimian-huxi
+    date: "2026-10-18"
+    title: "打呼噜是睡得香？有人一晚上憋气几百次，自己却不知道"
+    topic: "阻塞性睡眠呼吸暂停（OSA）科普：女性/打鼾与高血压独立危险因素、高血压患者中患病率 30%-50%、难治性高血压达 80%、中国约 1.76 亿人患病、夜间间歇性缺氧机制、夜间猝死与心血管风险、多导睡眠监测金标准、CPAP 治疗；新华网/首都之窗/友谊医院/朝阳医院/人卫共识多源核实"
+    article: "output/dahulu-shuimian-huxi.md"
+    theme: "warm-editorial"
+    humanness_score: 34.0
+    cover: "output/cover-dahulu.jpg"
+    inline_images:
+      - "output/dahulu-1.jpg"
+      - "output/dahulu-2.jpg"
+      - "output/dahulu-3.jpg"
+      - "output/dahulu-4.jpg"
+    status: draft
+    drafts:
+      - version: v1
+        note: "humanness 34.0（三项硬检测均达标：flag_words 0、negation_pairs 1、formulaic_rhetoric 0）；关键数据均可核实；配图 5 张人工读图核验通过（封面夜间安睡、内文图上呼吸道剖面/夜间血氧下降曲线/CPAP 面罩安睡/睡眠监测），全部无乱码错字；合规 0/0、SEO 0 error"
+        media_id: "q_zrQd1gVlCJUeajP8dHyUFlJTKiwMLOBucU6eYuQysNkBJesiA4ReWofcuqL94r"
+        action: 以此版发布
+
+  - id: 2026-10-18-jiazhuangxian-jiejie
+    date: "2026-10-18"
+    title: "体检查出甲状腺结节，先别急着预约手术"
+    topic: "甲状腺结节科普：中国成人超声检出率约 20%、95% 良性/5%-10% 恶性、TI-RADS 分级（3 类<2%、4A 2%-10%、4B 10%-50%、4C 50%-90%、5 类>90%）、1cm 穿刺分水岭、乳头状癌占 80% 以上且预后好、值得警惕的超声描述、碘与辐射、家族史；北京市中医药管理局/清华长庚医院/新华医院/中华医学会多源核实"
+    article: "output/jiazhuangxian-jiejie.md"
+    theme: "warm-editorial"
+    humanness_score: 33.4
+    cover: "output/cover-jiazhuangxian.jpg"
+    inline_images:
+      - "output/jiazhuangxian-1.jpg"
+      - "output/jiazhuangxian-2.jpg"
+      - "output/jiazhuangxian-3.jpg"
+      - "output/jiazhuangxian-4.jpg"
+    status: draft
+    drafts:
+      - version: v1
+        note: "humanness 33.4（三项硬检测均达标：flag_words 0、negation_pairs 1、formulaic_rhetoric 0）；关键数据均可核实；配图 5 张人工读图核验通过（封面看报告担忧、内文图颈部甲状腺位置/超声检查/细针穿刺活检/日历随访），全部无乱码错字；合规 0/0、SEO 0 error"
+        media_id: "q_zrQd1gVlCJUeajP8dHyYFDTZW6r1FJrKccNn_jLFIoUEjLo-xdN-35pSHh9hU5"
+        action: 以此版发布
+
 style_sources:
   - date: "2026-10-10"
     note: "从账号 9 篇已发文章学习写作与配图风格"
