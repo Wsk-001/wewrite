@@ -137,4 +137,16 @@ Entries discovered by the Agent during task execution should follow this format:
   - config.yaml 的 author 在根级，`cmd_publish` 曾只读 `wechat` 段导致草稿作者栏为空；改配置读取处要确认层级（根级 fallback 已补）
   - 图片落盘必须让字节格式与扩展名一致：`_center_crop_to_ratio` 比例匹配时原样返回 provider 的 PNG，会写出「.jpg 装 PNG」；微信靠嗅探仍显示，但从返回 URL 可验证（`mmbiz_png` 说明上传的是 PNG，`mmbiz_jpg` 才对），已在 generate_image 落盘前统一转码
   - PNG 存照片体积是 JPEG 的 10 倍（1.7-2.1MB vs 160-230KB），微信图片上限 2MB，转码同时也是体积兜底
-  - 调 `draft/get` 校验草稿时用 `r.content.decode("utf-8")`：微信返回 `Content-Type: text/plain` 无 charset，requests 会按 latin-1 解出乱码，误判成文章编码坏了；正文 `media_id` 写错或删稿用 `draft/delete`（errcode 0 即成功）
+   - 调 `draft/get` 校验草稿时用 `r.content.decode("utf-8")`：微信返回 `Content-Type: text/plain` 无 charset，requests 会按 latin-1 解出乱码，误判成文章编码坏了；正文 `media_id` 写错或删稿用 `draft/delete`（errcode 0 即成功）
+
+[Project Knowledge Summary]
+- Date: 2026-10-21
+- Context: 用户反馈配图环节耗时很久；实测定位为串行生成 + 无效重试逻辑，已改批量并发
+- Category: Build Methods
+- Instructions:
+  - 单张图 API 实测仅 ~7s（z-image-turbo 1024 方图 6.6s + 下载 0.5s），慢的根源是 5 张图逐张串行跑
+  - image_gen.py 已支持 --batch <json>（[{prompt, output, size?}]）并发生成，--workers 默认 5，stdout 出 {ok, failed} JSON；配图环节必须批量并发，逐张串行算流程错误
+  - 原 attempt 循环 except 后直接 break，重试从未生效；已改为 _generate_with_retry 同 provider 退避重试 2 次（2s/4s），重试耗尽才换链上下一个
+  - 所有 provider 请求改用分离式超时 (CONNECT_TIMEOUT=10, READ_TIMEOUT=120)，坏网关时 10s 内快速失败换下一家，避免傻等 120s
+  - 实测生成耗时：1024 方图 ~7s、article 1792x1024 ~12s、cover 1920x816 ~13s；5 张并发总耗时 = 最慢一张 ≈ 15s，尺寸对单张耗时影响不大
+  - 配图环节另一个大头是视觉自检：SKILL Step 6 已规定自检必须并行读图/并行建任务，只允许「批量生成→并发自检→批量重生成→复检」一轮循环，超两轮要回头修提示词模板
