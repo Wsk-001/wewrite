@@ -159,7 +159,7 @@ def cmd_publish(args):
     appid = args.appid or wechat_cfg.get("appid")
     secret = args.secret or wechat_cfg.get("secret")
     theme_name = args.theme or cfg.get("theme", "professional-clean")
-    author = args.author or wechat_cfg.get("author")
+    author = args.author or wechat_cfg.get("author") or cfg.get("author")
 
     if not appid or not secret:
         print("Error: --appid and --secret required (or set in config.yaml)", file=sys.stderr)
