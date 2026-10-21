@@ -40,21 +40,12 @@ Entries discovered by the Agent during task execution should follow this format:
 
 [User Instruction Summary]
 - Date: 2026-10-14
-- Context: 用户要求修改配图规则
+- Context: 用户两次修改配图规则（图内文字规范；献血配图 AI bug 后要求建立检测流程）
 - Instructions:
-  - 图内**允许出现文字**，但必须清晰、正确、可读，准确表达图中含义
-  - **严禁**乱码、错字、乱拼字符、无意义英文串、伪文字；严禁文字与实际内容不符
-  - 拿不准就用提示词重生成或整图去掉文字——宁可整图不带文字，也不允许出现乱码
-
-[User Instruction Summary]
-- Date: 2026-10-10
-- Context: 献血科普文配图出现 AI bug（血袋贴上臂、采血管方向像输血、游离针头），用户要求建立检测流程
-- Instructions:
-  - 以后每次 AI 生成配图，插入文章前必须先做 AI bug 视觉检测，检测通过才允许上传使用
-  - 检测方式：用视觉分析工具（image_analysis）或直接读图自检；服务不可用时读图人工过一遍
-  - 检测清单（沉淀自本次案例）：医疗设备重力/管路方向逻辑（血袋必须低于穿刺点）、游离器械比划、操作步骤合理性、手指数量/肢体畸变、图内文字乱码、物体漂浮穿模、场景与文章事实匹配
-  - 发现 bug 后修 prompt 重新生成并复检，通过后再发布
-  - 场景类配图生成前，先搜索真实流程细节（如献血：肘窝穿刺、止血带、握力球、血袋放采血秤），把正确细节写进 prompt
+  - AI 生成配图插入文章前必须先做视觉检测：用 image_analysis 或直接读图自检，服务不可用时人工过一遍；发现 bug 修 prompt 重生成并复检，通过才允许上传
+  - 检测清单：医疗设备重力/管路方向（血袋必须低于穿刺点）、游离器械比划、操作步骤合理性、手指数量/肢体畸变、图内文字乱码、物体漂浮穿模、场景与文章事实匹配
+  - 图内允许出现文字，但必须清晰正确、与内容一致；严禁乱码、错字、乱拼字符、无意义英文串、伪文字；拿不准就重生成或去掉文字——宁可无字也不许乱码
+  - 场景类配图生成前先搜真实流程细节（如献血：肘窝穿刺、止血带、握力球、血袋放采血秤），把正确细节写进 prompt
 
 [Project Knowledge Summary]
 - Date: 2026-10-10
@@ -62,51 +53,38 @@ Entries discovered by the Agent during task execution should follow this format:
 - Category: Environment Configuration
 - Instructions:
   - 图片 API 走 MoAark 平台（https://api.moark.com/v1），OpenAI 兼容 /images/generations 端点，模型 z-image-turbo
-  - MoAark 尺寸参数名是 image_size（不是 size，传 size 会 400"参数无效"）；响应返回 b64_json 而非 url，toolkit/image_gen.py 已做兼容
-  - z-image-turbo 固定输出 1024x1024 方图，忽略尺寸参数；image_gen.py 已加中心裁剪逻辑适配封面比例
+  - MoAark 尺寸参数走 width/height 双字段（均为 16 的倍数，否则 400）；`size` 报「参数无效」，`aspect_ratio`/`image_size` 会被静默忽略并恒返 1024x1024 方图；响应是 b64_json 而非 url，toolkit/image_gen.py 已兼容
+  - 请求尺寸与实际返回比例差 >2% 时 _warn_size_mismatch 会告警；比例匹配时不再裁切，落盘前用 _ensure_output_format 保证字节格式与扩展名一致
   - SiliconFlow 和 ModelScope 的端点对该 key 均返回认证失败，确认走 MoAark
 
 [Project Knowledge Summary]
-- Date: 2026-10-10
-- Context: 微信公众号 API 调试
+- Date: 2026-10-20
+- Context: 公众号发布链路与运营规则（API 调试 → 生态调研 → 预检加固）
 - Category: Operations & Deployment
 - Instructions:
-  - 公众号「小科普oao」AppID wx9deec3eb05e1647e，凭据已写入 config/config.yaml（已 gitignore）
-  - 微信 API 要求调用方 IP 在白名单内，沙箱出口 IP 123.56.157.253 需加入公众号后台白名单（errcode 40164 表示未加）
-  - 发布流程：python3 toolkit/cli.py publish article.md --cover cover.jpg 推送草稿箱，后台人工确认发布
-
-[Project Knowledge Summary]
-- Date: 2026-10-10
-- Context: 从账号 9 篇已发文章提炼写作与配图风格
-- Category: Workflow & Collaboration
-- Instructions:
-  - 「小科普oao」是健康科普账号，9 篇参考文章存于 references/examples/source_articles/ref-01~09.md
-  - 写作人格 personas/xiaokepuoao.yaml，写作参数 config/writing-config.yaml 已按实测指纹校准
-  - 配图风格规范（三条路线 + z-image-turbo prompt 模板）在 references/xiaokepuoao-style.md
-  - scripts/fetch_article.py 曾有 img/br/hr void 元素被提前 return 吞掉的 bug，已修复；抓公众号文章先确认 md 里有图再分析
-
-[Project Knowledge Summary]
-- Date: 2026-10-13
-- Context: 联网调研 2026 微信公众号生态规则，用于 WeWrite 流程优化
-- Category: Operations & Deployment
-- Instructions:
-  - AI 内容标识是强制合规项：《人工智能生成合成内容标识办法》2025-09 施行，2026 年已处置 1.3 万+未标注账号，微信「应标未标可直至封号」；AI 配图必须加「AI生成」标注，发布时勾选平台 AI 声明
-  - 微信 2026-03《运营规范》新增「非真人自动化创作行为」条款，官方合规口径：AI 初稿需人工深加工（补真实案例、加个人观点、去 AI 味）
-  - 2026 推荐流算法权重：完读率约 35% > 分享转发约 30% > 收藏约 20% > 互动质量约 15%；阅读进度不足 30% 退出被标记低质
-  - 搜一搜 SEO 关键阈值：核心词进标题前 12 字、关键词密度 2-3%、小标题 >=3、标题党词按作弊处理
-  - 健康科普红线：不得虚构病例/疗效结果、禁用「保证根治」类断言；第一人称场景开场用泛化场景
-  - datacube getarticletotal 有 add_to_fav_count（收藏）字段，fetch_stats.py 目前未采集
+  - 公众号「小科普oao」AppID wx9deec3eb05e1647e，凭据在 config/config.yaml（gitignore）；API 要求出口 IP 白名单，沙箱 IP 123.56.157.253（errcode 40164 表示未加）
+  - 发布流程：python3 toolkit/cli.py publish article.md --cover cover.jpg 推草稿箱，后台人工确认发布
+  - AI 内容标识是强制合规项：《人工智能生成合成内容标识办法》2025-09 施行，微信「应标未标可直至封号」；AI 配图须加「AI生成」标注并在发布时勾选平台 AI 声明
+  - 微信 2026-03《运营规范》新增「非真人自动化创作行为」条款，合规口径是 AI 初稿需人工深加工（真实案例、个人观点、去 AI 味）
+  - 2026 推荐流权重：完读率约 35% > 分享约 30% > 收藏约 20% > 互动约 15%，阅读进度不足 30% 退出会被标记低质；搜一搜阈值：核心词进标题前 12 字、密度 2-3%、小标题 ≥3，标题党按作弊处理
+  - 健康科普红线：不得虚构病例/疗效，禁用「保证根治」类断言；第一人称场景开场用泛化场景
+  - toolkit/cli.py publish 的 _validate_publish_inputs 先于任何网络调用预检：文章/封面缺失、--cover 与 --no-cover 冲突、正文本地图不存在、引用数 ≠ --expect-images、正文无本地图引用 → exit 2 并列出文件；--force 跳过图片检查
+  - 图片路径解析兼容原样相对路径、相对文章目录、仅文件名回退；预检与真实上传必须共用 _resolve_image_path，否则预检通过、上传静默丢图；图片引用要 unquote 百分号编码
+  - SKILL Step 1 检查 .venv，缺失则跑 install.sh（失败提示装 python3-venv）；Step 8 固定带 --expect-images 4，缺图直接拒推
+  - humanness_range 单一来源是 config/writing-config.yaml，humanness_score.py 输出 humanness_range 与 in_range，SKILL 不用硬编码阈值
+  - 改 SKILL/references 后重建 dist/openclaw（build_openclaw.py；改 SKILL 时两个 dist 都要重建，只建一个会不一致）；dist/*.zip 是发布归档，不随日常改动重建
+  - datacube getarticletotal 有 add_to_fav_count（收藏）字段，fetch_stats.py 未采集
 
 [Project Knowledge Summary]
 - Date: 2026-10-16
-- Context: B 方案目录重构（配置/资料/脚本各归各位）
+- Context: 风格提炼 + B 方案目录重构（配置/资料/脚本各归各位）
 - Category: Workflow & Collaboration
 - Instructions:
-  - 配置集中在 config/：config.yaml（微信/图片凭据，gitignore）、style.yaml（账号风格）、writing-config.yaml（写作参数），各带 .example；加载器 toolkit/config.py 与 scripts/diagnose.py 优先 config/，兼容旧根目录
-  - references/ 分 5 组：pipeline/（主管道文档）、compliance/（合规SEO）、guides/（指南命令）、examples/（范文库，gitignore 用户内容）；visual/ 已随孤儿文档删除
-  - scripts/ 保持扁平，索引见 scripts/README.md；不分子目录，避免 import 与调用路径回归
-  - dist/ 只跟踪 dist/openclaw、dist/codex 与两个发布 zip（dist/wewrite-*.zip）；改规则/主题后需重建 dist
-  - build_openclaw.py 的 config 目录只打包 *.example，不打包用户真实配置
+  - 「小科普oao」健康科普账号，参考文章 references/examples/source_articles/ref-01~09.md；写作人格 personas/xiaokepuoao.yaml，配图风格（三条路线 + z-image-turbo prompt 模板）在 references/xiaokepuoao-style.md
+  - 配置集中在 config/：config.yaml（微信/图片凭据，gitignore）、style.yaml（账号风格）、writing-config.yaml（写作参数），各带 .example；toolkit/config.py 与 scripts/diagnose.py 优先 config/ 并兼容旧根目录
+  - references/ 分 5 组：pipeline/、compliance/、guides/、examples/（范文库，gitignore 用户内容）；scripts/ 保持扁平，索引见 scripts/README.md
+  - dist/ 只跟踪 dist/openclaw、dist/codex 与两个发布 zip；build_openclaw.py 的 config 目录只打包 *.example，不打包真实配置
+  - scripts/fetch_article.py 曾有 img/br/hr void 元素被提前 return 吞掉的 bug，已修复；抓公众号文章先确认 md 里有图再分析
 
 [User Instruction Summary]
 - Date: 2026-10-17
@@ -123,23 +101,10 @@ Entries discovered by the Agent during task execution should follow this format:
 - Instructions:
   - humanness_score.py Tier2 由 5 项扩为 8 项：新增 flag_words（红旗词，每命中扣 0.25，目标 0）、negation_pairs（否定对举"不是X而是Y"，容差 1 次，超出每次扣 0.4）、formulaic_rhetoric（三段式排比/虚假范围"从X到Y"，容差 1 次，超出每次扣 0.5）
   - 三项新检测为「负向检查」（0 命中=得分高=更人），不加 bell-curve 中心（加中心会反转成"越干净越像 AI"，是错的）
-  - 新增三项后整体刻度下调约 5-7 分，humanness_range 由 [26,40] 重新校准为 [20,38]（9 篇历史实测 21-33）
+  - 新增三项后整体刻度下调约 5-7 分，区间由 [26,40] 下调；2026-10-21 修掉 banned_words 校准反转后全库 14 篇重评为 20.1-39.0，现区间 [20,40]
   - composite = (1 - humanness)*100，分数越低越人；Tier2 检查数变化会平移 absolute 刻度，改动检测项后必须用历史文章重新校准区间
   - 新增 tests/test_humanness_score.py（7 例）；全量 pytest 81 passed
   - 破折号中断句法同时计入 broken_sentences，过度依赖会让节奏刻意
-
-[Project Knowledge Summary]
-- Date: 2026-10-20
-- Context: 发布链路加固（venv 引导 / 发布前预检 / 人味区间单一来源）
-- Category: Operations & Deployment
-- Instructions:
-  - SKILL.md Step 1 增加 .venv 存在性检查，缺失则跑 install.sh；install.sh 建 venv 失败时提示安装 python3-venv（Debian/Ubuntu）
-  - toolkit/cli.py publish 新增 _validate_publish_inputs 预检，先于任何网络调用：文章不存在、--cover 与 --no-cover 冲突、缺封面（须显式 --no-cover）、封面文件不存在、正文 ![]() 本地图不存在、引用数 ≠ --expect-images、正文无本地图引用 → 一律 exit 2 并列出文件；--force 跳过图片检查
-  - 图片路径解析兼容三种写法：原样相对路径、相对文章目录、仅文件名回退（文章已在 output/ 时 output/x.jpg 可直接命中）
-  - humanness_range 单一来源收敛到 config/writing-config.yaml（默认 [20,38]），humanness_score.py 输出 humanness_range 与 in_range 字段，SKILL 不再用硬编码阈值
-  - SKILL Step 8 发布命令固定带 --expect-images 4，与「每篇固定 4 张内文图」对齐；formatting-styles.md / visual-prompts.md 同步说明「缺图不再静默出稿，直接拒推」
-  - 新增 tests/test_cli_publish_validation.py（10 例）；全量 pytest 91 passed；context_budget PEAK ~4095 tok（<12500 上限）
-  - 改 SKILL/references 后需 python3 scripts/build_openclaw.py 重建 dist/openclaw；dist/*.zip 是发布归档，不随日常改动重建
 
 [Project Knowledge Summary]
 - Date: 2026-10-21
@@ -153,7 +118,6 @@ Entries discovered by the Agent during task execution should follow this format:
   - 反爬识别：页面含 antispider/请输入验证码 → 脚本 exit 3、blocked=true，流程须退化为 WebSearch 并注明该源缺失
   - references/pipeline/topic-selection.md 新增「检索源分发」表：公众号生态→wechat_search.py、热点→fetch_hotspots.py、公开网页/文献→WebSearch；SKILL Step 2 同步加运行命令
   - 新增 tests/test_wechat_search.py（7 例，离线解析）；全量 pytest 98 passed
-  - 沙箱直连搜狗可用（HTTP 200），无需代理；但高频调用会触发验证码，选题阶段每个候选只查一次
 
 [Project Knowledge Summary]
 - Date: 2026-10-21
@@ -164,8 +128,13 @@ Entries discovered by the Agent during task execution should follow this format:
   - `--json` 必须做到 stdout 纯 JSON：verbose 报告与 --calibrate 表格改道 stderr（contextlib.redirect_stdout），否则 SKILL Step 5 的 `--json` 无法解析
   - 否定对举/排比原来逐 pattern 累加：`不是A而是B` 同时命中 `不是…而是` 与 `不是…是` 被计 2 次，把「容差 1 次」变成「一次就罚」；改用 _count_structure_spans 合并重叠 span 后计数
   - FLAG_WORDS 曾重复收录「归根结底」（一处命中扣两次），并有错字「母庸置疑」；BANNED_WORDS 同类错字「莫庸置疑」「值得注意的 是」；均已修正并补入值得注意/不可忽视
-  - 修完检测逻辑必须重跑 13 篇历史文章复核区间：现 21.2-35.6，全部落在 [20,38]，与 history.yaml 记录的差异来自去掉重复扣分
+  - 修完检测逻辑必须重跑全部历史文章复核区间：当前 14 篇为 20.1-39.0，全部落在 [20,40]
   - cli publish 预检与真实上传必须共用 _resolve_image_path（含仅文件名回退），否则预检通过、上传静默丢图；图片引用要 unquote 百分号编码
   - wechat_search：只有命中 antispider/验证码标记才算 blocked；「无结果列表」不能谎报反爬（改为 warning 字段）；翻页间隔 1s；不要用 apparent_encoding 覆盖已声明的 utf-8
-  - 搜狗会因连续查询把出口 IP 打入验证码状态（blocked 持续一段时间），此时脚本 exit 3 并提示退化为 WebSearch
+  - 搜狗会因连续查询把出口 IP 打入验证码状态（blocked 持续一段时间），此时脚本 exit 3 并提示退化为 WebSearch；选题阶段每个候选只查一次，沙箱直连可用、无需代理
   - 改 SKILL.md 后要同时重建两个 dist：build_openclaw.py 与 build_codex.py，只重建一个会导致 dist 不一致
+  - `_BELL_CURVE_CHECKS` 只放「过犹不及」类指标；单调指标（如 banned_words，命中越少越好）进去会被 overshoot 惩罚反转——0 命中 raw=1.0 直接判 0 分，比 1 命中还低
+  - config.yaml 的 author 在根级，`cmd_publish` 曾只读 `wechat` 段导致草稿作者栏为空；改配置读取处要确认层级（根级 fallback 已补）
+  - 图片落盘必须让字节格式与扩展名一致：`_center_crop_to_ratio` 比例匹配时原样返回 provider 的 PNG，会写出「.jpg 装 PNG」；微信靠嗅探仍显示，但从返回 URL 可验证（`mmbiz_png` 说明上传的是 PNG，`mmbiz_jpg` 才对），已在 generate_image 落盘前统一转码
+  - PNG 存照片体积是 JPEG 的 10 倍（1.7-2.1MB vs 160-230KB），微信图片上限 2MB，转码同时也是体积兜底
+  - 调 `draft/get` 校验草稿时用 `r.content.decode("utf-8")`：微信返回 `Content-Type: text/plain` 无 charset，requests 会按 latin-1 解出乱码，误判成文章编码坏了；正文 `media_id` 写错或删稿用 `draft/delete`（errcode 0 即成功）
