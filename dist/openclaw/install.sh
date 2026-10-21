@@ -25,7 +25,14 @@ fi
 
 if [ ! -d .venv ]; then
   echo "→ 创建虚拟环境 .venv ..."
-  "$PYTHON" -m venv .venv
+  if ! "$PYTHON" -m venv .venv; then
+    echo "" >&2
+    echo "✗ 创建 venv 失败。Debian/Ubuntu 需要先安装 venv 组件：" >&2
+    echo "    sudo apt-get install -y python3-venv" >&2
+    echo "  若系统只提供带小版本的包，可用：" >&2
+    echo "    sudo apt-get install -y python3.11-venv" >&2
+    exit 1
+  fi
 else
   echo "→ 复用已有的 .venv"
 fi

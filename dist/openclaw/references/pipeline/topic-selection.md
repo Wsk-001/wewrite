@@ -1,5 +1,25 @@
 # 选题评估规则
 
+## 检索源分发（先按类型分发取料，再评分）
+
+单一 WebSearch 搜不到公众号生态（同行怎么写、哪些题已被写烂）。按问题类型分发到不同源，结果合并去重后再进评估：
+
+| 问题类型 | 用什么 | 说明 |
+|---|---|---|
+| 公众号/微信生态（同题饱和度、标题套路、同行角度） | `python3 scripts/wechat_search.py "关键词" --days 90 --pages 3` | 搜狗微信搜索，公开可用、无需登录/浏览器；`--resolve` 可追出真实 `mp.weixin.qq.com` 链接供 `fetch_article.py` 抓正文 |
+| 抖音/头条/微博热点（热度分来源） | `python3 scripts/fetch_hotspots.py --limit 20` | 微博/头条/百度热搜合并去重 |
+| 国内外公开网页、权威指南、论文 | WebSearch | 核实结论与数据出处 |
+| 事件时效性 | WebSearch（限定时间范围） | 确认不是旧闻翻炒 |
+
+> WebSearch 指宿主 Agent 的联网搜索工具本身（Claude Code 的 WebSearch / OpenClaw 的 web_search / Tavily 等皆可），本 skill 不绑定具体实现；`wechat_search.py` 与 `fetch_hotspots.py` 则是脚本级直连，不依赖宿主能力。
+
+**取料顺序**：
+1. `fetch_hotspots.py` 拿热度候选；
+2. 每个候选跑一次 `wechat_search.py`，看公众号是否已写满：近 30 天同题 ≥3 篇 → 相关度分扣 2-3 分，或换反直觉切入角；
+3. WebSearch 核实关键数据与时间点，数据对不上直接淘汰。
+
+**降级**：`wechat_search.py` 退出码 3 或输出 `blocked: true`（搜狗反爬）→ 跳过该源，用 WebSearch 搜「微信公众号 + 关键词」兜底，并在选题报告里注明该源缺失，不要假装检索过。
+
 ## 评估维度
 
 热度分（权重 30%）：热搜前10 → 8-10分，10-30 → 5-7分

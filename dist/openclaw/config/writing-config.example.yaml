@@ -40,6 +40,8 @@ emotional_arc: "restrained_to_burst"
 
 # 负面情绪最低占比 (0-1)
 # AI 中文文本负面情绪仅 11-12%，人类 25-34%
+# 参考值：健康科普以克制调性为主，本项为建议值而非硬性门槛，
+# 实测常低于 0.20 仍可落入人味区间（靠句长/节奏/真实数据密度支撑）。
 # → 对抗情感分布检测 [规则 1.4]
 negative_emotion_floor: 0.20
 
@@ -118,4 +120,25 @@ opening_style: "scene"
 closing_style: "open_question"
 
 # 写作人设——影响整体语感和视角
-persona: "科技媒体资深编辑，写了八年公众号，对AI行业有深度认知"每 H2 段 3 条+（推荐）\n# → 对抗 token 概率分布检测 [规则 3.1]\nreal_data_density: \"high\"\n\n# 成语/俗语密度——每段平均出现几次\nidiom_density: 0.15\n\n# 开头策略\n# scene: 场景描写\n# data: 数据冲击\n# question: 反问\n# anecdote: 个人经历\n# cold_open: 冷开场（直接切入）\nopening_style: \"scene\"\n\n# 收尾策略\n# summary: 总结回顾（AI默认，避免）\n# open_question: 留一个没答案的问题\n# image: 用一个画面收束\n# abrupt: 戛然而止\nclosing_style: \"open_question\"\n\n# 写作人设——影响整体语感和视角\npersona: \"科技媒体资深编辑，写了八年公众号，对AI行业有深度认知\"\n"}]
+persona: "科技媒体资深编辑，写了八年公众号，对AI行业有深度认知"
+
+# 人味评分目标区间（0=人，100=AI）
+# 新增 flag_words/negation_pairs/formulaic_rhetoric 三项检测后，整体刻度下调，
+# 默认区间由 [26,40] 调整为 [20,38]。SKILL.md Step 5 优先读本字段。
+humanness_range: [20, 38]
+
+# ============================================================
+# 四、红旗词与 AI 结构检测（新增，脚本硬检测）
+# ============================================================
+
+# 红旗词密度上限——出现几个开始扣分（每命中 1 次扣 0.25）
+# 红旗词 = AI 高频书面语/连接词（因而/旨在/毋庸置疑/由此可见/值得注意的是…）
+# 与 blacklist.words 的区别：blacklist 针对恐吓类套话，红旗词针对"AI 腔书面语"
+flag_words_max: 0
+
+# 否定对举结构容差（"不是 X，而是 Y"）——允许出现几次不扣分，超出每次扣 0.4
+# AI 中文头号痕迹结构，偶发 1 次无妨，反复出现即为手印
+negation_pairs_max: 1
+
+# 修辞公式化容差（三段式排比 / 虚假范围"从 X 到 Y"）——超出每次扣 0.5
+formulaic_rhetoric_max: 1
