@@ -254,6 +254,26 @@ publishes:
         media_id: "q_zrQd1gVlCJUeajP8dHyYFDTZW6r1FJrKccNn_jLFIoUEjLo-xdN-35pSHh9hU5"
         action: 以此版发布
 
+  - id: 2026-10-21-aizheng-paixing
+    date: "2026-10-21"
+    title: "癌症发病前五公布，真正该看的是另一张榜"
+    topic: "国家癌症中心 2022 年数据（新发 482.47 万/死亡 257.42 万）发病前五（肺癌 106.06 万、结直肠 51.71 万、甲状腺 46.61 万、肝癌 36.77 万、胃癌 35.87 万，占 57.42%）与死亡前五（肺癌 73.33 万、肝癌 31.65 万、胃癌 26.04 万、结直肠 24.00 万、食管 18.75 万，占 67.5%）的错位：甲状腺癌发病第 3 却不在死亡前五，结直肠癌发病第 2、死亡第 4，食管癌只在死亡榜；媒体对第 5 位存在胃癌 35.87 万与女性乳腺癌 35.72 万的口径分歧"
+    article: "output/aizheng-paixing.md"
+    theme: "warm-editorial"
+    humanness_score: 32.96
+    cover: "output/cover-aizheng.jpg"
+    inline_images:
+      - "output/aizheng-1.jpg"
+      - "output/aizheng-2.jpg"
+      - "output/aizheng-3.jpg"
+      - "output/aizheng-4.jpg"
+    status: draft
+    drafts:
+      - version: v1
+        note: "humanness 32.96 in_range（flag_words 0、negation_pairs 0、formulaic_rhetoric 0）；合规 0 error/0 warn；SEO 0 error/2 warn（筛查未进标题与首段）；配图 5 张读图自检通过，落盘统一为真 JPEG（160-230KB）；标题已去掉无往年数据支撑的「换了」表述"
+        media_id: "q_zrQd1gVlCJUeajP8dHya7iTFd5z01lEZavpVkkejDtvnLu1wftn5BYSiPVBoPU"
+        action: 以此版发布
+
 style_sources:
   - date: "2026-10-10"
     note: "从账号 9 篇已发文章学习写作与配图风格"
