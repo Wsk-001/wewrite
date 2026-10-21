@@ -146,6 +146,19 @@ description: |
   真实细节（动作要领、器物方位、步骤顺序）写进提示词，再生成
 - 「生成后：视觉 bug 自检闭环」——每张图生成后必须读图自检（按清单逐项核对），
   不通过则修订提示词重生成，全部通过才允许进入 Step 7
+
+多张配图（封面 + 正文图）必须一次批量并发生成，逐张串行调用会被判为流程错误：
+1. 写 batch 文件 {baseDir}/output/.imgbatch.json：
+   [{"prompt": "...", "output": "{baseDir}/output/xxx-1.jpg", "size": "article"},
+    {"prompt": "...", "output": "{baseDir}/output/cover-xxx.jpg", "size": "cover"}]
+2. 运行: python3 {baseDir}/toolkit/image_gen.py --batch {baseDir}/output/.imgbatch.json --workers 5
+3. 读 stdout JSON 确认 ok/failed；failed 的图修 prompt 后单独重跑该张
+4. 自检不通过的图只重生成该一张，其余不动
+
+视觉自检同样禁止逐张串行：把本批全部图片在同一条消息里并行读图（或并行建
+image_analysis 任务后统一收结果），一次性按清单核对；不通过的收集成第二批，
+一次 batch 重生成后再并发复检。整个 Step 6 只允许「批量生成 → 并发自检 →
+批量重生成 → 复检」一轮循环，超过两轮说明提示词本身有系统性问题，回头修提示词模板。
 ```
 
 ---

@@ -6,11 +6,15 @@ import hmac
 import json
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
 import yaml
+
+CONNECT_TIMEOUT = 10
+READ_TIMEOUT = 120
 
 
 def _load_config() -> dict:
@@ -90,7 +94,7 @@ class DoubaoProvider(ImageProvider):
             f"{self._base_url}/images/generations",
             headers={"Content-Type": "application/json", "Authorization": f"Bearer {self._api_key}"},
             json={"model": self._model, "prompt": prompt, "response_format": "url", "size": size, "stream": False, "watermark": False},
-            timeout=120,
+            timeout=(CONNECT_TIMEOUT, READ_TIMEOUT),
         )
         data = resp.json()
         if resp.status_code != 200:
@@ -98,7 +102,7 @@ class DoubaoProvider(ImageProvider):
         url = data.get("data", [{}])[0].get("url")
         if not url:
             raise ValueError(f"No image URL: {data}")
-        return requests.get(url, timeout=60).content
+        return requests.get(url, timeout=(CONNECT_TIMEOUT, 60)).content
 
 
 class OpenAIProvider(ImageProvider):
@@ -126,7 +130,7 @@ class OpenAIProvider(ImageProvider):
             f"{self._base_url}/images/generations",
             headers={"Content-Type": "application/json", "Authorization": f"Bearer {self._api_key}"},
             json=body,
-            timeout=120,
+            timeout=(CONNECT_TIMEOUT, READ_TIMEOUT),
         )
         data = resp.json()
         if resp.status_code != 200:
@@ -134,7 +138,7 @@ class OpenAIProvider(ImageProvider):
         item = data.get("data", [{}])[0]
         url = item.get("url")
         if url:
-            return requests.get(url, timeout=60).content
+            return requests.get(url, timeout=(CONNECT_TIMEOUT, 60)).content
         b64 = item.get("b64_json")
         if b64:
             return base64.b64decode(b64)
@@ -157,7 +161,7 @@ class GeminiProvider(ImageProvider):
             headers={"Content-Type": "application/json", "x-goog-api-key": self._api_key},
             json={"contents": [{"parts": [{"text": prompt}]}],
                   "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}},
-            timeout=120,
+            timeout=(CONNECT_TIMEOUT, READ_TIMEOUT),
         )
         if resp.status_code != 200:
             msg = resp.text[:200]
@@ -187,7 +191,7 @@ class DashScopeProvider(ImageProvider):
             headers={"Content-Type": "application/json", "Authorization": f"Bearer {self._api_key}"},
             json={"model": self._model, "input": {"messages": [{"role": "user", "content": [{"text": prompt}]}]},
                   "parameters": {"prompt_extend": False, "size": ds_size, "watermark": False}},
-            timeout=120,
+            timeout=(CONNECT_TIMEOUT, READ_TIMEOUT),
         )
         data = resp.json()
         if resp.status_code != 200:
@@ -204,7 +208,7 @@ class DashScopeProvider(ImageProvider):
         if not img:
             raise ValueError(f"No image in DashScope response: {data}")
         if img.startswith("http"):
-            return requests.get(img, timeout=60).content
+            return requests.get(img, timeout=(CONNECT_TIMEOUT, 60)).content
         return base64.b64decode(img)
 
 
@@ -225,7 +229,7 @@ class MiniMaxProvider(ImageProvider):
             f"{self._base_url}/image_generation",
             headers={"Content-Type": "application/json", "Authorization": f"Bearer {self._api_key}"},
             json={"model": self._model, "prompt": prompt, "response_format": "base64", "width": w, "height": h, "n": 1},
-            timeout=120,
+            timeout=(CONNECT_TIMEOUT, READ_TIMEOUT),
         )
         data = resp.json()
         if resp.status_code != 200:
@@ -252,7 +256,7 @@ class ReplicateProvider(ImageProvider):
             f"{self._base_url}/models/{self._model}/predictions",
             headers=headers,
             json={"input": {"prompt": prompt, "aspect_ratio": aspect, "number_of_images": 1, "output_format": "png"}},
-            timeout=120,
+            timeout=(CONNECT_TIMEOUT, READ_TIMEOUT),
         )
         data = resp.json()
         if resp.status_code not in (200, 201):
@@ -273,7 +277,7 @@ class ReplicateProvider(ImageProvider):
             output = output.get("url", output.get("uri"))
         if not output or not isinstance(output, str):
             raise ValueError(f"No image URL in Replicate output: {data}")
-        return requests.get(output, timeout=60).content
+        return requests.get(output, timeout=(CONNECT_TIMEOUT, 60)).content
 
 
 class AzureOpenAIProvider(ImageProvider):
@@ -290,14 +294,14 @@ class AzureOpenAIProvider(ImageProvider):
             f"{self._base_url}/deployments/{self._deployment}/images/generations?api-version=2025-04-01-preview",
             headers={"Content-Type": "application/json", "api-key": self._api_key},
             json={"prompt": prompt, "size": size, "n": 1, "quality": "medium"},
-            timeout=120,
+            timeout=(CONNECT_TIMEOUT, READ_TIMEOUT),
         )
         data = resp.json()
         if resp.status_code != 200:
             raise ValueError(f"Azure OpenAI error ({resp.status_code}): {data}")
         item = data.get("data", [{}])[0]
         if item.get("url"):
-            return requests.get(item["url"], timeout=60).content
+            return requests.get(item["url"], timeout=(CONNECT_TIMEOUT, 60)).content
         if item.get("b64_json"):
             return base64.b64decode(item["b64_json"])
         raise ValueError(f"No image in Azure response: {data}")
@@ -316,7 +320,7 @@ class OpenRouterProvider(ImageProvider):
             headers={"Content-Type": "application/json", "Authorization": f"Bearer {self._api_key}"},
             json={"model": self._model, "messages": [{"role": "user", "content": prompt}],
                   "modalities": ["image"], "stream": False},
-            timeout=120,
+            timeout=(CONNECT_TIMEOUT, READ_TIMEOUT),
         )
         data = resp.json()
         if resp.status_code != 200:
@@ -326,7 +330,7 @@ class OpenRouterProvider(ImageProvider):
         if images:
             img = images[0]
             if img.startswith("http"):
-                return requests.get(img, timeout=60).content
+                return requests.get(img, timeout=(CONNECT_TIMEOUT, 60)).content
             if img.startswith("data:"):
                 _, b64 = img.split(",", 1)
                 return base64.b64decode(b64)
@@ -339,7 +343,7 @@ class OpenRouterProvider(ImageProvider):
                         if url.startswith("data:"):
                             _, b64 = url.split(",", 1)
                             return base64.b64decode(b64)
-                        return requests.get(url, timeout=60).content
+                        return requests.get(url, timeout=(CONNECT_TIMEOUT, 60)).content
         raise ValueError(f"No image in OpenRouter response: {data}")
 
 
@@ -408,7 +412,7 @@ class JimengProvider(ImageProvider):
                     return base64.b64decode(b64_list[0])
                 urls = data.get("image_urls", [])
                 if urls:
-                    return requests.get(urls[0], timeout=60).content
+                    return requests.get(urls[0], timeout=(CONNECT_TIMEOUT, 60)).content
                 raise ValueError(f"No image data in Jimeng result: {result}")
             if code and code != 10000:
                 status = result.get("data", {}).get("status")
@@ -538,6 +542,24 @@ def _ensure_output_format(raw_bytes: bytes, output_path: str) -> bytes:
     return buf.getvalue()
 
 
+def _generate_with_retry(provider, prompt: str, size: str, retries: int = 2) -> bytes:
+    """同一 provider 内快速重试：偶发网络抖动立刻退避重发，避免傻等整轮超时。"""
+    last_error = None
+    for attempt in range(retries + 1):
+        try:
+            return provider.generate(prompt, size)
+        except Exception as e:
+            last_error = e
+            if attempt < retries:
+                wait = 2 * (attempt + 1)
+                print(
+                    f"Provider '{provider.provider_key}' attempt {attempt + 1} failed: {e}. Retrying in {wait}s...",
+                    file=sys.stderr,
+                )
+                time.sleep(wait)
+    raise last_error
+
+
 def generate_image(prompt: str, output_path: str, size: str = "cover", config: dict = None) -> str:
     if config is None:
         config = _load_config()
@@ -545,16 +567,11 @@ def generate_image(prompt: str, output_path: str, size: str = "cover", config: d
     last_error = None
     for provider in chain:
         resolved_size = provider.resolve_size(size)
-        raw_bytes = None
-        for attempt in range(3):
-            try:
-                raw_bytes = provider.generate(prompt, resolved_size)
-                break
-            except Exception as e:
-                last_error = e
-                print(f"Provider '{provider.provider_key}' failed: {e}. Trying next...", file=sys.stderr)
-                break
-        if raw_bytes is None:
+        try:
+            raw_bytes = _generate_with_retry(provider, prompt, resolved_size)
+        except Exception as e:
+            last_error = e
+            print(f"Provider '{provider.provider_key}' failed: {e}. Trying next...", file=sys.stderr)
             continue
         _warn_size_mismatch(raw_bytes, resolved_size, provider.provider_key)
         raw_bytes = _center_crop_to_ratio(raw_bytes, resolved_size)
@@ -578,14 +595,86 @@ def generate_image(prompt: str, output_path: str, size: str = "cover", config: d
     raise ValueError(f"All providers failed. Last error: {last_error}")
 
 
+def generate_images_batch(
+    tasks: list, config: dict = None, max_workers: int = 5
+) -> dict:
+    """并发生成多张图，消除逐张串行等待。
+
+    tasks: [{"prompt": str, "output": str, "size": str(可选 cover/article/vertical/square/WxH)}]
+    返回 {"ok": {output: path}, "failed": {output: error_msg}}
+    """
+    if config is None:
+        config = _load_config()
+    results = {"ok": {}, "failed": {}}
+    workers = min(max_workers, len(tasks)) if tasks else 0
+    if workers <= 0:
+        return results
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {
+            pool.submit(
+                generate_image,
+                t["prompt"],
+                t["output"],
+                t.get("size", "cover"),
+                config,
+            ): t["output"]
+            for t in tasks
+        }
+        for fut in as_completed(futures):
+            output = futures[fut]
+            try:
+                results["ok"][output] = fut.result()
+                print(f"[batch] done: {output}", file=sys.stderr)
+            except Exception as e:
+                results["failed"][output] = str(e)
+                print(f"[batch] failed: {output}: {e}", file=sys.stderr)
+    return results
+
+
+def _run_batch(batch_path: str, max_workers: int, provider_override: str = None):
+    with open(batch_path, "r", encoding="utf-8") as f:
+        tasks = json.load(f)
+    if not isinstance(tasks, list) or not tasks:
+        print("Error: batch file must be a non-empty JSON array", file=sys.stderr)
+        sys.exit(1)
+    for i, t in enumerate(tasks):
+        if not t.get("prompt") or not t.get("output"):
+            print(f"Error: task[{i}] needs both 'prompt' and 'output'", file=sys.stderr)
+            sys.exit(1)
+    config = _load_config()
+    if provider_override:
+        config.setdefault("image", {})["provider"] = provider_override
+    t0 = time.time()
+    results = generate_images_batch(tasks, config=config, max_workers=max_workers)
+    elapsed = time.time() - t0
+    print(
+        f"Batch finished in {elapsed:.1f}s: {len(results['ok'])} ok, {len(results['failed'])} failed",
+        file=sys.stderr,
+    )
+    print(json.dumps(results, ensure_ascii=False, indent=2))
+    if results["failed"]:
+        sys.exit(1)
+
+
 def main():
     ap = argparse.ArgumentParser(description="Generate images using AI")
-    ap.add_argument("--prompt", required=True, help="Image generation prompt")
-    ap.add_argument("--output", required=True, help="Output file path")
+    ap.add_argument("--prompt", default=None, help="Image generation prompt")
+    ap.add_argument("--output", default=None, help="Output file path")
     ap.add_argument("--size", default="cover", help="Size: cover, article, vertical, square, or WxH")
     ap.add_argument("--provider", default=None, help=f"Override provider ({', '.join(PROVIDERS)})")
+    ap.add_argument(
+        "--batch", default=None,
+        help="JSON file: [{prompt, output, size?}, ...]; generates concurrently",
+    )
+    ap.add_argument("--workers", type=int, default=5, help="Concurrent workers for --batch (default 5)")
     args = ap.parse_args()
     try:
+        if args.batch:
+            _run_batch(args.batch, args.workers, args.provider)
+            return
+        if not args.prompt or not args.output:
+            print("Error: --prompt/--output required (or use --batch)", file=sys.stderr)
+            sys.exit(1)
         config = _load_config()
         if args.provider:
             config.setdefault("image", {})["provider"] = args.provider
