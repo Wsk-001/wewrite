@@ -105,3 +105,50 @@ def test_banned_words_score_is_monotonic_after_calibration():
     calibrate_tiers(clean, dirty)
     assert clean["banned_words"]["score"] > dirty["banned_words"]["score"]
     assert clean["banned_words"]["score"] == 1.0
+
+
+def test_sentence_range_large_no_longer_bell_penalized():
+    """range 越大越像人。曾因钟形校准把 range=78 压到 0 分，与 stddev≥15 互斥。"""
+    from humanness_score import score_sentence_length_range, calibrate_tiers
+    from humanness_score import _BELL_CURVE_CHECKS
+
+    assert "sentence_length_range" not in _BELL_CURVE_CHECKS
+    long = "这句稍微长一些，用来撑开句子长度的上界，也顺带制造一点节奏差。"
+    text = "\n".join(["短。", long, "又是一句很短的话。", long, "短句。", long])
+    r = score_sentence_length_range(text)
+    assert r["score"] >= 0.8, r
+
+
+def test_real_sources_recognizes_date_and_authority_citation():
+    """“央视新闻 10 月 22 日”“云南卫健委的科普里写得很清楚”属真实出处。"""
+    from humanness_score import score_real_sources
+
+    text = "央视新闻 10 月 22 日发了条提醒。云南卫健委的科普里写得很清楚：别乱揉。"
+    r = score_real_sources(text)
+    assert "0 real-source" not in r["detail"], r["detail"]
+    count = int(r["detail"].split()[0])
+    assert count >= 2, r["detail"]
+
+
+def test_real_sources_counts_overlaps_once():
+    from humanness_score import score_real_sources
+
+    r = score_real_sources("王主任医师指出，熬夜确实伤眼。")
+    assert r["detail"].startswith("1 real-source"), r["detail"]
+
+
+def test_negative_emotion_target_matches_persona_fingerprint():
+    """账号指纹负面情绪 2-10%，目标线由 20% 下调到 10%。"""
+    from humanness_score import score_negative_emotion_ratio
+
+    text = "。".join(["今天又熬夜了，烦"] + ["这是普通的一句描述"] * 11) + "。"
+    r = score_negative_emotion_ratio(text)
+    assert "target ≥10%" in r["detail"]
+    assert r["score"] >= 0.7, r
+
+
+def test_flag_words_no_false_positive_on_visible_importance():
+    from humanness_score import score_flag_words
+
+    assert score_flag_words("它的重要性可见，别忽视。")["score"] == 1.0
+    assert score_flag_words("由此可见，问题不在眼睛。")["score"] < 1.0

@@ -3,7 +3,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 
-from seo_check import _keyword_density, _parse_article, check_article  # noqa: E402
+from seo_check import _keyword_density, _parse_article, check_article, split_keywords  # noqa: E402
 
 GOOD_ARTICLE = """# 失眠的人别再数羊了，试试这套方法
 
@@ -115,3 +115,16 @@ def check_article_text_with_history(tmp_path, history):
     f = tmp_path / "a.md"
     f.write_text(GOOD_ARTICLE, encoding="utf-8")
     return check_article(str(f), ["失眠"], str(history))
+
+
+def test_split_keywords_handles_comma():
+    assert split_keywords("护眼,伤眼") == ["护眼", "伤眼"]
+
+
+def test_split_keywords_handles_whitespace_and_cjk_punctuation():
+    assert split_keywords("护眼 伤眼，眼健康、干眼") == ["护眼", "伤眼", "眼健康", "干眼"]
+
+
+def test_split_keywords_empty():
+    assert split_keywords("") == []
+    assert split_keywords("  , ，、 ") == []

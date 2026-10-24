@@ -101,7 +101,7 @@ Entries discovered by the Agent during task execution should follow this format:
 - Instructions:
   - humanness_score.py Tier2 由 5 项扩为 8 项：新增 flag_words（红旗词，每命中扣 0.25，目标 0）、negation_pairs（否定对举"不是X而是Y"，容差 1 次，超出每次扣 0.4）、formulaic_rhetoric（三段式排比/虚假范围"从X到Y"，容差 1 次，超出每次扣 0.5）
   - 三项新检测为「负向检查」（0 命中=得分高=更人），不加 bell-curve 中心（加中心会反转成"越干净越像 AI"，是错的）
-  - 新增三项后整体刻度下调约 5-7 分，区间由 [26,40] 下调；2026-10-21 修掉 banned_words 校准反转后全库 14 篇重评为 20.1-39.0，现区间 [20,40]
+  - 区间随每次检测逻辑修复重算：2026-10-17 新增三项后由 [26,40] 下调；2026-10-21 修 banned_words 反转后为 [20,40]（14 篇 20.1-39.0）；2026-10-22 修 5 处校准缺陷后为 [16,36]（14 篇 17.6-34.2）
   - composite = (1 - humanness)*100，分数越低越人；Tier2 检查数变化会平移 absolute 刻度，改动检测项后必须用历史文章重新校准区间
   - 新增 tests/test_humanness_score.py（7 例）；全量 pytest 81 passed
   - 破折号中断句法同时计入 broken_sentences，过度依赖会让节奏刻意
@@ -128,7 +128,7 @@ Entries discovered by the Agent during task execution should follow this format:
   - `--json` 必须做到 stdout 纯 JSON：verbose 报告与 --calibrate 表格改道 stderr（contextlib.redirect_stdout），否则 SKILL Step 5 的 `--json` 无法解析
   - 否定对举/排比原来逐 pattern 累加：`不是A而是B` 同时命中 `不是…而是` 与 `不是…是` 被计 2 次，把「容差 1 次」变成「一次就罚」；改用 _count_structure_spans 合并重叠 span 后计数
   - FLAG_WORDS 曾重复收录「归根结底」（一处命中扣两次），并有错字「母庸置疑」；BANNED_WORDS 同类错字「莫庸置疑」「值得注意的 是」；均已修正并补入值得注意/不可忽视
-  - 修完检测逻辑必须重跑全部历史文章复核区间：当前 14 篇为 20.1-39.0，全部落在 [20,40]
+  - 修完检测逻辑必须重跑全部历史文章复核区间：当前 14 篇为 17.6-34.2，全部落在 [16,36]
   - cli publish 预检与真实上传必须共用 _resolve_image_path（含仅文件名回退），否则预检通过、上传静默丢图；图片引用要 unquote 百分号编码
   - wechat_search：只有命中 antispider/验证码标记才算 blocked；「无结果列表」不能谎报反爬（改为 warning 字段）；翻页间隔 1s；不要用 apparent_encoding 覆盖已声明的 utf-8
   - 搜狗会因连续查询把出口 IP 打入验证码状态（blocked 持续一段时间），此时脚本 exit 3 并提示退化为 WebSearch；选题阶段每个候选只查一次，沙箱直连可用、无需代理
@@ -150,3 +150,5 @@ Entries discovered by the Agent during task execution should follow this format:
   - 所有 provider 请求改用分离式超时 (CONNECT_TIMEOUT=10, READ_TIMEOUT=120)，坏网关时 10s 内快速失败换下一家，避免傻等 120s
   - 实测生成耗时：1024 方图 ~7s、article 1792x1024 ~12s、cover 1920x816 ~13s；5 张并发总耗时 = 最慢一张 ≈ 15s，尺寸对单张耗时影响不大
   - 配图环节另一个大头是视觉自检：SKILL Step 6 已规定自检必须并行读图/并行建任务，只允许「批量生成→并发自检→批量重生成→复检」一轮循环，超两轮要回头修提示词模板
+  - 2026-10-22 全流程验收发现并修复 5 处校准缺陷：range 钟形误罚（与 stddev 互斥，range 大反被压 0）、real_sources 漏认「10 月 22 日」「科普里写得很清楚」类真实出处、negative_emotion 目标 20% 与账号指纹 2-10% 冲突、flag_words 误报单独出现的「可见」（改用精确词「由此可见」）、seo --keywords 不认空格分隔。修复后全库 14 篇重评 17.6-34.2（均值 25.7），humanness_range 由 [20,40] 调为 [16,36]，negative_emotion_floor 0.12→0.10
+  - z-image-turbo 生成含中文文字的图约 1/5 概率出伪文字残留，配图统一走「图内无文字」路线最稳

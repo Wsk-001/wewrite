@@ -33,7 +33,17 @@ from pathlib import Path
 
 BANNED_WORDS = ["\u9996\u5148", "\u5176\u6b21", "\u518d\u8005", "\u6700\u540e", "\u603b\u4e4b", "\u7efc\u4e0a\u6240\u8ff0", "\u603b\u800c\u8a00\u4e4b", "\u6b64\u5916", "\u53e6\u5916", "\u4e0e\u6b64\u540c\u65f6", "\u4e0d\u4ec5\u5982\u6b64", "\u66f4\u91cd\u8981\u7684\u662f", "\u5728\u6b64\u57fa\u7840\u4e0a", "\u4f5c\u4e3a\u4e00\u4e2a", "\u8ba9\u6211\u4eec", "\u503c\u5f97\u6ce8\u610f\u7684\u662f", "\u9700\u8981\u6307\u51fa\u7684\u662f", "\u4e0d\u53ef\u5426\u8ba4", "\u6bcb\u5eb8\u7f6e\u7591", "\u4f17\u6240\u5468\u77e5", "\u4e8b\u5b9e\u4e0a", "\u663e\u800c\u6613\u89c1", "\u53ef\u4ee5\u8bf4", "\u4ece\u67d0\u79cd\u610f\u4e49\u4e0a\u8bf4", "\u975e\u5e38\u91cd\u8981", "\u81f3\u5173\u91cd\u8981", "\u4e0d\u8a00\u800c\u55bb", "\u5177\u6709\u91cd\u8981\u610f\u4e49", "\u53d1\u6325\u7740\u91cd\u8981\u4f5c\u7528", "\u610f\u4e49\u6df1\u8fdc", "\u5f71\u54cd\u6df1\u8fdc", "\u5f15\u53d1\u4e86\u5e7f\u6cdb\u5173\u6ce8", "\u5f15\u8d77\u4e86\u70ed\u70c8\u8ba8\u8bba", "\u603b\u7684\u6765\u8bf4", "\u7efc\u5408\u6765\u770b", "\u7531\u6b64\u53ef\u89c1", "\u4e0d\u96be\u53d1\u73b0", "\u901a\u8fc7\u4ee5\u4e0a\u5206\u6790", "\u6b63\u5982\u6211\u4eec\u6240\u770b\u5230\u7684"]
 
-REAL_SOURCE_PATTERNS = [r'[A-Z][a-z]+\s+[A-Z][a-z]+', r'[\u4e00-\u9fff]{2,4}(?:\u8868\u793a|\u6307\u51fa|\u8ba4\u4e3a|\u5199\u9053|\u63d0\u5230|\u8bf4\u8fc7)', r'(?:\u636e|\u6839\u636e|\u6765\u81ea)\s*[\u4e00-\u9fff]+(?:\u62a5\u544a|\u6570\u636e|\u7814\u7a76|\u8c03\u67e5)', r'20[12]\d\s*\u5e74', r'\d+(?:\.\d+)?%', r'(?:\u4ebf|\u4e07)\s*(?:\u7f8e\u5143|\u5143|\u4eba\u6c11\u5e01)']
+REAL_SOURCE_PATTERNS = [
+    r'[A-Z][a-z]+\s+[A-Z][a-z]+',
+    r'[\u4e00-\u9fff]{2,4}(?:\u8868\u793a|\u6307\u51fa|\u8ba4\u4e3a|\u5199\u9053|\u63d0\u5230|\u8bf4\u8fc7|\u5f3a\u8c03)',
+    r'(?:\u636e|\u6839\u636e|\u6765\u81ea|\u63f4\u5f15)\s*[\u4e00-\u9fff]{1,12}(?:\u62a5\u544a|\u6570\u636e|\u7814\u7a76|\u8c03\u67e5|\u901a\u62a5|\u516c\u544a|\u79d1\u666e|\u62a5\u9053|\u6307\u5357|\u624b\u518c|\u767d\u76ae\u4e66)',
+    r'[\u4e00-\u9fff]{2,12}(?:\u7684\u79d1\u666e|\u7684\u7a3f\u5b50|\u7684\u62a5\u9053|\u7684\u901a\u62a5|\u7684\u516c\u544a|\u53d1\u5e03\u4f1a|\u624b\u518c|\u6307\u5357|\u767d\u76ae\u4e66)[\u4e00-\u9fff]{0,4}(?:\u91cc|\u4e2d|\u4e0a)?(?:\u5199|\u8bf4|\u63d0|\u8bb2)',
+    r'[\u4e00-\u9fff]{2,10}(?:\u4e3b\u4efb\u533b\u5e08|\u526f\u4e3b\u4efb\u533b\u5e08|\u4e3b\u6cbb\u533b\u5e08|\u6559\u6388|\u7814\u7a76\u5458)',
+    r'20[12]\d\s*\u5e74',
+    r'\d{1,2}\s*\u6708\s*\d{1,2}\s*\u65e5',
+    r'\d+(?:\.\d+)?%',
+    r'(?:\u4ebf|\u4e07)\s*(?:\u7f8e\u5143|\u5143|\u4eba\u6c11\u5e01)',
+]
 
 NEGATIVE_MARKERS = ["\u5931\u671b", "\u7cdf\u7cd5", "\u626f", "\u5751", "\u70c2", "\u5dee\u52b2", "\u5d29\u6e83", "\u5410\u69fd", "\u9a82", "\u6012", "\u70e6", "\u7126\u8651", "\u62c5\u5fe7", "\u4e0d\u6ee1", "\u6076\u5fc3", "\u53ef\u6015", "\u53ef\u60b2", "\u53ef\u7b11", "\u79bb\u8c31", "\u5c34\u5c2c", "\u65e0\u8bed", "\u8822", "\u60e8", "\u4e8f", "\u5371", "\u7edd\u671b", "\u8ff7\u832b", "\u5fc3\u7d2f", "\u4e27", "\u540e\u6094", "\u540e\u6015", "\u5fc3\u5bd2", "\u9a97", "\u5ffd\u60a0", "\u5272\u83dc\u8359", "\u5957\u8def", "\u753b\u5927\u997c", "\u6d17\u8111", "\u767d\u8d39", "\u767d\u642d", "\u6ca1\u620f", "\u9ec4\u4e86", "\u51c9\u4e86", "\u5e9f\u4e86", "\u50bb", "\u5929\u771f", "\u5403\u4e8f", "\u81ea\u5609", "\u6253\u8138", "\u5475\u5475", "\u597d\u5427", "\u884c\u5427", "\u771f\u670d\u4e86", "\u592a\u626f\u4e86", "\u8bf4\u5b9e\u8bdd\u6211\u5f88\u5931\u671b", "\u641e\u4ec0\u4e48", "\u4e0d\u9760\u8c31", "\u53d7\u4e0d\u4e86", "\u53d7\u591f\u4e86", "\u60f3\u54ed", "\u4f24\u5fc3", "\u82e6\u54c8\u54c8", "\u5f97\u8fc7\u4e14\u8fc7"]
 
@@ -59,7 +69,7 @@ FLAG_WORDS = [
     "\u503c\u5f97\u6ce8\u610f", "\u503c\u5f97\u4e00\u63d0", "\u503c\u5f97\u4e00\u8bf4",
     "\u4e0d\u5bb9\u5ffd\u89c6", "\u4e0d\u53ef\u5ffd\u89c6", "\u4e0d\u53ef\u5c0f\u89d1",
     "\u4e0d\u5bb9\u7f6e\u7591", "\u6bcb\u5eb8\u7f6e\u7591", "\u52a1\u5fc5", "\u5207\u8bb0", "\u8bf7\u8bb0\u4f4f",
-    "\u5f52\u6839\u7ed3\u5e95", "\u4ece\u672c\u8d28\u4e0a\u8bb2", "\u4e0d\u96be\u770b\u51fa", "\u53ef\u89c1", "\u8db3\u89c1",
+    "\u5f52\u6839\u7ed3\u5e95", "\u4ece\u672c\u8d28\u4e0a\u8bb2", "\u4e0d\u96be\u770b\u51fa", "\u7531\u6b64\u53ef\u89c1", "\u8db3\u89c1",
     "\u4e0d\u8a00\u800c\u55bb", "\u4e8b\u5b9e\u4e0a", "\u5b9e\u9645\u4e0a",
     "\u65e0\u5f62\u4e2d", "\u6f5c\u79fb\u9ed8\u5316", "\u4e0e\u6b64\u540c\u65f6", "\u7efc\u4e0a\u6240\u8ff0",
     "\u603b\u800c\u8a00\u4e4b", "\u4e0e\u5176\u8bf4", "\u5728\u5f53\u4e0b", "\u5728\u5f53\u4eca",
@@ -122,7 +132,7 @@ def score_sentence_length_range(text):
     expected = max(1, len(text) / 500)
     short_score = min(1.0, short_paras / expected)
     score = range_score * 0.6 + short_score * 0.4
-    return _make_result(score, f"range={rng} (target \u226530), short_paras={short_paras}", "sentence_variance")
+    return _make_result(score, f"range={rng} (target \u226530), short_paras={short_paras} (target \u2265{expected:.0f})", "sentence_variance")
 
 
 def score_paragraph_length_variance(text):
@@ -154,8 +164,8 @@ def score_negative_emotion_ratio(text):
         return _make_result(0.5, "no sentences", "emotional_arc")
     negative_count = sum(1 for s in sentences if any(m in s for m in NEGATIVE_MARKERS))
     ratio = negative_count / len(sentences)
-    score = min(1.0, ratio / 0.25)
-    return _make_result(score, f"negative={negative_count}/{len(sentences)} ({ratio:.0%}, target \u226520%)", "emotional_arc")
+    score = min(1.0, ratio / 0.10)
+    return _make_result(score, f"negative={negative_count}/{len(sentences)} ({ratio:.0%}, target \u226510%)", "emotional_arc")
 
 
 def score_adverb_density(text):
@@ -203,9 +213,7 @@ def score_broken_sentences(text):
 
 
 def score_real_sources(text):
-    count = 0
-    for pattern in REAL_SOURCE_PATTERNS:
-        count += len(re.findall(pattern, text))
+    count = _count_structure_spans(text, REAL_SOURCE_PATTERNS)
     score = min(1.0, count / 5.0)
     return _make_result(score, f"{count} real-source indicators (target \u22655)", "real_data_density")
 
@@ -285,7 +293,7 @@ def run_tier(checks, text):
     return results
 
 
-_BELL_CURVE_CHECKS = {"broken_sentences": 0.39, "self_correction": 0.20, "sentence_length_range": 0.71, "paragraph_length_variance": 0.52}
+_BELL_CURVE_CHECKS = {"broken_sentences": 0.39, "self_correction": 0.20, "paragraph_length_variance": 0.52}
 
 
 def _bell_curve(raw_score, center):
@@ -406,10 +414,10 @@ def _print_verbose(result):
             print(f"  {param}: {score:.2f}")
 
 
-CALIBRATION_BASELINES = {"pure_ai": {"label": "Pure AI (typical ChatGPT output)", "expected_composite_min": 75, "expected_composite_max": 85}, "ai_with_editing": {"label": "AI draft + human editing", "expected_composite_min": 40, "expected_composite_max": 55}, "human_written": {"label": "Genuine human blog post", "expected_composite_min": 15, "expected_composite_max": 30}, "target_range": {"label": "WeWrite target range", "expected_composite_min": 20, "expected_composite_max": 38}}
+CALIBRATION_BASELINES = {"pure_ai": {"label": "Pure AI (typical ChatGPT output)", "expected_composite_min": 75, "expected_composite_max": 85}, "ai_with_editing": {"label": "AI draft + human editing", "expected_composite_min": 40, "expected_composite_max": 55}, "human_written": {"label": "Genuine human blog post", "expected_composite_min": 15, "expected_composite_max": 30}, "target_range": {"label": "WeWrite target range", "expected_composite_min": 16, "expected_composite_max": 36}}
 
 
-DEFAULT_HUMANNESS_RANGE = (20.0, 40.0)
+DEFAULT_HUMANNESS_RANGE = (16.0, 36.0)
 
 
 def _calibration_verdict(result: dict) -> dict:

@@ -43,7 +43,7 @@ emotional_arc: "restrained_to_burst"
 # 参考值：健康科普以克制调性为主，本项为建议值而非硬性门槛，
 # 实测常低于 0.20 仍可落入人味区间（靠句长/节奏/真实数据密度支撑）。
 # → 对抗情感分布检测 [规则 1.4]
-negative_emotion_floor: 0.20
+negative_emotion_floor: 0.10
 
 # 副词密度上限——每 100 字最多几个副词
 # AI 中文文本副词显著偏多
@@ -126,7 +126,7 @@ persona: "科技媒体资深编辑，写了八年公众号，对AI行业有深�
 # 新增 flag_words/negation_pairs/formulaic_rhetoric 三项检测后，整体刻度下调，
 # 默认区间由 [26,40] 调整为 [20,38]；修正 banned_words 钟形校准反转后全库重评
 # 为 20.1-39.0（均值 28.5、标准差 4.9），上限放宽至 40。SKILL.md Step 5 优先读本字段。
-humanness_range: [20, 40]
+humanness_range: [16, 36]
 
 # ============================================================
 # 四、红旗词与 AI 结构检测（新增，脚本硬检测）

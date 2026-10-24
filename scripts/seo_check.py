@@ -84,6 +84,11 @@ def _suggest_links(history_path: str, title: str, keywords: list[str], max_links
     return [{"title": t, "topic": topic, "link": link, "relevance": o} for o, t, link, topic in scored[:max_links]]
 
 
+def split_keywords(raw: str) -> list[str]:
+    """核心词按空白、英文逗号、中文逗号、顿号统一切分。"""
+    return [k for k in re.split(r"[\s,，、]+", raw or "") if k.strip()]
+
+
 def check_article(path: str, keywords: list[str], history_path: str | None = None):
     title, subheadings, body, paragraphs = _parse_article(path)
     body_clean = re.sub(r"\s", "", body)
@@ -142,12 +147,12 @@ def check_article(path: str, keywords: list[str], history_path: str | None = Non
 def main():
     parser = argparse.ArgumentParser(description="Pre-publish SEO check")
     parser.add_argument("input", help="Article markdown file")
-    parser.add_argument("--keywords", default="", help="Comma-separated core keywords")
+    parser.add_argument("--keywords", default="", help="Core keywords, separated by comma or whitespace")
     parser.add_argument("--history", default=None, help="history.yaml path for internal link suggestions")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     args = parser.parse_args()
 
-    keywords = [k for k in args.keywords.split(",") if k.strip()] if args.keywords else []
+    keywords = split_keywords(args.keywords)
     report = check_article(args.input, keywords, args.history)
 
     if args.json:
