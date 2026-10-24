@@ -20,6 +20,7 @@ from theme import load_theme, list_themes
 from wechat_api import get_access_token, upload_image, upload_thumb
 from publisher import create_draft, create_image_post
 from config import load_config
+from gzh_converter import GzhConverter
 
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"}
@@ -165,9 +166,25 @@ def cmd_publish(args):
         print("Error: --appid and --secret required (or set in config.yaml)", file=sys.stderr)
         sys.exit(1)
 
-    theme = load_theme(theme_name)
-    converter = WeChatConverter(theme=theme)
-    result = converter.convert_file(args.input)
+    # Check if using gzh-design theme
+    gzh_themes = ["moyu-green", "gzh-moyu-green"]
+    use_gzh = theme_name in gzh_themes
+    
+    if use_gzh:
+        # Use gzh-design converter
+        skill_root = Path(__file__).parent.parent / ".ai-ready" / "skills" / "gzh-design"
+        if not skill_root.exists():
+            print(f"Error: gzh-design skill not found at {skill_root}", file=sys.stderr)
+            sys.exit(1)
+        
+        converter = GzhConverter(skill_root)
+        result = converter.convert_file(Path(args.input), author=author)
+        print(f"[GZH Design] Using moyu-green theme")
+    else:
+        # Use original converter
+        theme = load_theme(theme_name)
+        converter = WeChatConverter(theme=theme)
+        result = converter.convert_file(args.input)
 
     print(f"Title: {result.title}")
     print(f"Digest: {result.digest}")
@@ -451,7 +468,7 @@ def main():
 
     p_publish = sub.add_parser("publish", help="Convert and publish as WeChat draft")
     p_publish.add_argument("input", help="Markdown file path")
-    p_publish.add_argument("-t", "--theme", default=None, help="Theme name")
+    p_publish.add_argument("-t", "--theme", default=None, help="Theme name (use 'moyu-green' for gzh-design)")
     p_publish.add_argument("--appid", default=None, help="WeChat AppID (or set in config.yaml)")
     p_publish.add_argument("--secret", default=None, help="WeChat AppSecret (or set in config.yaml)")
     p_publish.add_argument("--cover", help="Cover image file path")

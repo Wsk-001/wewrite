@@ -150,5 +150,5 @@ Entries discovered by the Agent during task execution should follow this format:
   - 所有 provider 请求改用分离式超时 (CONNECT_TIMEOUT=10, READ_TIMEOUT=120)，坏网关时 10s 内快速失败换下一家，避免傻等 120s
   - 实测生成耗时：1024 方图 ~7s、article 1792x1024 ~12s、cover 1920x816 ~13s；5 张并发总耗时 = 最慢一张 ≈ 15s，尺寸对单张耗时影响不大
   - 配图环节另一个大头是视觉自检：SKILL Step 6 已规定自检必须并行读图/并行建任务，只允许「批量生成→并发自检→批量重生成→复检」一轮循环，超两轮要回头修提示词模板
-  - 2026-10-22 全流程验收发现并修复 5 处校准缺陷：range 钟形误罚（与 stddev 互斥，range 大反被压 0）、real_sources 漏认「10 月 22 日」「科普里写得很清楚」类真实出处、negative_emotion 目标 20% 与账号指纹 2-10% 冲突、flag_words 误报单独出现的「可见」（改用精确词「由此可见」）、seo --keywords 不认空格分隔。修复后全库 14 篇重评 17.6-34.2（均值 25.7），humanness_range 由 [20,40] 调为 [16,36]，negative_emotion_floor 0.12→0.10
+  - 2026-10-22 全流程验收发现并修复 5 处校准缺陷：range 钟形误罚（与 stddev 互斥，range 大反被压 0）、real_sources 漏认「10 月 22 日」「科普里写得很清楚」类真实出处、negative_emotion 目标 20% 与账号指纹 2-10% 冲突、flag_words 误报单独出现的「可见」（改用精确词「由此可见」）、seo --keywords 不认空格分隔。修复后全库 14 篇重评 17.6-34.2（均值 25.7），humanness_range 由 [20,40] 调为 [16,36]，negative_emotion_floor 0.12→0.10。同日新文章《卸载5次又装回》全流程验证：初稿 33.0 分按短板清单（自我修正/词温档位/短行/破句）一轮优化至 20.3 PASS，配图 5 张并发 21.8s 一轮过自检，正文 2044 字（写作前定各节字数预算后未超标）
   - z-image-turbo 生成含中文文字的图约 1/5 概率出伪文字残留，配图统一走「图内无文字」路线最稳
