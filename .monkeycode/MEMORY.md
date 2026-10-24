@@ -152,3 +152,17 @@ Entries discovered by the Agent during task execution should follow this format:
   - 配图环节另一个大头是视觉自检：SKILL Step 6 已规定自检必须并行读图/并行建任务，只允许「批量生成→并发自检→批量重生成→复检」一轮循环，超两轮要回头修提示词模板
   - 2026-10-22 全流程验收发现并修复 5 处校准缺陷：range 钟形误罚（与 stddev 互斥，range 大反被压 0）、real_sources 漏认「10 月 22 日」「科普里写得很清楚」类真实出处、negative_emotion 目标 20% 与账号指纹 2-10% 冲突、flag_words 误报单独出现的「可见」（改用精确词「由此可见」）、seo --keywords 不认空格分隔。修复后全库 14 篇重评 17.6-34.2（均值 25.7），humanness_range 由 [20,40] 调为 [16,36]，negative_emotion_floor 0.12→0.10。同日新文章《卸载5次又装回》全流程验证：初稿 33.0 分按短板清单（自我修正/词温档位/短行/破句）一轮优化至 20.3 PASS，配图 5 张并发 21.8s 一轮过自检，正文 2044 字（写作前定各节字数预算后未超标）
   - z-image-turbo 生成含中文文字的图约 1/5 概率出伪文字残留，配图统一走「图内无文字」路线最稳
+
+[Project Knowledge Summary]
+- Date: 2026-10-24
+- Context: 集成 gzh-design skill 摸鱼绿主题（程序化实现，自动编号+关键词标记+封面智能拆分）
+- Category: Build Methods
+- Instructions:
+  - toolkit/gzh_converter.py 新增 GzhConverter 程序化实现 gzh-design skill 核心能力：自动章节编号（01/02/03 渐变徽章）、关键词提取（jieba TF-IDF + 绿色下划线标记）、封面标题智能拆分（切出核心主题用绿色高亮、其余文字白色）、签名区（作者信息 + 分隔条）、span leaf 包裹与微信合规
+  - 集成方式：cli.py publish -t moyu-green 调用 GzhConverter（默认仍用 WeChatConverter 快速发布）；GzhConverter 返回 ConvertResult 类型兼容原接口
+  - 验证通过：方便面文章 + 商演习惯文章完整流程测试、HTML 合规校验 PASS（2 个 WARNING：渐变+标点，属于技术能力限制）、草稿推送成功
+  - 主题选用：-t moyu-green 用于摸鱼绿视觉增强（科普、生活类内容）；默认无参数快速发布用原 WeChatConverter（无编号、无关键词标记、无封面高亮）
+  - 关键词提取用 jieba.analyse.extract_tags TF-IDF，取 top 8（idf_only=False 兼顾词频与通用性）；标记逻辑：精确词匹配，不拆分多字词，避免断词被标记
+  - 封面标题拆分规则：提取主语/宾语/核心名词为高亮词（jieba 分词后在 title 首次出现的位置），最多 3 个；其余拆分为 runs（每 2-3 字一段），适配封面设计器 cover_runs 排版
+  - gzh-design skill 外部依赖（含源 git 仓库）已从项目移除，.gitignore 排除 .ai-ready/skills/gzh-design/ 目录
+  - image_gen.py 增加 OpenAI provider 健壮性：先检查 r.status_code 再解析 JSON（避免 502/503 坏网关时解 HTML 出 JSONDecodeError）

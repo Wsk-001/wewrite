@@ -323,3 +323,28 @@ style_sources:
         note: "D1-D5 修复后首篇全流程验证；SEO 0 error / 3 warn（防沉迷为次级词可接受）"
         media_id: "q_zrQd1gVlCJUeajP8dHyfxCukAf_rfPanBlBSXMjY6nC2v0CHauQbmxD7htFctD"
         action: 以此版发布
+
+  - id: 2026-10-24-theme-integration
+    date: "2026-10-24"
+    title: "集成 gzh-design 摸鱼绿主题"
+    topic: "工具增强（集成 gzh-design skill 视觉主题为 cli.py publish -t moyu-green，程序化实现自动编号+关键词标记+封面智能拆分）"
+    article: "output/test_visual_a.md"
+    theme: "moyu-green"
+    humanness_score: null
+    cover: "output/test_visual_a_cover.jpg"
+    inline_images: []
+    status: draft
+    drafts:
+      - version: v1
+        note: "方便面文章测试完整流程，HTML 合规校验 PASS（2 WARNING：渐变+标点）"
+        media_id: "q_zrQd1gVlCJUeajP8dHyRm-r4L1UVfChSRgrGM2ZbejkBOk5WQdyRTdbnma1AC3"
+        action: 测试验证完成
+      - version: v2
+        note: "商演习惯文章复验，完整流程一次通过"
+        media_id: "q_zrQd1gVlCJUeajP8dHyU8UAaddcUIiYSgk-E4WYrnpPb0c2PHARvDiUZRz-k8L"
+        action: 测试验证完成
+    implementation_notes:
+      - "GzhConverter 新增 443 行，核心能力：自动章节编号（01/02/03 渐变徽章）、关键词提取（jieba TF-IDF top 8）+ 绿色下划线标记、封面标题智能拆分（核心词绿色高亮、其余白色 runs）、签名区（作者信息）、span leaf 包裹与微信合规"
+      - "集成方式：cli.py publish -t moyu-green 调用，默认保留 WeChatConverter 快速发布；返回 ConvertResult 类型兼容原接口"
+      - "关键词标记逻辑：精确词匹配（jieba 分词结果），不拆分多字词；封面标题拆分：主语/宾语/核心名词取 top 3 高亮，其余按 2-3 字拆段适配封面设计器 cover_runs"
+      - "gzh-design skill 外部依赖已移除，.gitignore 排除相关目录；image_gen.py 增加 OpenAI provider 健壮性（先检查 status_code 再解 JSON）"
