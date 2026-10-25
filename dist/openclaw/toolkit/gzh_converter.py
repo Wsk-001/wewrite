@@ -206,9 +206,6 @@ class GzhConverter:
         # Divider
         parts.append(self._generate_divider())
         
-        # Author signature
-        parts.append(self._generate_signature(author, author_intro))
-        
         # Container end
         parts.append('</section>')
         
@@ -414,29 +411,6 @@ class GzhConverter:
       <section style="flex:1;height:2px;background:linear-gradient(to right,{self.PRIMARY} 15%,{self.PRIMARY_LIGHT} 50%,transparent);opacity:0.3;"><span leaf=""><br></span></section>
       <span style="font-size:20px;"><span leaf="">✦</span></span>
       <section style="flex:1;height:2px;background:linear-gradient(to left,{self.PRIMARY} 15%,{self.PRIMARY_LIGHT} 50%,transparent);opacity:0.3;"><span leaf=""><br></span></section>
-    </section>
-  </section>'''
-    
-    def _generate_signature(self, author: Optional[str], author_intro: Optional[str] = None) -> str:
-        """Generate WeChat official account card (名片样式)."""
-        author_name = (author or "").strip() or "账号名"
-        avatar_char = author_name[0]
-
-        return f'''
-  <section style="margin:0 20px 28px;">
-    <section style="display:flex;align-items:center;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-      <section style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,{self.PRIMARY},{self.PRIMARY_LIGHT});display:flex;align-items:center;justify-content:center;margin-right:12px;">
-        <span style="font-size:20px;font-weight:900;color:#FFFFFF;"><span leaf="">{self._escape_html(avatar_char)}</span></span>
-      </section>
-      <section style="flex:1;">
-        <p style="font-size:15px;font-weight:700;color:#111827;margin:0;line-height:1.5;">
-          <span leaf="">{self._escape_html(author_name)}</span>
-        </p>
-        <p style="font-size:11px;color:#9CA3AF;margin:0;line-height:1.5;">
-          <span leaf="">服务号</span>
-        </p>
-      </section>
-      <span style="font-size:16px;color:#D1D5DB;font-weight:700;"><span leaf="">›</span></span>
     </section>
   </section>'''
     
