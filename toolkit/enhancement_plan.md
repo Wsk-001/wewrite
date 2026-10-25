@@ -107,8 +107,8 @@
 
 ## 结论
 
-- **不替换现有 converter**（保留快速发布能力）
-- **增加 gzh-theme 模式**（平衡自动化与精细度）
+- **传统 converter（L1）已于 2026-10-25 移除**：converter.py / theme.py / themes/ 目录（51 套 YAML）均已删除，排版统一走 gzh-design 主题
+- **gzh-theme 模式成为唯一自动化路径**：6 套主题集成于 gzh_converter.py + theme_configs.py，`--theme` 参数直接选择
 - **保留 /gzh-design skill**（终极精细排版）
 
-三级体系：快速 → 主题 → 手动，满足不同需求。
+两级体系：主题（自动化）→ 手动精排（重要篇目），满足不同需求。

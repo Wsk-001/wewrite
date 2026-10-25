@@ -3,7 +3,7 @@
 CLI entry point for WeWrite.
 
 Usage:
-    python cli.py preview article.md --theme professional-clean
+    python cli.py preview article.md --theme moyu-green
     python cli.py publish article.md --appid wx123 --secret abc123
     python cli.py themes
 """
@@ -15,11 +15,16 @@ import webbrowser
 from pathlib import Path
 from urllib.parse import unquote
 
-from converter import WeChatConverter, preview_html
-from theme import load_theme, list_themes
 from wechat_api import get_access_token, upload_image, upload_thumb
 from publisher import create_draft, create_image_post
 from config import load_config
+from gzh_converter import GzhConverter, ConvertResult
+from theme_configs import THEMES as GZH_THEMES
+
+
+def _is_gzh_theme(theme_name: str) -> bool:
+    """Check whether a theme name belongs to the gzh-design theme set."""
+    return theme_name in GZH_THEMES
 
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"}
@@ -127,12 +132,17 @@ def _validate_publish_inputs(args) -> None:
 
 def cmd_preview(args):
     """Generate HTML preview and open in browser."""
-    theme = load_theme(args.theme)
-    converter = WeChatConverter(theme=theme)
-    result = converter.convert_file(args.input)
+    theme_name = args.theme
+    if not _is_gzh_theme(theme_name):
+        print(f"Error: unknown gzh theme: {theme_name}", file=sys.stderr)
+        print(f"Available themes: {', '.join(GZH_THEMES)}", file=sys.stderr)
+        sys.exit(1)
 
-    # Wrap in full HTML for browser preview
-    full_html = preview_html(result.html, theme)
+    skill_root = Path(__file__).parent.parent / ".ai-ready" / "skills" / "gzh-design"
+    converter = GzhConverter(theme_identifier=theme_name, skill_root=skill_root if skill_root.exists() else None)
+    result = converter.convert_file(Path(args.input))
+    print(f"[GZH Design] Using {theme_name} theme")
+    full_html = _wrap_gzh_preview(result.html, theme_name)
 
     # Write to temp file
     input_path = Path(args.input)
@@ -149,6 +159,27 @@ def cmd_preview(args):
         print("Opened in browser.")
 
 
+def _wrap_gzh_preview(content_html: str, theme_name: str) -> str:
+    """Wrap GZH content in preview HTML shell."""
+    return f"""<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Preview - {theme_name}</title>
+  <style>
+    body {{ margin: 0; padding: 20px; background: #f5f5f5; font-family: sans-serif; }}
+    .phone {{ max-width: 375px; margin: 0 auto; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
+    .phone-content {{ padding: 0; }}
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="phone-content">{content_html}</div>
+  </div>
+</body>
+</html>"""
+
+
 def cmd_publish(args):
     """Convert, upload images, and create WeChat draft."""
     _validate_publish_inputs(args)
@@ -158,16 +189,22 @@ def cmd_publish(args):
 
     appid = args.appid or wechat_cfg.get("appid")
     secret = args.secret or wechat_cfg.get("secret")
-    theme_name = args.theme or cfg.get("theme", "professional-clean")
+    theme_name = args.theme or cfg.get("theme", "moyu-green")
     author = args.author or wechat_cfg.get("author") or cfg.get("author")
 
     if not appid or not secret:
         print("Error: --appid and --secret required (or set in config.yaml)", file=sys.stderr)
         sys.exit(1)
 
-    theme = load_theme(theme_name)
-    converter = WeChatConverter(theme=theme)
-    result = converter.convert_file(args.input)
+    if not _is_gzh_theme(theme_name):
+        print(f"Error: unknown gzh theme: {theme_name}", file=sys.stderr)
+        print(f"Available themes: {', '.join(GZH_THEMES)}", file=sys.stderr)
+        sys.exit(1)
+
+    skill_root = Path(__file__).parent.parent / ".ai-ready" / "skills" / "gzh-design"
+    converter = GzhConverter(theme_identifier=theme_name, skill_root=skill_root if skill_root.exists() else None)
+    result = converter.convert_file(Path(args.input), author=author)
+    print(f"[GZH Design] Using {theme_name} theme")
 
     print(f"Title: {result.title}")
     print(f"Digest: {result.digest}")
@@ -215,10 +252,9 @@ def cmd_publish(args):
 
 def cmd_themes(args):
     """List available themes."""
-    names = list_themes()
-    for name in names:
-        theme = load_theme(name)
-        print(f"  {name:24s} {theme.description}")
+    print("GZH Design Themes:")
+    for ident, theme in GZH_THEMES.items():
+        print(f"  {ident:24s} {theme.display_name} - {theme.suitable_for}")
 
 
 def cmd_image_post(args):
@@ -278,7 +314,7 @@ def cmd_image_post(args):
 
 
 def cmd_gallery(args):
-    """Render all themes side by side in a browser gallery."""
+    """Render all gzh themes side by side in a browser gallery."""
     from concurrent.futures import ThreadPoolExecutor
 
     if args.input:
@@ -286,16 +322,15 @@ def cmd_gallery(args):
     else:
         md_text = _gallery_sample_markdown()
 
-    names = list_themes()
+    names = list(GZH_THEMES.keys())
     results = {}
 
     def render_theme(name):
-        theme = load_theme(name)
-        converter = WeChatConverter(theme=theme)
+        converter = GzhConverter(theme_identifier=name)
         result = converter.convert(md_text)
-        return name, theme.description, result.html
+        return name, GZH_THEMES[name].display_name, result.html
 
-    with ThreadPoolExecutor(max_workers=8) as pool:
+    with ThreadPoolExecutor(max_workers=6) as pool:
         for name, desc, html in pool.map(lambda n: render_theme(n), names):
             results[name] = (desc, html)
 
@@ -306,15 +341,6 @@ def cmd_gallery(args):
 
     if not args.no_open:
         webbrowser.open(f"file://{Path(output).absolute()}")
-
-
-def cmd_learn_theme(args):
-    """Learn a theme from a WeChat article URL."""
-    import subprocess
-    script = Path(__file__).parent.parent / "scripts" / "learn_theme.py"
-    cmd = [sys.executable, str(script), args.url, "--name", args.name]
-    result = subprocess.run(cmd)
-    sys.exit(result.returncode)
 
 
 def _gallery_sample_markdown():
@@ -445,13 +471,14 @@ def main():
 
     p_preview = sub.add_parser("preview", help="Generate HTML and open in browser")
     p_preview.add_argument("input", help="Markdown file path")
-    p_preview.add_argument("-t", "--theme", default="professional-clean", help="Theme name")
+    p_preview.add_argument("-t", "--theme", default="moyu-green", help="GZH theme name")
     p_preview.add_argument("-o", "--output", help="Output HTML file path")
     p_preview.add_argument("--no-open", action="store_true", help="Don't open browser")
 
     p_publish = sub.add_parser("publish", help="Convert and publish as WeChat draft")
     p_publish.add_argument("input", help="Markdown file path")
-    p_publish.add_argument("-t", "--theme", default=None, help="Theme name")
+    p_publish.add_argument("-t", "--theme", default=None,
+        help="GZH theme. Options: moyu-green (摸鱼绿), red-white (红白), graphite-minimal (石墨), zen-whitespace (禅意), moyu-ticket (票据), olive-journal (手记)")
     p_publish.add_argument("--appid", default=None, help="WeChat AppID (or set in config.yaml)")
     p_publish.add_argument("--secret", default=None, help="WeChat AppSecret (or set in config.yaml)")
     p_publish.add_argument("--cover", help="Cover image file path")
@@ -489,10 +516,6 @@ def main():
     p_gallery.add_argument("-o", "--output", help="Output HTML file path")
     p_gallery.add_argument("--no-open", action="store_true", help="Don't open browser")
 
-    p_learn = sub.add_parser("learn-theme", help="Learn formatting theme from a WeChat article URL")
-    p_learn.add_argument("url", help="WeChat article URL")
-    p_learn.add_argument("--name", required=True, help="Theme name")
-
     args = parser.parse_args()
 
     try:
@@ -506,8 +529,6 @@ def main():
             cmd_image_post(args)
         elif args.command == "gallery":
             cmd_gallery(args)
-        elif args.command == "learn-theme":
-            cmd_learn_theme(args)
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)

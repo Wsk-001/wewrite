@@ -166,15 +166,9 @@ markdown_mapping:
 # 六、使用说明
 # ============================================================
 
-# 方案A（纯规范借鉴）：
-# 1. 在 writing_agent.py 提示词里引用本文件的核心规则
-# 2. 文章仍输出纯 Markdown
-# 3. 排版规范体现在：标题层级、加粗高亮的位置与频率、引用块用法、图片说明规范
-# 4. 通过 API 推送草稿时，公众号编辑器会做一轮格式化，视觉效果取决于平台默认样式
-
-# 方案B（HTML 渲染）：
-# 1. 读取此文件的设计变量和组件规则
-# 2. 调用 render_gzh_html.py 将 Markdown 装配成 HTML
-# 3. 通过 validate_gzh_html.py 校验合规
+# 排版统一走 gzh-design 主题渲染（L1 传统排版已移除）：
+# 1. gzh-design 主题由 toolkit/gzh_converter.py + toolkit/theme_configs.py 程序化实现
+# 2. 用法: python toolkit/cli.py preview article.md --theme <gzh主题名>
+# 3. 合规校验: .ai-ready/skills/gzh-design/scripts/validate_gzh_html.py
 # 4. 产物可手动粘贴到公众号编辑器（不掉格式）
 # 注意：API 推稿和手动粘贴的渲染效果可能不同，需实测验证

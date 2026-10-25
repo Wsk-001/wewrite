@@ -132,9 +132,14 @@ class OpenAIProvider(ImageProvider):
             json=body,
             timeout=(CONNECT_TIMEOUT, READ_TIMEOUT),
         )
-        data = resp.json()
         if resp.status_code != 200:
-            raise ValueError(f"OpenAI error ({resp.status_code}): {data.get('error', {}).get('message', str(data))}")
+            try:
+                data = resp.json()
+                msg = data.get('error', {}).get('message', str(data))
+            except Exception:
+                msg = resp.text
+            raise ValueError(f"OpenAI error ({resp.status_code}): {msg}")
+        data = resp.json()
         item = data.get("data", [{}])[0]
         url = item.get("url")
         if url:

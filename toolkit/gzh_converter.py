@@ -9,34 +9,46 @@ import subprocess
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 from datetime import datetime
-from collections import Counter
 from dataclasses import dataclass, field
 import jieba
 import jieba.analyse
 
+from theme_configs import get_theme, ThemeConfig
+
 
 @dataclass
 class ConvertResult:
-    """Conversion result compatible with WeChatConverter."""
+    """Conversion result shared by all converters."""
     html: str
     title: str
     digest: str
-    images: list[str] = field(default_factory=list)
+    images: list = field(default_factory=list)
 
 
 class GzhConverter:
-    """Convert Markdown to WeChat HTML using gzh-design moyu-green theme."""
+    """Convert Markdown to WeChat HTML using gzh-design themes."""
     
-    # Theme colors
-    PRIMARY = "#059669"
-    PRIMARY_LIGHT = "#A7F3D0"
-    HIGHLIGHT_BG = "#FDE68A"
-    TEXT_MAIN = "#374151"
-    TEXT_GRAY = "#9CA3AF"
-    
-    def __init__(self, skill_root: Path):
+    def __init__(self, theme_identifier: str = "moyu-green", skill_root: Optional[Path] = None):
+        """
+        Initialize converter with specified theme.
+        
+        Args:
+            theme_identifier: Theme identifier (moyu-green, red-white, etc.)
+            skill_root: Path to gzh-design skill root (for validation script)
+        """
+        self.theme_cfg = get_theme(theme_identifier)
+        if not self.theme_cfg:
+            raise ValueError(f"Unknown theme: {theme_identifier}")
+        
         self.skill_root = skill_root
-        self.validate_script = skill_root / "scripts" / "validate_gzh_html.py"
+        self.validate_script = skill_root / "scripts" / "validate_gzh_html.py" if skill_root else None
+        
+        # Extract colors from theme config
+        self.PRIMARY = self.theme_cfg.primary_color
+        self.PRIMARY_LIGHT = self.theme_cfg.accent_color or self.theme_cfg.primary_light
+        self.TEXT_MAIN = self.theme_cfg.text_color
+        self.TEXT_GRAY = self.theme_cfg.secondary_color
+        self.UNDERLINE_CSS = self.theme_cfg.underline_css
         
     def convert_file(self, md_path: Path, author: Optional[str] = None, author_intro: Optional[str] = None) -> ConvertResult:
         """Convert markdown file to WeChat HTML."""
@@ -234,22 +246,22 @@ class GzhConverter:
   <section style="margin:0 0 32px;background:#fff;border:1.5px solid rgba(5,150,105,0.15);border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);width:100%;">
     <section style="padding:32px 28px 28px;">
       <section style="display:flex;align-items:center;gap:8px;margin-bottom:28px;">
-        <span style="width:6px;height:6px;background:#059669;border-radius:50%;"><span leaf=""><br></span></span>
-        <span style="font-size:11px;font-weight:700;letter-spacing:3px;color:#059669;"><span leaf="">科普辟谣</span></span>
+        <span style="width:6px;height:6px;background:{self.PRIMARY};border-radius:50%;"><span leaf=""><br></span></span>
+        <span style="font-size:11px;font-weight:700;letter-spacing:3px;color:{self.PRIMARY};"><span leaf="">科普辟谣</span></span>
         <section style="flex:1;height:1px;overflow:hidden;background:linear-gradient(to right,rgba(5,150,105,0.12),transparent);"><span leaf=""><br></span></section>
         <span style="font-size:10px;color:#D1D5DB;font-weight:600;"><span leaf="">{date}</span></span>
       </section>
       <section>
         <p style="font-size:24px;font-weight:900;color:#111827;margin:0;line-height:1.05;letter-spacing:-2px;">
-          <span leaf="">{self._escape_html(title_line1)}</span>{"" if not green_word else f'<span style="color:#059669;"><span leaf="">{self._escape_html(green_word)}</span></span>'}
+          <span leaf="">{self._escape_html(title_line1)}</span>{"" if not green_word else f'<span style="color:{self.PRIMARY};"><span leaf="">{self._escape_html(green_word)}</span></span>'}
         </p>
-        {"" if not title_line2 else f'<p style="font-size:24px;font-weight:900;color:#059669;margin:0 0 16px;line-height:1.05;letter-spacing:-2px;"><span leaf="">{self._escape_html(title_line2)}</span></p>'}
-        <section style="width:48px;height:3px;background:linear-gradient(to right,#059669,#34D399);border-radius:2px;margin-bottom:12px;">
+        {"" if not title_line2 else f'<p style="font-size:24px;font-weight:900;color:{self.PRIMARY};margin:0 0 16px;line-height:1.05;letter-spacing:-2px;"><span leaf="">{self._escape_html(title_line2)}</span></p>'}
+        <section style="width:48px;height:3px;background:linear-gradient(to right,{self.PRIMARY},{self.PRIMARY_LIGHT});border-radius:2px;margin-bottom:12px;">
           <span leaf=""><br></span>
         </section>
       </section>
     </section>
-    <section style="background:#059669;padding:12px 28px;display:flex;align-items:center;justify-content:space-between;">
+    <section style="background:{self.PRIMARY};padding:12px 28px;display:flex;align-items:center;justify-content:space-between;">
       <p style="font-size:12px;color:rgba(255,255,255,0.9);margin:0;font-weight:600;letter-spacing:0.5px;">
         <span leaf="">MonkeyCode-AI 智能开发平台</span>
       </p>
@@ -264,7 +276,7 @@ class GzhConverter:
 <section style="margin:0 0 32px;">
   <section style="padding:0 20px;margin-bottom:20px;">
     <section style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-      <section style="display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#059669,#34D399);box-shadow:0 2px 8px rgba(5,150,105,0.25);">
+      <section style="display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,{self.PRIMARY},{self.PRIMARY_LIGHT});box-shadow:0 2px 8px rgba(5,150,105,0.25);">
         <span style="font-size:15px;font-weight:900;color:#fff;"><span leaf="">{number:02d}</span></span>
       </section>
       <p style="font-size:18px;font-weight:800;color:#111827;margin:0;line-height:1.4;">
@@ -326,24 +338,24 @@ class GzhConverter:
         """Convert inline markdown to WeChat HTML."""
         html = text
         
-        # Bold -> green underline (since it's keyword)
+        # Bold -> keyword underline (since it's keyword)
         html = re.sub(
             r'\*\*([^*]+)\*\*',
-            r'<span style="border-bottom:2px solid #A7F3D0;font-weight:600;"><span leaf="">\1</span></span>',
+            f'<span style="{self.UNDERLINE_CSS}"><span leaf="">\\1</span></span>',
             html
         )
         
-        # Underline marker (from auto-detection) -> green underline
+        # Underline marker (from auto-detection) -> keyword underline
         html = re.sub(
             r'\+\+([^+]+)\+\+',
-            r'<span style="border-bottom:2px solid #A7F3D0;font-weight:600;"><span leaf="">\1</span></span>',
+            f'<span style="{self.UNDERLINE_CSS}"><span leaf="">\\1</span></span>',
             html
         )
         
         # Highlight -> yellow background
         html = re.sub(
             r'==([^=]+)==',
-            r'<span style="background:#FDE68A;padding:2px 6px;border-radius:3px;"><span leaf="">\1</span></span>',
+            f'<span style="background:{self.theme_cfg.highlight_bg};padding:2px 6px;border-radius:3px;"><span leaf="">\\1</span></span>',
             html
         )
         
@@ -391,27 +403,31 @@ class GzhConverter:
     
     def _generate_divider(self) -> str:
         """Generate divider."""
-        return '''
+        return f'''
   <section style="margin:0 20px 24px;">
     <section style="display:flex;align-items:center;gap:8px;">
-      <section style="flex:1;height:2px;background:linear-gradient(to right,#059669 15%,#6EE7B7 50%,transparent);opacity:0.3;"><span leaf=""><br></span></section>
+      <section style="flex:1;height:2px;background:linear-gradient(to right,{self.PRIMARY} 15%,{self.PRIMARY_LIGHT} 50%,transparent);opacity:0.3;"><span leaf=""><br></span></section>
       <span style="font-size:20px;"><span leaf="">✦</span></span>
-      <section style="flex:1;height:2px;background:linear-gradient(to left,#059669 15%,#6EE7B7 50%,transparent);opacity:0.3;"><span leaf=""><br></span></section>
+      <section style="flex:1;height:2px;background:linear-gradient(to left,{self.PRIMARY} 15%,{self.PRIMARY_LIGHT} 50%,transparent);opacity:0.3;"><span leaf=""><br></span></section>
     </section>
   </section>'''
     
     def _generate_signature(self, author: Optional[str], author_intro: Optional[str]) -> str:
         """Generate author signature and CTA."""
         author_name = author or "{{作者名}}"
-        intro = author_intro or "{{一句话简介，如：热衷于分享 AI 观察与干货}}"
+        intro = author_intro or "{{一句话简介，如:热衷于分享 AI 观察与干货}}"
+        
+        # Calculate background gradient based on primary color
+        bg_light = self.PRIMARY_LIGHT if self.theme_cfg.accent_color else "#F0FDF4"
+        border_color = self.PRIMARY_LIGHT
         
         return f'''
-  <section style="margin:0 20px 28px;padding:20px 18px;border-radius:12px;background:linear-gradient(135deg,#ECFDF5 0%,#F0FDF4 100%);border:1px solid #BBF7D0;">
+  <section style="margin:0 20px 28px;padding:20px 18px;border-radius:12px;background:linear-gradient(135deg,{bg_light} 0%,#F0FDF4 100%);border:1px solid {border_color};">
     <p style="font-size:13px;color:#6B7280;margin:0 0 6px;line-height:1.7;">
       <span leaf="">我是 {self._escape_html(author_name)}，{self._escape_html(intro)}。</span>
     </p>
     <p style="font-size:13px;color:#6B7280;margin:0;line-height:1.7;">
-      <span leaf="">如果你觉得今天这篇有收获，欢迎</span><span style="border-bottom:2px solid #A7F3D0;font-weight:600;"><span leaf="">点赞、在看、转发</span></span><span leaf="">三连，我们下篇见。</span>
+      <span leaf="">如果你觉得今天这篇有收获，欢迎</span><span style="{self.UNDERLINE_CSS}"><span leaf="">点赞、在看、转发</span></span><span leaf="">三连，我们下篇见。</span>
     </p>
   </section>'''
     
@@ -425,8 +441,8 @@ class GzhConverter:
     
     def validate(self, html_path: Path) -> bool:
         """Run validation script on generated HTML."""
-        if not self.validate_script.exists():
-            print(f"Warning: validation script not found: {self.validate_script}")
+        if not self.validate_script or not self.validate_script.exists():
+            print("Warning: validation script not available (gzh-design skill not installed)")
             return False
         
         result = subprocess.run(

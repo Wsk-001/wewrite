@@ -39,7 +39,7 @@ reference_accounts:
   - "少数派"
 
 # 排版
-theme: "professional-clean"
+theme: "moyu-green"
 
 # 封面
 cover_style: "简洁科技感，蓝色调，扁平化设计"

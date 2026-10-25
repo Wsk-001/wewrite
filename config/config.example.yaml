@@ -2,5 +2,5 @@
 wechat:
   appid: "wx_your_appid"
   secret: "your_secret"
-theme: "warm-editorial"
+theme: "moyu-green"
 author: "小科普oao"

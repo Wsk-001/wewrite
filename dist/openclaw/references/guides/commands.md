@@ -9,11 +9,10 @@
 |--------|------|
 | 重新设置风格 | `读取: {skill_dir}/references/guides/onboard.md` |
 | 学习我的修改 | `读取: {skill_dir}/references/guides/learn-edits.md`。支持本地 markdown 修改与微信草稿箱同步（`python3 {skill_dir}/scripts/learn_edits.py --from-wechat`） |
-| 学习排版 / 学排版 | `python3 {skill_dir}/scripts/learn_theme.py <url> --name <name>`，提取后提示用户设置 style.yaml 的 theme 字段 |
 | 学习这篇文章 / 导入范文 + URL | `python3 {skill_dir}/scripts/fetch_article.py <url> -o /tmp/article.md && python3 {skill_dir}/scripts/extract_exemplar.py /tmp/article.md -s <账号名>` |
 | 查看范文库 | `python3 {skill_dir}/scripts/extract_exemplar.py --list` |
 | 看看文章数据 | `读取: {skill_dir}/references/guides/effect-review.md` |
-| 看看有什么主题 / 主题画廊 | `python3 {skill_dir}/toolkit/cli.py gallery` |
+| 看看有什么主题 / 主题画廊 | `python3 {skill_dir}/toolkit/cli.py gallery`（6 套 gzh-design 主题） |
 | 做一个小绿书 / 图片帖 | `python3 {skill_dir}/toolkit/cli.py image-post img1.jpg img2.jpg -t "标题"` |
 | 更新 / 更新 WeWrite / 升级 | 在 {skill_dir} 执行 `git pull origin main`，完成后告知版本变化 |
 | 检查一下 / 自检 / 这篇文章怎么样 | 见下方「自检报告」 |
