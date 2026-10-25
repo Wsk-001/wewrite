@@ -154,14 +154,16 @@ Entries discovered by the Agent during task execution should follow this format:
   - z-image-turbo 生成含中文文字的图约 1/5 概率出伪文字残留，配图统一走「图内无文字」路线最稳
 
 [Project Knowledge Summary]
-- Date: 2026-10-24
-- Context: 集成 gzh-design skill 摸鱼绿主题（程序化实现，自动编号+关键词标记+封面智能拆分）
+- Date: 2026-10-24（2026-10-25 更新：旧 converter 已移除，gzh-design 成唯一自动化路径）
+- Context: 集成 gzh-design 主题（程序化实现，自动编号+关键词标记+封面智能拆分），随后完成六主题化重构
 - Category: Build Methods
 - Instructions:
-  - toolkit/gzh_converter.py 新增 GzhConverter 程序化实现 gzh-design skill 核心能力：自动章节编号（01/02/03 渐变徽章）、关键词提取（jieba TF-IDF + 绿色下划线标记）、封面标题智能拆分（切出核心主题用绿色高亮、其余文字白色）、签名区（作者信息 + 分隔条）、span leaf 包裹与微信合规
-  - 集成方式：cli.py publish -t moyu-green 调用 GzhConverter（默认仍用 WeChatConverter 快速发布）；GzhConverter 返回 ConvertResult 类型兼容原接口
-  - 验证通过：方便面文章 + 商演习惯文章完整流程测试、HTML 合规校验 PASS（2 个 WARNING：渐变+标点，属于技术能力限制）、草稿推送成功
-  - 主题选用：-t moyu-green 用于摸鱼绿视觉增强（科普、生活类内容）；默认无参数快速发布用原 WeChatConverter（无编号、无关键词标记、无封面高亮）
+  - toolkit/gzh_converter.py 程序化实现 gzh-design skill 核心能力：自动章节编号（01/02/03 渐变徽章）、关键词提取（jieba TF-IDF + 下划线标记）、封面标题智能拆分（核心主题高亮、其余白色）、签名区、span leaf 包裹与微信合规
+  - 2026-10-25 重构：converter.py/theme.py/themes 目录（51 套 YAML）已删除，WeChatConverter 不复存在；排版唯一自动化路径是 gzh_converter.py + theme_configs.py（6 套主题：moyu-green/red-white/graphite-minimal/zen-whitespace/moyu-ticket/olive-journal），`--theme <name>` 选择，config theme 默认 moyu-green
+  - 主题配置集中在 toolkit/theme_configs.py 的 THEMES 字典；GzhConverter 全参数化读 ThemeConfig，加新主题只需补一条配置
+  - 验证方式：发布用裸 HTML（convert 返回的 result.html）跑 gzh-design validate 合规校验为 PASS（2 个 WARNING：渐变+半角标点，技术能力限制）；`cli.py preview` 产物含浏览器包装外壳（<style>/<div class="phone">），直接拿去校验必然报 3 个 ERROR，属预期
+  - 封面卡片顶栏只放分类名不放日期；底部绿条与文末名片显示账号名（author 从 config 贯穿到 cover）；章节标题手写的「01 」前缀会被自动剥离防与徽章重复（仅当数字等于当前徽章号才剥，防误伤「10 秒测试」类标题）；文末签名是 HTML 模拟的公众号名片卡片（头像=主题色首字圆标，微信原生名片组件无法嵌入文章 HTML，此为平台约束）；签名自我介绍/求三连文案已按用户要求移除
+  - jieba 已加入 requirements.txt（gzh_converter 关键词提取依赖）；validate() 在 skill_root 缺失时安全返回 False（gzh-design skill 是 gitignore 的本地依赖，.ai-ready/skills/gzh-design/）
   - 关键词提取用 jieba.analyse.extract_tags TF-IDF，取 top 8（idf_only=False 兼顾词频与通用性）；标记逻辑：精确词匹配，不拆分多字词，避免断词被标记
   - 封面标题拆分规则：提取主语/宾语/核心名词为高亮词（jieba 分词后在 title 首次出现的位置），最多 3 个；其余拆分为 runs（每 2-3 字一段），适配封面设计器 cover_runs 排版
   - gzh-design skill 外部依赖（含源 git 仓库）已从项目移除，.gitignore 排除 .ai-ready/skills/gzh-design/ 目录

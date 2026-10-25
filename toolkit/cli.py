@@ -140,7 +140,9 @@ def cmd_preview(args):
 
     skill_root = Path(__file__).parent.parent / ".ai-ready" / "skills" / "gzh-design"
     converter = GzhConverter(theme_identifier=theme_name, skill_root=skill_root if skill_root.exists() else None)
-    result = converter.convert_file(Path(args.input))
+    cfg = load_config()
+    author = cfg.get("wechat", {}).get("author") or cfg.get("author")
+    result = converter.convert_file(Path(args.input), author=author)
     print(f"[GZH Design] Using {theme_name} theme")
     full_html = _wrap_gzh_preview(result.html, theme_name)
 

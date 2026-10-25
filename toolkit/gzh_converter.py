@@ -8,7 +8,6 @@ import re
 import subprocess
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
-from datetime import datetime
 from dataclasses import dataclass, field
 import jieba
 import jieba.analyse
@@ -191,7 +190,7 @@ class GzhConverter:
         )
         
         # Cover (simplified version without image)
-        parts.append(self._generate_cover(structure))
+        parts.append(self._generate_cover(structure, author))
         
         # Intro paragraphs
         if structure["intro_paragraphs"]:
@@ -215,10 +214,10 @@ class GzhConverter:
         
         return "\n".join(parts)
     
-    def _generate_cover(self, structure: Dict) -> str:
+    def _generate_cover(self, structure: Dict, author: Optional[str] = None) -> str:
         """Generate cover component."""
         title = structure["title"]
-        date = datetime.now().strftime("%Y-%m-%d")
+        account_name = (author or "").strip() or "账号名"
         
         # Split title into lines (simple heuristic)
         if len(title) > 15:
@@ -249,7 +248,6 @@ class GzhConverter:
         <span style="width:6px;height:6px;background:{self.PRIMARY};border-radius:50%;"><span leaf=""><br></span></span>
         <span style="font-size:11px;font-weight:700;letter-spacing:3px;color:{self.PRIMARY};"><span leaf="">科普辟谣</span></span>
         <section style="flex:1;height:1px;overflow:hidden;background:linear-gradient(to right,rgba(5,150,105,0.12),transparent);"><span leaf=""><br></span></section>
-        <span style="font-size:10px;color:#D1D5DB;font-weight:600;"><span leaf="">{date}</span></span>
       </section>
       <section>
         <p style="font-size:24px;font-weight:900;color:#111827;margin:0;line-height:1.05;letter-spacing:-2px;">
@@ -263,7 +261,7 @@ class GzhConverter:
     </section>
     <section style="background:{self.PRIMARY};padding:12px 28px;display:flex;align-items:center;justify-content:space-between;">
       <p style="font-size:12px;color:rgba(255,255,255,0.9);margin:0;font-weight:600;letter-spacing:0.5px;">
-        <span leaf="">MonkeyCode-AI 智能开发平台</span>
+        <span leaf="">{self._escape_html(account_name)}</span>
       </p>
     </section>
   </section>'''
@@ -271,6 +269,13 @@ class GzhConverter:
     def _generate_section(self, number: int, section: Dict) -> str:
         """Generate section with auto-numbering."""
         title = section["title"]
+
+        # Strip leading number in markdown title when it duplicates the auto badge
+        # (e.g. "## 01 门格的问题" -> badge "01" + "门格的问题").
+        # Require a separator/space after the number so titles like "10 秒测试" survive.
+        deduped = re.sub(rf'^第?\s*(?:{number:02d}|{number})(?:\s*[、.．:：]\s*|\s+)(?=\S)', '', title)
+        if deduped:
+            title = deduped
         
         parts = [f'''
 <section style="margin:0 0 32px;">
@@ -412,23 +417,27 @@ class GzhConverter:
     </section>
   </section>'''
     
-    def _generate_signature(self, author: Optional[str], author_intro: Optional[str]) -> str:
-        """Generate author signature and CTA."""
-        author_name = author or "{{作者名}}"
-        intro = author_intro or "{{一句话简介，如:热衷于分享 AI 观察与干货}}"
-        
-        # Calculate background gradient based on primary color
-        bg_light = self.PRIMARY_LIGHT if self.theme_cfg.accent_color else "#F0FDF4"
-        border_color = self.PRIMARY_LIGHT
-        
+    def _generate_signature(self, author: Optional[str], author_intro: Optional[str] = None) -> str:
+        """Generate WeChat official account card (名片样式)."""
+        author_name = (author or "").strip() or "账号名"
+        avatar_char = author_name[0]
+
         return f'''
-  <section style="margin:0 20px 28px;padding:20px 18px;border-radius:12px;background:linear-gradient(135deg,{bg_light} 0%,#F0FDF4 100%);border:1px solid {border_color};">
-    <p style="font-size:13px;color:#6B7280;margin:0 0 6px;line-height:1.7;">
-      <span leaf="">我是 {self._escape_html(author_name)}，{self._escape_html(intro)}。</span>
-    </p>
-    <p style="font-size:13px;color:#6B7280;margin:0;line-height:1.7;">
-      <span leaf="">如果你觉得今天这篇有收获，欢迎</span><span style="{self.UNDERLINE_CSS}"><span leaf="">点赞、在看、转发</span></span><span leaf="">三连，我们下篇见。</span>
-    </p>
+  <section style="margin:0 20px 28px;">
+    <section style="display:flex;align-items:center;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.04);">
+      <section style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,{self.PRIMARY},{self.PRIMARY_LIGHT});display:flex;align-items:center;justify-content:center;margin-right:12px;">
+        <span style="font-size:20px;font-weight:900;color:#FFFFFF;"><span leaf="">{self._escape_html(avatar_char)}</span></span>
+      </section>
+      <section style="flex:1;">
+        <p style="font-size:15px;font-weight:700;color:#111827;margin:0;line-height:1.5;">
+          <span leaf="">{self._escape_html(author_name)}</span>
+        </p>
+        <p style="font-size:11px;color:#9CA3AF;margin:0;line-height:1.5;">
+          <span leaf="">服务号</span>
+        </p>
+      </section>
+      <span style="font-size:16px;color:#D1D5DB;font-weight:700;"><span leaf="">›</span></span>
+    </section>
   </section>'''
     
     def _escape_html(self, text: str) -> str:
