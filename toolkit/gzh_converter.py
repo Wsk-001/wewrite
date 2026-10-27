@@ -49,6 +49,18 @@ class GzhConverter:
         self.TEXT_GRAY = self.theme_cfg.secondary_color
         self.UNDERLINE_CSS = self.theme_cfg.underline_css
         
+        # Extract layout parameters from theme config
+        self.SECTION_MARGIN = self.theme_cfg.section_margin
+        self.LINE_HEIGHT = self.theme_cfg.line_height
+        self.TITLE_WEIGHT = self.theme_cfg.title_weight
+        self.BODY_WEIGHT = self.theme_cfg.body_weight
+
+    def _rgba(self, alpha: float) -> str:
+        """Derive rgba() string from the theme primary color."""
+        h = self.PRIMARY.lstrip("#")
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        return f"rgba({r},{g},{b},{alpha})"
+        
     def convert_file(self, md_path: Path, author: Optional[str] = None, author_intro: Optional[str] = None) -> ConvertResult:
         """Convert markdown file to WeChat HTML."""
         md_text = md_path.read_text(encoding="utf-8")
@@ -185,8 +197,8 @@ class GzhConverter:
         # Container start
         parts.append(
             '<section style="max-width:677px;margin:0 auto;background:#ffffff;'
-            'font-family:-apple-system,BlinkMacSystemFont,\'PingFang SC\',\'Hiragino Sans GB\',\'Microsoft YaHei\',sans-serif;'
-            'color:#374151;line-height:1.75;letter-spacing:0.5px;overflow-x:hidden;">'
+            "font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;"
+            f'color:{self.TEXT_MAIN};line-height:{self.LINE_HEIGHT};letter-spacing:0.5px;overflow-x:hidden;">'
         )
         
         # Cover (simplified version without image)
@@ -239,13 +251,18 @@ class GzhConverter:
             green_word = ""
         
         return f'''
-  <section style="margin:0 0 32px;background:#fff;border:1.5px solid rgba(5,150,105,0.15);border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);width:100%;">
+  <section style="margin:0 0 {self.SECTION_MARGIN}px;background:#fff;border:1.5px solid {self._rgba(0.15)};border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);width:100%;">
     <section style="padding:32px 28px 28px;">
       <section style="display:flex;align-items:center;gap:8px;margin-bottom:28px;">
         <span style="width:6px;height:6px;background:{self.PRIMARY};border-radius:50%;"><span leaf=""><br></span></span>
         <span style="font-size:11px;font-weight:700;letter-spacing:3px;color:{self.PRIMARY};"><span leaf="">科普辟谣</span></span>
-        <section style="flex:1;height:1px;overflow:hidden;background:linear-gradient(to right,rgba(5,150,105,0.12),transparent);"><span leaf=""><br></span></section>
+        <section style="flex:1;height:1px;overflow:hidden;background:linear-gradient(to right,{self._rgba(0.12)},transparent);"><span leaf=""><br></span></section>
       </section>
+        <p style="font-size:24px;font-weight:{self.TITLE_WEIGHT};color:#111827;margin:0;line-height:1.05;letter-spacing:-2px;">
+          <span leaf="">{self._escape_html(title_line1)}</span>{f'<span style="color:{self.PRIMARY};"><span leaf="">{self._escape_html(green_word)}</span></span>' if green_word else ""}
+        </p>
+        {"" if not title_line2 else f'<p style="font-size:24px;font-weight:{self.TITLE_WEIGHT};color:{self.PRIMARY};margin:0 0 16px;line-height:1.05;letter-spacing:-2px;"><span leaf="">{self._escape_html(title_line2)}</span></p>'}
+    </section>
       <section>
         <p style="font-size:24px;font-weight:900;color:#111827;margin:0;line-height:1.05;letter-spacing:-2px;">
           <span leaf="">{self._escape_html(title_line1)}</span>{"" if not green_word else f'<span style="color:{self.PRIMARY};"><span leaf="">{self._escape_html(green_word)}</span></span>'}
@@ -275,13 +292,13 @@ class GzhConverter:
             title = deduped
         
         parts = [f'''
-<section style="margin:0 0 32px;">
+<section style="margin:0 0 {self.SECTION_MARGIN}px;">
   <section style="padding:0 20px;margin-bottom:20px;">
     <section style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-      <section style="display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,{self.PRIMARY},{self.PRIMARY_LIGHT});box-shadow:0 2px 8px rgba(5,150,105,0.25);">
+      <section style="display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,{self.PRIMARY},{self.PRIMARY_LIGHT});box-shadow:0 2px 8px {self._rgba(0.25)};">
         <span style="font-size:15px;font-weight:900;color:#fff;"><span leaf="">{number:02d}</span></span>
       </section>
-      <p style="font-size:18px;font-weight:800;color:#111827;margin:0;line-height:1.4;">
+      <p style="font-size:18px;font-weight:{self.TITLE_WEIGHT};color:#111827;margin:0;line-height:1.4;">
         <span leaf="">{self._escape_html(title)}</span>
       </p>
     </section>
@@ -308,7 +325,7 @@ class GzhConverter:
         # Convert markdown syntax
         html_text = self._convert_inline_markdown(marked_text)
         
-        return f'''    <p style="font-size:14px;line-height:1.9;color:#374151;margin:0 0 14px;">
+        return f'''    <p style="font-size:14px;line-height:{self.LINE_HEIGHT};color:{self.TEXT_MAIN};margin:0 0 14px;font-weight:{self.BODY_WEIGHT};">
       {html_text}
     </p>'''
     

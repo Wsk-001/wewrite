@@ -348,3 +348,58 @@ style_sources:
       - "集成方式：cli.py publish -t moyu-green 调用，默认保留 WeChatConverter 快速发布；返回 ConvertResult 类型兼容原接口"
       - "关键词标记逻辑：精确词匹配（jieba 分词结果），不拆分多字词；封面标题拆分：主语/宾语/核心名词取 top 3 高亮，其余按 2-3 字拆段适配封面设计器 cover_runs"
       - "gzh-design skill 外部依赖已移除，.gitignore 排除相关目录；image_gen.py 增加 OpenAI provider 健壮性（先检查 status_code 再解 JSON）"
+
+  - id: 2026-10-26-yangsheng-trendtruth
+    date: "2026-10-26"
+    title: "养生热潮下的真相：年轻人正在踩的三大坑"
+    topic: "年轻人养生误区科普（热点新闻分析，83.7%年轻消费者 + 35倍草本茶增长 + 中医学术背书）"
+    article: "output/养生热潮的三大误区.md"
+    theme: "moyu-green"
+    humanness_score: 28.5
+    cover: "output/cover-yangsheng.jpg"
+    inline_images: []
+    status: draft
+    drafts:
+      - version: v1
+        note: "完整 8 步流程发布：选题-框架-写作-合规-配图-排版-发布。文章 2892 字，3 张配图已生成，摸鱼绿主题排版，手动推送到公众号草稿箱"
+        media_id: "q_zrQd1gVlCJUeajP8dHyStTkV0CYcsdEGxqIap95e6THZTl1OTARgR-C2wuG57T"
+        thumb_media_id: "q_zrQd1gVlCJUeajP8dHyRDLiyIjf1Z-VcuXG0T_FxvqMQv1ir5htxpNKWUPiWFf"
+        action: 等待用户后台确认发布
+
+
+  - id: 2026-10-27-huoguo-dratang-piaoling
+    date: "2026-10-27"
+    title: "火锅汤煮30分钟，嘌呤翻10倍：想喝汤的先看这条时间线"
+    topic: "火锅喝大汤 × 高尿酸/痛风科普（热点抓取选题，#火锅正式进入喝大汤时代# 2026-10-20 热搜 + 海底捞藕汤 150 万份；西安市第五医院清汤锅底嘌呤 7.38→80mg/100g、100g 久煮汤升尿酸 133μmol/L；《中国高尿酸血症与痛风诊疗指南（2024）》420/360 诊断线；白皮书 1.77 亿/18-35 岁占 60%/18-29 岁男性 32.3%；痛点型框架，密度强化策略，喝汤时间线速查表收藏元素）"
+    article: "output/火锅喝大汤误区.md"
+    theme: "moyu-green"
+    humanness_score: 23.78
+    cover: "output/cover-huoguo.jpg"
+    inline_images:
+      - "output/huoguo-1.jpg"
+      - "output/huoguo-2.jpg"
+      - "output/huoguo-3.jpg"
+      - "output/huoguo-4.jpg"
+    status: draft
+    drafts:
+      - version: v1
+        note: "完整 8 步流程一次通过：热点抓取-选题评分 7.8（同题 90 天仅 2 篇）-数据 WebSearch 核实-写作 1942 字-反AI 23.78 在区间-合规 0error-SEO 0error-配图 5 张批量生成+1 轮自检重生成-摸鱼绿排版 v1-推送草稿箱"
+        media_id: "q_zrQd1gVlCJUeajP8dHyfhbdV2OXvEqfEUnIn_hdnuYdhlvJTFVJA2X2A6P3JYR"
+        thumb_media_id: "q_zrQd1gVlCJUeajP8dHyUbaieLbaAWpY46qktwk3eLh6_9d4V5jwFni4oGn8KHU"
+        action: 待删除
+
+      - version: v2
+        note: "新增 --theme auto 内容自动选型 + 汤底暖橙(hotpot-warm)定制主题：命中特征词 火锅/汤/饮食，按内容重排版后重发；头部尚有绿色硬编码残留"
+        media_id: "q_zrQd1gVlCJUeajP8dHyeBtzjLyu2ieizUSCJGE9m6Zg8GyDiaSOnlzPToxyU6o"
+        action: 待删除
+
+      - version: v3
+        note: "修复 gzh_converter 三处摸鱼绿硬编码 rgba，全部改为从主题主色派生(_rgba 辅助方法)；汤底暖橙全主题色 100% 跟随配置"
+        media_id: "q_zrQd1gVlCJUeajP8dHyTb39ASgNPD4fT43k7dxmzy7HZ-RdUG9eKrbjxGGYn_P"
+        action: 待删除
+
+      - version: v4
+        note: "升级为生成式设计引擎：内容驱动配色（类别:饮食 得分37，语义+封面混合色相 19°，主色 #AD5A32 / 浅色 #E2D5CE / 强调 #C18638）+ 排版自适应（饮食类松弛间距 36px / 行高 1.85 / 标题 800 / 正文 400），全主题参数参数化无硬编码"
+        media_id: "q_zrQd1gVlCJUeajP8dHyS42lKGzA3UgJUh1OVjKnuIBElX7rZMo8iMzvyyvpUtJ"
+        thumb_media_id: "q_zrQd1gVlCJUeajP8dHyeuS4iwLMsXcVjsjUbEf8o09vSc6pFLizM2-4BPNilOz"
+        action: 以此版发布

@@ -19,12 +19,35 @@ from wechat_api import get_access_token, upload_image, upload_thumb
 from publisher import create_draft, create_image_post
 from config import load_config
 from gzh_converter import GzhConverter, ConvertResult
-from theme_configs import THEMES as GZH_THEMES
+from theme_configs import THEMES as GZH_THEMES, generate_adaptive_theme
 
 
 def _is_gzh_theme(theme_name: str) -> bool:
     """Check whether a theme name belongs to the gzh-design theme set."""
-    return theme_name in GZH_THEMES
+    return theme_name in GZH_THEMES or theme_name == "adaptive"
+
+
+def _resolve_theme(theme_name: str, article_path, cover_path=None) -> str:
+    """Resolve `auto` theme by generating adaptive design from content; pass through otherwise."""
+    if theme_name != "auto":
+        return theme_name
+    
+    text = Path(article_path).read_text(encoding="utf-8")
+    lines = text.splitlines()
+    title = next((l.lstrip("# ").strip() for l in lines if l.startswith("# ")), "")
+    
+    # 查找封面图（优先使用显式传入的，否则查找同目录 cover-* 文件）
+    if cover_path is None:
+        article_dir = Path(article_path).parent
+        covers = list(article_dir.glob("cover-*.jpg")) + list(article_dir.glob("cover-*.png"))
+        cover_path = covers[0] if covers else None
+    
+    theme, design_report = generate_adaptive_theme(title, text, cover_path)
+    print(design_report)
+    
+    # 注册到全局 THEMES 以便 GzhConverter.get_theme 查找
+    GZH_THEMES["adaptive"] = theme
+    return "adaptive"
 
 
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp"}
@@ -132,10 +155,10 @@ def _validate_publish_inputs(args) -> None:
 
 def cmd_preview(args):
     """Generate HTML preview and open in browser."""
-    theme_name = args.theme
+    theme_name = _resolve_theme(args.theme, args.input)
     if not _is_gzh_theme(theme_name):
         print(f"Error: unknown gzh theme: {theme_name}", file=sys.stderr)
-        print(f"Available themes: {', '.join(GZH_THEMES)}", file=sys.stderr)
+        print(f"Available themes: {', '.join(GZH_THEMES)} (or 'auto')", file=sys.stderr)
         sys.exit(1)
 
     skill_root = Path(__file__).parent.parent / ".ai-ready" / "skills" / "gzh-design"
@@ -191,7 +214,11 @@ def cmd_publish(args):
 
     appid = args.appid or wechat_cfg.get("appid")
     secret = args.secret or wechat_cfg.get("secret")
-    theme_name = args.theme or cfg.get("theme", "moyu-green")
+    theme_name = _resolve_theme(
+        args.theme or cfg.get("theme", "moyu-green"), 
+        args.input, 
+        cover_path=args.cover
+    )
     author = args.author or wechat_cfg.get("author") or cfg.get("author")
 
     if not appid or not secret:
@@ -200,7 +227,7 @@ def cmd_publish(args):
 
     if not _is_gzh_theme(theme_name):
         print(f"Error: unknown gzh theme: {theme_name}", file=sys.stderr)
-        print(f"Available themes: {', '.join(GZH_THEMES)}", file=sys.stderr)
+        print(f"Available themes: {', '.join(GZH_THEMES)} (or 'auto')", file=sys.stderr)
         sys.exit(1)
 
     skill_root = Path(__file__).parent.parent / ".ai-ready" / "skills" / "gzh-design"
@@ -257,6 +284,8 @@ def cmd_themes(args):
     print("GZH Design Themes:")
     for ident, theme in GZH_THEMES.items():
         print(f"  {ident:24s} {theme.display_name} - {theme.suitable_for}")
+    print("\nSpecial:")
+    print(f"  {'auto':24s} 自适应生成 - 根据内容语义和封面图自动设计配色")
 
 
 def cmd_image_post(args):
@@ -473,14 +502,14 @@ def main():
 
     p_preview = sub.add_parser("preview", help="Generate HTML and open in browser")
     p_preview.add_argument("input", help="Markdown file path")
-    p_preview.add_argument("-t", "--theme", default="moyu-green", help="GZH theme name")
+    p_preview.add_argument("-t", "--theme", default="moyu-green", help="GZH theme name, or 'auto' to match content")
     p_preview.add_argument("-o", "--output", help="Output HTML file path")
     p_preview.add_argument("--no-open", action="store_true", help="Don't open browser")
 
     p_publish = sub.add_parser("publish", help="Convert and publish as WeChat draft")
     p_publish.add_argument("input", help="Markdown file path")
     p_publish.add_argument("-t", "--theme", default=None,
-        help="GZH theme. Options: moyu-green (摸鱼绿), red-white (红白), graphite-minimal (石墨), zen-whitespace (禅意), moyu-ticket (票据), olive-journal (手记)")
+        help="GZH theme. Options: moyu-green (摸鱼绿), red-white (红白), graphite-minimal (石墨), zen-whitespace (禅意), moyu-ticket (票据), olive-journal (手记), hotpot-warm (汤底暖橙), or 'auto' to match content")
     p_publish.add_argument("--appid", default=None, help="WeChat AppID (or set in config.yaml)")
     p_publish.add_argument("--secret", default=None, help="WeChat AppSecret (or set in config.yaml)")
     p_publish.add_argument("--cover", help="Cover image file path")
@@ -502,11 +531,11 @@ def main():
     )
     p_publish.add_argument("--title", help="Override article title")
     p_publish.add_argument("--author", default=None, help="Article author")
-    p_publish.add_argument("--digest", default=None, help="Override article digest (\u2264120 UTF-8 bytes)")
+    p_publish.add_argument("--digest", default=None, help="Override article digest (≤120 UTF-8 bytes)")
 
     sub.add_parser("themes", help="List available themes")
 
-    p_imgpost = sub.add_parser("image-post", help="Create WeChat image post (\u5c0f\u7eff\u4e66)")
+    p_imgpost = sub.add_parser("image-post", help="Create WeChat image post (小绿书)")
     p_imgpost.add_argument("images", nargs="+", help="Image file paths (1-20, first = cover)")
     p_imgpost.add_argument("-t", "--title", required=True, help="Post title (max 32 chars)")
     p_imgpost.add_argument("-c", "--content", default="", help="Plain text description (max ~1000 chars)")
@@ -521,6 +550,28 @@ def main():
     args = parser.parse_args()
 
     try:
+        # 在执行命令前，加载配置并验证
+        from config_manager import load_config, get_config_path, validate_config, check_startup
+        
+        cfg = load_config()
+        cfg_path = get_config_path()
+        
+        # 输出配置加载信息
+        if cfg_path:
+            print(f"[Config] Loaded from: {cfg_path}", file=sys.stderr)
+        else:
+            print("[Config] No config file found, using defaults", file=sys.stderr)
+        
+        # 验证配置
+        is_valid = validate_config()
+        if not is_valid:
+            print(f"[Config] ⚠ Configuration has issues", file=sys.stderr)
+        else:
+            print("[Config] ✓ Configuration valid", file=sys.stderr)
+        
+        # 检查启动状态
+        check_startup()
+        
         if args.command == "preview":
             cmd_preview(args)
         elif args.command == "publish":

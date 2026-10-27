@@ -18,22 +18,14 @@ READ_TIMEOUT = 120
 
 
 def _load_config() -> dict:
-    try:
-        import sys as _sys
-        _sys.path.insert(0, str(Path(__file__).parent))
-        from config import load_config
-        return load_config()
-    except ImportError:
-        for p in [
-            Path(__file__).parent.parent / "config" / "config.yaml",
-            Path(__file__).parent.parent / "config.yaml",
-            Path(__file__).parent / "config.yaml",
-            Path.home() / ".config" / "wewrite" / "config.yaml",
-        ]:
-            if p.exists():
-                with open(p, "r", encoding="utf-8") as f:
-                    return yaml.safe_load(f) or {}
-        return {}
+    """
+    通过配置管理器加载配置
+    
+    这里不再有备用逻辑，直接使用配置管理器
+    所有配置加载都经过同一入口，确保一致性
+    """
+    from config_manager import load_config
+    return load_config()
 
 
 # 封面用微信首图比例 2.35:1，各 provider 只差分辨率，不要改动比例。
@@ -434,18 +426,41 @@ PROVIDERS = {
 
 
 def _build_provider_chain(config: dict) -> list:
+    """
+    构建图片生成器链
+    
+    新逻辑：
+    1. 优先使用 image.providers 列表（推荐方式）
+    2. 如果没有 providers，检查旧格式 (image.provider + image.api_key)
+    3. 如果都没有，明确报错，而不是无声使用默认值
+    """
     img_cfg = config.get("image", {})
     providers_list = img_cfg.get("providers")
+    
+    # 优先使用 providers 列表
     if providers_list and isinstance(providers_list, list):
         chain = []
         for entry in providers_list:
-            provider_name = entry.get("provider", "doubao")
+            provider_name = entry.get("provider")
             api_key = entry.get("api_key")
+            
+            if not provider_name:
+                raise ValueError(
+                    "image.providers: missing 'provider' field. "
+                    "Each provider must have 'provider' name (e.g., 'openai', 'doubao')"
+                )
             if not api_key:
-                continue
+                raise ValueError(
+                    f"image.providers: missing 'api_key' for provider '{provider_name}'"
+                )
+            
             cls = PROVIDERS.get(provider_name)
             if not cls:
-                continue
+                raise ValueError(
+                    f"image.providers: unknown provider '{provider_name}'. "
+                    f"Supported: {', '.join(PROVIDERS.keys())}"
+                )
+            
             kwargs = {"api_key": api_key}
             if entry.get("model"):
                 kwargs["model"] = entry["model"]
@@ -458,13 +473,34 @@ def _build_provider_chain(config: dict) -> list:
             if entry.get("deployment"):
                 kwargs["deployment"] = entry["deployment"]
             chain.append(cls(**kwargs))
+        
         if not chain:
             raise ValueError("No valid providers in image.providers list")
         return chain
+    
+    # 备用：检查旧格式 (image.provider + image.api_key)
+    provider_name = img_cfg.get("provider")
     api_key = img_cfg.get("api_key")
+    
+    if not provider_name and not api_key:
+        raise ValueError(
+            "No image provider configured!\n"
+            "Please set 'image.providers' in config.yaml, or set both 'image.provider' and 'image.api_key'.\n"
+            "Supported providers: " + ", ".join(PROVIDERS.keys())
+        )
+    
+    if not provider_name:
+        raise ValueError("image.provider not set in config.yaml")
     if not api_key:
         raise ValueError("image.api_key not set in config.yaml")
-    cls = PROVIDERS.get(img_cfg.get("provider", "doubao"), DoubaoProvider)
+    
+    cls = PROVIDERS.get(provider_name)
+    if not cls:
+        raise ValueError(
+            f"Unknown provider: {provider_name}. "
+            f"Supported: {', '.join(PROVIDERS.keys())}"
+        )
+    
     return [cls(api_key=api_key, model=img_cfg.get("model", ""), base_url=img_cfg.get("base_url", ""))]
 
 

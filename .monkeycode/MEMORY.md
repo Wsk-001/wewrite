@@ -167,4 +167,16 @@ Entries discovered by the Agent during task execution should follow this format:
   - 关键词提取用 jieba.analyse.extract_tags TF-IDF，取 top 8（idf_only=False 兼顾词频与通用性）；标记逻辑：精确词匹配，不拆分多字词，避免断词被标记
   - 封面标题拆分规则：提取主语/宾语/核心名词为高亮词（jieba 分词后在 title 首次出现的位置），最多 3 个；其余拆分为 runs（每 2-3 字一段），适配封面设计器 cover_runs 排版
   - gzh-design skill 外部依赖（含源 git 仓库）已从项目移除，.gitignore 排除 .ai-ready/skills/gzh-design/ 目录
-  - image_gen.py 增加 OpenAI provider 健壮性：先检查 r.status_code 再解析 JSON（避免 502/503 坏网关时解 HTML 出 JSONDecodeError）
+   - image_gen.py 增加 OpenAI provider 健壮性：先检查 r.status_code 再解析 JSON（避免 502/503 坏网关时解 HTML 出 JSONDecodeError）
+
+[Project Knowledge Summary]
+- Date: 2026-10-26
+- Context: 发现配置加载存在单一来源、无缓存、缺多模块支持的设计缺陷，完成重构
+- Category: Build Methods
+- Instructions:
+   - 新增 toolkit/config_manager.py：实现单例 ConfigManager 确保配置全局只加载一次，统一管理配置路径查找、校验、缓存与日志输出；CLI 启动时自动验证并输出加载状态
+   - config_manager 暴露的 API：load_config()、validate_config()、check_startup()、get_config_path()，支持兼容旧 API（带参数 reload 控制是否重新加载）
+   - toolkit/config.py 改为兼容层，从 config_manager 重新导出 API；新增 get_config(reload=False) 供旧代码调用；所有新模块优先从 config_manager 导入
+   - toolkit/image_gen.py 改进：_load_config() 与 _build_provider_chain() 改用 config_manager，配置加载失败时立即抛异常而非静默降级；所有 provider 请求改用分离式超时 (CONNECT_TIMEOUT=10, READ_TIMEOUT=120)
+   - toolkit/cli.py main() 函数改进：启动时显式调用 validate_config() 与 check_startup()，若配置无效输出警告信息至 stderr，继续执行但让用户知晓异常状态
+   - 向后兼容性验证：旧的 from config import get_config 仍可用；新的 from config_manager import load_config 支持；旧 API 如 validate_config(cfg) 改为无参设计，config_manager 负责管理 cfg 对象
