@@ -168,6 +168,10 @@ def cmd_preview(args):
     cfg = load_config()
     author = cfg.get("wechat", {}).get("author") or cfg.get("author")
     result = converter.convert_file(Path(args.input), author=author)
+    if result.residues:
+        print("Warning: 转换产物存在 markdown 语法残留（排版降级）:", file=sys.stderr)
+        for r in result.residues:
+            print(f"  - {r}", file=sys.stderr)
     print(f"[GZH Design] Using {theme_name} theme")
     full_html = _wrap_gzh_preview(result.html, theme_name)
 
@@ -235,6 +239,12 @@ def cmd_publish(args):
     skill_root = Path(__file__).parent.parent / ".ai-ready" / "skills" / "gzh-design"
     converter = GzhConverter(theme_identifier=theme_name, skill_root=skill_root if skill_root.exists() else None)
     result = converter.convert_file(Path(args.input), author=author)
+    if result.residues and not getattr(args, "force", False):
+        print("Error: 转换产物存在 markdown 语法残留，对应内容会以降级形态发布：", file=sys.stderr)
+        for r in result.residues:
+            print(f"  - {r}", file=sys.stderr)
+        print("请修复原文对应语法后再发布，或确认后加 --force 跳过本检查。", file=sys.stderr)
+        sys.exit(2)
     print(f"[GZH Design] Using {theme_name} theme")
 
     print(f"Title: {result.title}")

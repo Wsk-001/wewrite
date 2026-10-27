@@ -9,6 +9,7 @@ import subprocess
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass, field
+from html import unescape as _unescape
 import jieba
 import jieba.analyse
 
@@ -22,6 +23,7 @@ class ConvertResult:
     title: str
     digest: str
     images: list = field(default_factory=list)
+    residues: list = field(default_factory=list)
 
 
 class GzhConverter:
@@ -70,16 +72,17 @@ class GzhConverter:
         """Convert markdown text to WeChat HTML."""
         # Parse structure
         structure = self._parse_markdown(md_text)
-        
+
         # Generate HTML
         html = self._generate_html(structure, author, author_intro)
-        
+
         # Extract metadata
         return ConvertResult(
             html=html,
             title=structure["title"],
             digest=self._extract_digest(structure),
-            images=structure["images"]
+            images=structure["images"],
+            residues=self._check_markdown_residue(html)
         )
     
     def _parse_markdown(self, md_text: str) -> Dict:
@@ -99,10 +102,63 @@ class GzhConverter:
         current_paragraph_lines = []
         in_container = None  # Track ::: container type (e.g., "summary")
         container_lines = []
-        
-        for line in lines:
+        skip_until = -1  # Table blocks consumed by lookahead
+
+        for line_idx, line in enumerate(lines):
+            if line_idx <= skip_until:
+                continue
             stripped = line.strip()
-            
+
+            # Table block (consecutive lines starting with "|")
+            if stripped.startswith("|"):
+                block_end = line_idx
+                while block_end < len(lines) and lines[block_end].strip().startswith("|"):
+                    block_end += 1
+                block = [lines[i].strip() for i in range(line_idx, block_end)]
+                table = self._parse_table_block(block)
+                # Flush pending paragraph first
+                if current_paragraph_lines:
+                    para_text = self._join_paragraph(current_paragraph_lines)
+                    if current_section:
+                        current_section["content"].append(para_text)
+                    else:
+                        structure["intro_paragraphs"].append(para_text)
+                    current_paragraph_lines = []
+                if table:
+                    item = {"type": "table", "header": table[0], "rows": table[1]}
+                    skip_until = block_end - 1
+                else:
+                    # Invalid table syntax - fall through as plain text so the
+                    # residue check can flag it at publish time
+                    item = " ".join(block)
+                if current_section:
+                    current_section["content"].append(item)
+                else:
+                    structure["intro_paragraphs"].append(item)
+                continue
+
+            # Blockquote (consecutive lines starting with ">")
+            if stripped.startswith(">"):
+                quote_end = line_idx
+                quote_lines = []
+                while quote_end < len(lines) and lines[quote_end].strip().startswith(">"):
+                    quote_lines.append(lines[quote_end].strip().lstrip(">").strip())
+                    quote_end += 1
+                if current_paragraph_lines:
+                    para_text = self._join_paragraph(current_paragraph_lines)
+                    if current_section:
+                        current_section["content"].append(para_text)
+                    else:
+                        structure["intro_paragraphs"].append(para_text)
+                    current_paragraph_lines = []
+                item = {"type": "blockquote", "text": self._join_paragraph([l for l in quote_lines if l])}
+                skip_until = quote_end - 1
+                if current_section:
+                    current_section["content"].append(item)
+                else:
+                    structure["intro_paragraphs"].append(item)
+                continue
+
             # Container fence (:::type or closing :::)
             if stripped.startswith(":::"):
                 if in_container:
@@ -163,9 +219,9 @@ class GzhConverter:
                 continue
             
             # List item (- xxx / * xxx / 1. xxx) - flush paragraph first, then emit item
-            list_match = re.match(r'^([-*])\s+(.+)$', stripped) or re.match(r'^(\d+)[.、)]\s+(.+)$', stripped)
-            if list_match:
-                item_text = list_match.group(2).strip()
+            unordered_match = re.match(r'^[-*]\s+(.+)$', stripped)
+            ordered_match = re.match(r'^(\d{1,3})[.、)]\s+(.+)$', stripped)
+            if unordered_match or ordered_match:
                 # Flush any pending paragraph lines
                 if current_paragraph_lines:
                     para_text = self._join_paragraph(current_paragraph_lines)
@@ -174,7 +230,12 @@ class GzhConverter:
                     else:
                         structure["intro_paragraphs"].append(para_text)
                     current_paragraph_lines = []
-                item = {"type": "list_item", "text": item_text}
+                if ordered_match:
+                    item = {"type": "list_item", "text": ordered_match.group(2).strip(),
+                            "ordered": True, "index": int(ordered_match.group(1))}
+                else:
+                    item = {"type": "list_item", "text": unordered_match.group(1).strip(),
+                            "ordered": False}
                 if current_section:
                     current_section["content"].append(item)
                 else:
@@ -261,6 +322,29 @@ class GzhConverter:
         
         return structure
     
+    def _parse_table_block(self, block: List[str]) -> Optional[Tuple[List[str], List[List[str]]]]:
+        """Parse a block of pipe-table lines.
+
+        Returns (header_cells, rows) when the block is a valid table
+        (first data line is a separator row), otherwise None.
+        """
+        if len(block) < 2:
+            return None
+
+        def split_row(line: str) -> List[str]:
+            return [c.strip() for c in line.strip().strip("|").split("|")]
+
+        header = split_row(block[0])
+        separator = split_row(block[1])
+        if len(header) < 2 or len(separator) != len(header):
+            return None
+        if not all(re.fullmatch(r':?-{2,}:?', c) for c in separator):
+            return None
+
+        rows = [split_row(l) for l in block[2:]]
+        rows = [r for r in rows if any(r)]
+        return header, rows
+
     def _join_paragraph(self, lines: List[str]) -> str:
         """Join paragraph lines into single text.
 
@@ -434,25 +518,76 @@ class GzhConverter:
         return "\n".join(parts)
     
     def _render_content_item(self, item) -> str:
-        """Render a content item (str paragraph, image, list_item, or subheading)."""
+        """Render a content item (str paragraph, image, list_item, subheading, table, blockquote)."""
         if isinstance(item, dict):
             t = item.get("type")
             if t == "image":
                 return self._generate_image(item)
             if t == "list_item":
-                return self._generate_list_item(item["text"])
+                return self._generate_list_item(item)
             if t == "subheading":
                 return self._generate_subheading(item["text"])
+            if t == "table":
+                return self._generate_table(item)
+            if t == "blockquote":
+                return self._generate_blockquote(item)
             return self._generate_paragraph(str(item))
         return self._generate_paragraph(item)
 
-    def _generate_list_item(self, text: str) -> str:
-        """Generate a bullet list item (WeChat-safe section+p)."""
-        marked_text = self._mark_keywords(text)
+    def _generate_list_item(self, item: Dict) -> str:
+        """Generate a list item (WeChat-safe section+p). Ordered items keep their number."""
+        marked_text = self._mark_keywords(item["text"])
         html_text = self._convert_inline_markdown(marked_text)
-        return f'''    <p style="font-size:14px;line-height:{self.LINE_HEIGHT};color:{self.TEXT_MAIN};margin:0 0 10px;padding-left:18px;position:relative;font-weight:{self.BODY_WEIGHT};">
-      <span style="position:absolute;left:0;color:{self.PRIMARY};font-weight:700;">•</span>{html_text}
+        if item.get("ordered"):
+            marker = (
+                f'<span style="position:absolute;left:0;color:{self.PRIMARY};'
+                f'font-weight:700;font-size:13px;">{item.get("index", "")}.</span>'
+            )
+            padding_left = 24
+        else:
+            marker = f'<span style="position:absolute;left:0;color:{self.PRIMARY};font-weight:700;">•</span>'
+            padding_left = 18
+        return f'''    <p style="font-size:14px;line-height:{self.LINE_HEIGHT};color:{self.TEXT_MAIN};margin:0 0 10px;padding-left:{padding_left}px;position:relative;font-weight:{self.BODY_WEIGHT};">
+      {marker}{html_text}
     </p>'''
+
+    def _generate_table(self, table: Dict) -> str:
+        """Generate a markdown table as a WeChat-safe <table> with theme colors and zebra rows."""
+        header = table["header"]
+        rows = table["rows"]
+
+        ths = "".join(
+            f'<th style="border:1px solid {self._rgba(0.3)};padding:8px 10px;background:{self.PRIMARY};color:#FFFFFF;font-weight:700;font-size:13px;text-align:center;">'
+            f'<span leaf="">{self._escape_html(c)}</span></th>'
+            for c in header
+        )
+
+        body_parts = []
+        for i, row in enumerate(rows):
+            zebra = f'background:{self._rgba(0.05)};' if i % 2 == 1 else ""
+            tds = []
+            for cell in row:
+                align = "center" if len(cell) <= 8 else "left"
+                cell_html = self._convert_inline_markdown(cell)
+                tds.append(
+                    f'<td style="border:1px solid {self._rgba(0.18)};padding:8px 10px;font-size:13px;color:{self.TEXT_MAIN};text-align:{align};{zebra}">{cell_html}</td>'
+                )
+            body_parts.append("<tr>" + "".join(tds) + "</tr>")
+
+        return f'''    <section style="margin:16px 0;">
+      <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+        <thead><tr>{ths}</tr></thead>
+        <tbody>{"".join(body_parts)}</tbody>
+      </table>
+    </section>'''
+
+    def _generate_blockquote(self, item: Dict) -> str:
+        """Generate a blockquote as a theme-colored left-border card."""
+        marked_text = self._mark_keywords(item["text"])
+        html_text = self._convert_inline_markdown(marked_text)
+        return f'''    <section style="margin:14px 0;padding:12px 16px;background:{self._rgba(0.05)};border-left:4px solid {self.PRIMARY};border-radius:0 8px 8px 0;">
+      <p style="font-size:14px;line-height:{self.LINE_HEIGHT};color:{self.TEXT_MAIN};margin:0;font-weight:{self.BODY_WEIGHT};">{html_text}</p>
+    </section>'''
 
     def _generate_subheading(self, text: str) -> str:
         """Generate a ### subheading."""
@@ -529,7 +664,14 @@ class GzhConverter:
             r'<span style="background:#F3F4F6;color:#1F2937;padding:2px 6px;border-radius:4px;font-size:13px;font-weight:600;"><span leaf="">\1</span></span>',
             html
         )
-        
+
+        # Links: WeChat strips external hrefs, render as styled text reference
+        html = re.sub(
+            r'\[([^\]]+)\]\([^)]+\)',
+            f'<span style="color:{self.PRIMARY};font-weight:600;text-decoration:underline;">\\1</span>',
+            html
+        )
+
         # Wrap remaining text in <span leaf="">
         # Split by tags and wrap plain text segments
         parts = re.split(r'(<[^>]+>)', html)
@@ -575,7 +717,7 @@ class GzhConverter:
         <span style="font-size:14px;font-weight:700;color:{self.PRIMARY};letter-spacing:2px;"><span leaf="">一句话版本</span></span>
       </section>
       <p style="font-size:14px;font-weight:500;color:{self.TEXT_MAIN};line-height:1.8;margin:0;letter-spacing:0.5px;">
-        <span leaf="">{self._escape_html(summary_text)}</span>
+        {self._convert_inline_markdown(summary_text)}
       </p>
     </section>
   </section>'''
@@ -598,7 +740,31 @@ class GzhConverter:
                 .replace("<", "&lt;")
                 .replace(">", "&gt;")
                 .replace('"', "&quot;"))
-    
+
+    # 残留检测：转换产物可见文本中若出现这些 markdown 语法，说明解析器漏接了
+    _RESIDUE_PATTERNS = [
+        ("表格竖线残留（|）", r"\|"),
+        ("容器标记残留（:::）", r":::"),
+        ("加粗标记残留（**）", r"\*\*"),
+        ("高亮标记残留（==）", r"=="),
+        ("下划线标记残留（++）", r"\+\+"),
+        ("代码标记残留（`）", r"`"),
+        ("图片语法残留（![）", r"!\["),
+        ("链接语法残留（](）", r"\]\("),
+        ("标题井号残留（行首 #）", r"(?:^|\n)#{1,6}\s"),
+        ("引用符号残留（行首 >）", r"(?:^|\n)>\s"),
+    ]
+
+    def _check_markdown_residue(self, html: str) -> List[str]:
+        """Extract visible text from generated HTML and flag leftover markdown syntax."""
+        text = re.sub(r'<[^>]+>', '', html)
+        text = _unescape(text)
+        residues = []
+        for name, pattern in self._RESIDUE_PATTERNS:
+            if re.search(pattern, text):
+                residues.append(name)
+        return residues
+
     def validate(self, html_path: Path) -> bool:
         """Run validation script on generated HTML."""
         if not self.validate_script or not self.validate_script.exists():
