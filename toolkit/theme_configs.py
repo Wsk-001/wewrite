@@ -165,6 +165,8 @@ CATEGORY_VARIANT = {
     "用药": "clinical",
     "心血管": "clinical",
     "呼吸": "clinical",
+    "眼科": "clinical",
+    "骨骼": "clinical",
     "饮食": "classic",
     "节庆": "classic",
     "皮肤": "classic",
@@ -172,6 +174,9 @@ CATEGORY_VARIANT = {
     "心理": "editorial",
     "通用": "editorial",
 }
+
+# 语义得分低于该值视为弱命中，触发向次类别的色相混合
+WEAK_SEMANTIC_SCORE = 8
 
 
 def _hue_distance(h1: float, h2: float) -> float:
@@ -235,23 +240,38 @@ def extract_cover_hue(cover_path) -> Optional[float]:
 def generate_adaptive_theme(title: str, content: str, cover_path=None) -> tuple:
     """根据内容自动生成专属主题配色。返回 (ThemeConfig, design_report_str)。"""
     import colorsys
-    
-    # 1. 语义色相
-    category, semantic_hue, score = analyze_content_hue(title, content)
-    
-    # 2. 封面主色混合
+    import math
+
+    # 1. 语义色相（含次类别）
+    category, semantic_hue, score, runner_up = analyze_content_hue(title, content)
+
+    # 1.5 语义弱命中（score < 8）时向次类别圆周加权 70/30 靠拢，
+    # 避免小众选题落在主类别默认色相上；强命中保持纯语义色相（与已验收文章一致）
+    blend_note = ""
+    if runner_up and score < WEAK_SEMANTIC_SCORE:
+        runner_hue = CONTENT_HUE_MAP[runner_up][0]
+        x = 0.7 * math.cos(2 * math.pi * semantic_hue) + 0.3 * math.cos(2 * math.pi * runner_hue)
+        y = 0.7 * math.sin(2 * math.pi * semantic_hue) + 0.3 * math.sin(2 * math.pi * runner_hue)
+        semantic_hue = (math.atan2(y, x) % (2 * math.pi)) / (2 * math.pi)
+        blend_note = f"（弱语义，混入 {runner_up} 30%）"
+    style_variant = CATEGORY_VARIANT.get(category, "classic")
+
+    # 2. 封面主色混合（仅在封面与语义色相圆周距离 ≤ 90° 时生效：
+    # 封面只做精修，冲突时保持纯语义色相，避免 50/50 中点两头不靠）
     cover_hue = extract_cover_hue(cover_path) if cover_path else None
-    if cover_hue is not None:
-        # 封面色相可信时做圆周混合（50/50）
-        import math
+    if cover_hue is not None and _hue_distance(semantic_hue, cover_hue) <= 0.25:
         x = math.cos(2*math.pi*semantic_hue) + math.cos(2*math.pi*cover_hue)
         y = math.sin(2*math.pi*semantic_hue) + math.sin(2*math.pi*cover_hue)
         final_hue = (math.atan2(y, x) % (2*math.pi)) / (2*math.pi)
         hue_source = "语义+封面混合"
+    elif cover_hue is not None:
+        final_hue = semantic_hue
+        hue_source = f"语义（封面色相 {int(cover_hue*360)}° 冲突已忽略）"
     else:
         final_hue = semantic_hue
         hue_source = "语义"
-    
+    hue_source += blend_note
+
     # 3. 饱和度/明度：内容严肃度
     serious_words = ["深度", "分析", "报告", "数据", "指南", "研究"]
     serious_hits = sum(1 for w in serious_words if w in title or content.count(w) > 0)
@@ -305,15 +325,17 @@ def generate_adaptive_theme(title: str, content: str, cover_path=None) -> tuple:
         line_height=layout["line_height"],
         title_weight=layout["title_weight"],
         body_weight=layout["body_weight"],
+        style_variant=style_variant,
         suitable_for=f"内容驱动设计（{category}）",
         description=f"根据内容自动生成（色相源: {hue_source}）"
     )
-    
+
     design_report = (
         f"[自适应主题设计]\n"
         f"  类别: {category}（得分 {score}）\n"
         f"  色相: {hue_source} → {int(final_hue*360)}°\n"
         f"  配色: 主色 {primary} / 浅色 {primary_light} / 强调 {accent}\n"
+        f"  版式: {style_variant}\n"
         f"  排版: 间距 {layout['margin']}px / 行高 {layout['line_height']} / 标题 {layout['title_weight']} / 正文 {layout['body_weight']}"
     )
     
