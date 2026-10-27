@@ -49,6 +49,18 @@ class GzhConverter:
         self.TEXT_GRAY = self.theme_cfg.secondary_color
         self.UNDERLINE_CSS = self.theme_cfg.underline_css
         
+        # Extract layout parameters from theme config
+        self.SECTION_MARGIN = self.theme_cfg.section_margin
+        self.LINE_HEIGHT = self.theme_cfg.line_height
+        self.TITLE_WEIGHT = self.theme_cfg.title_weight
+        self.BODY_WEIGHT = self.theme_cfg.body_weight
+
+    def _rgba(self, alpha: float) -> str:
+        """Derive rgba() string from the theme primary color."""
+        h = self.PRIMARY.lstrip("#")
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        return f"rgba({r},{g},{b},{alpha})"
+        
     def convert_file(self, md_path: Path, author: Optional[str] = None, author_intro: Optional[str] = None) -> ConvertResult:
         """Convert markdown file to WeChat HTML."""
         md_text = md_path.read_text(encoding="utf-8")
@@ -78,19 +90,57 @@ class GzhConverter:
             "title": "",
             "intro_paragraphs": [],
             "sections": [],
-            "images": []
+            "images": [],
+            "summary": None
         }
         
         current_section = None
         intro_done = False
         current_paragraph_lines = []
+        in_container = None  # Track ::: container type (e.g., "summary")
+        container_lines = []
         
         for line in lines:
             stripped = line.strip()
             
+            # Container fence (:::type or closing :::)
+            if stripped.startswith(":::"):
+                if in_container:
+                    # Closing fence - save container content
+                    if in_container == "summary":
+                        # Join container lines, skip the type label if present
+                        content_lines = [l for l in container_lines if not l.strip().startswith(":::")]
+                        structure["summary"] = " ".join(content_lines).strip()
+                    in_container = None
+                    container_lines = []
+                else:
+                    # Opening fence - detect container type
+                    # Extract type from ":::type optional-label" -> "type"
+                    fence_text = stripped[3:].strip()  # Remove ":::"
+                    if fence_text:
+                        # Take first word as container type
+                        in_container = fence_text.split()[0] if fence_text.split() else "generic"
+                    else:
+                        in_container = "generic"
+                    container_lines = []
+                continue
+            
+            # If inside container, collect lines
+            if in_container:
+                container_lines.append(stripped)
+                continue
+            
             # Title
             if stripped.startswith("# ") and not structure["title"]:
                 structure["title"] = stripped[2:].strip()
+                continue
+            
+            # Duplicate H1 title - ignore silently instead of leaking "#" into text
+            if stripped.startswith("# "):
+                continue
+            
+            # Horizontal rule (skip it - don't add to content)
+            if stripped in ("---", "***", "___") or re.match(r'^-{3,}$|^\*{3,}$|^_{3,}$', stripped):
                 continue
             
             # Section
@@ -112,6 +162,41 @@ class GzhConverter:
                 structure["sections"].append(current_section)
                 continue
             
+            # List item (- xxx / * xxx / 1. xxx) - flush paragraph first, then emit item
+            list_match = re.match(r'^([-*])\s+(.+)$', stripped) or re.match(r'^(\d+)[.、)]\s+(.+)$', stripped)
+            if list_match:
+                item_text = list_match.group(2).strip()
+                # Flush any pending paragraph lines
+                if current_paragraph_lines:
+                    para_text = self._join_paragraph(current_paragraph_lines)
+                    if current_section:
+                        current_section["content"].append(para_text)
+                    else:
+                        structure["intro_paragraphs"].append(para_text)
+                    current_paragraph_lines = []
+                item = {"type": "list_item", "text": item_text}
+                if current_section:
+                    current_section["content"].append(item)
+                else:
+                    structure["intro_paragraphs"].append(item)
+                continue
+            
+            # Subheading (### xxx)
+            if stripped.startswith("### "):
+                if current_paragraph_lines:
+                    para_text = self._join_paragraph(current_paragraph_lines)
+                    if current_section:
+                        current_section["content"].append(para_text)
+                    else:
+                        structure["intro_paragraphs"].append(para_text)
+                    current_paragraph_lines = []
+                sub = {"type": "subheading", "text": stripped[4:].strip()}
+                if current_section:
+                    current_section["content"].append(sub)
+                else:
+                    structure["intro_paragraphs"].append(sub)
+                continue
+            
             # Image
             img_match = re.match(r'!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)', stripped)
             if img_match:
@@ -119,12 +204,19 @@ class GzhConverter:
                 if not img_url.startswith(("http://", "https://")):
                     structure["images"].append(img_url)
                 
-                # Save image as content item
+                img_item = {"type": "image", "url": img_url, "alt": img_match.group(1)}
+                # Save image as content item (works in intro AND sections)
+                if current_paragraph_lines:
+                    para_text = self._join_paragraph(current_paragraph_lines)
+                    if current_section:
+                        current_section["content"].append(para_text)
+                    else:
+                        structure["intro_paragraphs"].append(para_text)
+                    current_paragraph_lines = []
                 if current_section:
-                    if current_paragraph_lines:
-                        current_section["content"].append(self._join_paragraph(current_paragraph_lines))
-                        current_paragraph_lines = []
-                    current_section["content"].append({"type": "image", "url": img_url, "alt": img_match.group(1)})
+                    current_section["content"].append(img_item)
+                else:
+                    structure["intro_paragraphs"].append(img_item)
                 continue
             
             # Empty line - paragraph break
@@ -152,17 +244,49 @@ class GzhConverter:
             elif not intro_done:
                 structure["intro_paragraphs"].append(para_text)
         
+        # Unclosed container at EOF - salvage content instead of dropping it
+        if in_container:
+            if in_container == "summary" and container_lines:
+                content_lines = [l for l in container_lines if l.strip()]
+                structure["summary"] = " ".join(content_lines).strip()
+            elif container_lines:
+                # Treat remaining lines as a normal paragraph
+                text_lines = [l for l in container_lines if l.strip()]
+                if text_lines:
+                    para_text = self._join_paragraph(text_lines)
+                    if current_section:
+                        current_section["content"].append(para_text)
+                    elif not intro_done:
+                        structure["intro_paragraphs"].append(para_text)
+        
         return structure
     
     def _join_paragraph(self, lines: List[str]) -> str:
-        """Join paragraph lines into single text."""
-        return " ".join(lines)
+        """Join paragraph lines into single text.
+
+        仅当两侧都是 ASCII 字母/数字时插入一个空格（英文单词断行）；
+        任一侧是中文、全角字符或标点符号时直接拼接。
+        """
+        result = ""
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            if result:
+                prev_c = result[-1]
+                next_c = line[0]
+                if (prev_c.isascii() and prev_c.isalnum()
+                        and next_c.isascii() and next_c.isalnum()):
+                    result += " "
+            result += line
+        return result
     
     def _extract_digest(self, structure: Dict) -> str:
         """Extract article digest from intro paragraphs."""
-        if structure["intro_paragraphs"]:
-            # Take first intro paragraph, max 100 chars
-            first_para = structure["intro_paragraphs"][0]
+        first_para = next(
+            (p for p in structure["intro_paragraphs"] if isinstance(p, str)), None
+        )
+        if first_para:
             # Remove markdown syntax
             clean = re.sub(r'\*\*([^*]+)\*\*', r'\1', first_para)
             clean = re.sub(r'==([^=]+)==', r'\1', clean)
@@ -185,8 +309,8 @@ class GzhConverter:
         # Container start
         parts.append(
             '<section style="max-width:677px;margin:0 auto;background:#ffffff;'
-            'font-family:-apple-system,BlinkMacSystemFont,\'PingFang SC\',\'Hiragino Sans GB\',\'Microsoft YaHei\',sans-serif;'
-            'color:#374151;line-height:1.75;letter-spacing:0.5px;overflow-x:hidden;">'
+            "font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;"
+            f'color:{self.TEXT_MAIN};line-height:{self.LINE_HEIGHT};letter-spacing:0.5px;overflow-x:hidden;">'
         )
         
         # Cover (simplified version without image)
@@ -196,12 +320,16 @@ class GzhConverter:
         if structure["intro_paragraphs"]:
             parts.append('<section style="margin:0 20px 24px;">')
             for para in structure["intro_paragraphs"]:
-                parts.append(self._generate_paragraph(para, is_intro=True))
+                parts.append(self._render_content_item(para))
             parts.append('</section>')
         
         # Sections with auto-numbering
         for idx, section in enumerate(structure["sections"], 1):
             parts.append(self._generate_section(idx, section))
+        
+        # Summary card (if present)
+        if structure.get("summary"):
+            parts.append(self._generate_summary_card(structure["summary"]))
         
         # Divider
         parts.append(self._generate_divider())
@@ -218,43 +346,51 @@ class GzhConverter:
         
         # Split title into lines (simple heuristic)
         if len(title) > 15:
-            # Try to split at punctuation or spaces
+            # Try to split at punctuation or spaces near the middle
             mid = len(title) // 2
-            split_pos = mid
+            split_pos = None
             for i in range(mid - 5, mid + 5):
-                if i < len(title) and title[i] in "，。、 ":
+                if 0 < i < len(title) and title[i] in "，。、：" and i + 1 < len(title):
                     split_pos = i + 1
                     break
-            title_line1 = title[:split_pos].strip()
-            title_line2 = title[split_pos:].strip()
+            if split_pos is None:
+                # No punctuation nearby - look outward for a safe boundary
+                # (never split inside a run of alphanumerics)
+                for i in list(range(mid + 5, min(len(title) - 1, mid + 12))) + list(range(max(1, mid - 12), mid - 5)):
+                    if title[i] in "，。、：： ":
+                        split_pos = i + 1
+                        break
+            if split_pos:
+                title_line1 = title[:split_pos].strip()
+                title_line2 = title[split_pos:].strip()
+            else:
+                title_line1 = title
+                title_line2 = ""
         else:
             title_line1 = title
             title_line2 = ""
         
-        # Extract key phrase for green highlight (simple: take last few chars of line1)
-        if len(title_line1) > 8:
-            green_word = title_line1[-4:]
+        # Extract key phrase for highlight - only when the tail is pure CJK
+        # (never split "30分钟" into "3" + "0分钟")
+        tail = title_line1[-4:] if len(title_line1) > 8 else ""
+        if tail and re.fullmatch(r'[\u4e00-\u9fff]{4}', tail):
+            green_word = tail
             title_line1 = title_line1[:-4]
         else:
             green_word = ""
         
         return f'''
-  <section style="margin:0 0 32px;background:#fff;border:1.5px solid rgba(5,150,105,0.15);border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);width:100%;">
+  <section style="margin:0 0 {self.SECTION_MARGIN}px;background:#fff;border:1.5px solid {self._rgba(0.15)};border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.06);width:100%;">
     <section style="padding:32px 28px 28px;">
       <section style="display:flex;align-items:center;gap:8px;margin-bottom:28px;">
         <span style="width:6px;height:6px;background:{self.PRIMARY};border-radius:50%;"><span leaf=""><br></span></span>
         <span style="font-size:11px;font-weight:700;letter-spacing:3px;color:{self.PRIMARY};"><span leaf="">科普辟谣</span></span>
-        <section style="flex:1;height:1px;overflow:hidden;background:linear-gradient(to right,rgba(5,150,105,0.12),transparent);"><span leaf=""><br></span></section>
+        <section style="flex:1;height:1px;overflow:hidden;background:linear-gradient(to right,{self._rgba(0.12)},transparent);"><span leaf=""><br></span></section>
       </section>
-      <section>
-        <p style="font-size:24px;font-weight:900;color:#111827;margin:0;line-height:1.05;letter-spacing:-2px;">
-          <span leaf="">{self._escape_html(title_line1)}</span>{"" if not green_word else f'<span style="color:{self.PRIMARY};"><span leaf="">{self._escape_html(green_word)}</span></span>'}
+        <p style="font-size:24px;font-weight:{self.TITLE_WEIGHT};color:#111827;margin:0;line-height:1.05;letter-spacing:-2px;">
+          <span leaf="">{self._escape_html(title_line1)}</span>{f'<span style="color:{self.PRIMARY};"><span leaf="">{self._escape_html(green_word)}</span></span>' if green_word else ""}
         </p>
-        {"" if not title_line2 else f'<p style="font-size:24px;font-weight:900;color:{self.PRIMARY};margin:0 0 16px;line-height:1.05;letter-spacing:-2px;"><span leaf="">{self._escape_html(title_line2)}</span></p>'}
-        <section style="width:48px;height:3px;background:linear-gradient(to right,{self.PRIMARY},{self.PRIMARY_LIGHT});border-radius:2px;margin-bottom:12px;">
-          <span leaf=""><br></span>
-        </section>
-      </section>
+         {"" if not title_line2 else f'<p style="font-size:24px;font-weight:{self.TITLE_WEIGHT};color:{self.PRIMARY};margin:0 0 16px;line-height:1.05;letter-spacing:-2px;"><span leaf="">{self._escape_html(title_line2)}</span></p>'}
     </section>
     <section style="background:{self.PRIMARY};padding:12px 28px;display:flex;align-items:center;justify-content:space-between;">
       <p style="font-size:12px;color:rgba(255,255,255,0.9);margin:0;font-weight:600;letter-spacing:0.5px;">
@@ -275,13 +411,13 @@ class GzhConverter:
             title = deduped
         
         parts = [f'''
-<section style="margin:0 0 32px;">
+<section style="margin:0 0 {self.SECTION_MARGIN}px;">
   <section style="padding:0 20px;margin-bottom:20px;">
     <section style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-      <section style="display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,{self.PRIMARY},{self.PRIMARY_LIGHT});box-shadow:0 2px 8px rgba(5,150,105,0.25);">
+      <section style="display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,{self.PRIMARY},{self.PRIMARY_LIGHT});box-shadow:0 2px 8px {self._rgba(0.25)};">
         <span style="font-size:15px;font-weight:900;color:#fff;"><span leaf="">{number:02d}</span></span>
       </section>
-      <p style="font-size:18px;font-weight:800;color:#111827;margin:0;line-height:1.4;">
+      <p style="font-size:18px;font-weight:{self.TITLE_WEIGHT};color:#111827;margin:0;line-height:1.4;">
         <span leaf="">{self._escape_html(title)}</span>
       </p>
     </section>
@@ -290,16 +426,42 @@ class GzhConverter:
         # Section content
         parts.append('  <section style="margin:0 20px 14px;">')
         for item in section["content"]:
-            if isinstance(item, dict) and item.get("type") == "image":
-                parts.append(self._generate_image(item))
-            else:
-                parts.append(self._generate_paragraph(item))
+            parts.append(self._render_content_item(item))
         parts.append('  </section>')
         
         parts.append('</section>')
         
         return "\n".join(parts)
     
+    def _render_content_item(self, item) -> str:
+        """Render a content item (str paragraph, image, list_item, or subheading)."""
+        if isinstance(item, dict):
+            t = item.get("type")
+            if t == "image":
+                return self._generate_image(item)
+            if t == "list_item":
+                return self._generate_list_item(item["text"])
+            if t == "subheading":
+                return self._generate_subheading(item["text"])
+            return self._generate_paragraph(str(item))
+        return self._generate_paragraph(item)
+
+    def _generate_list_item(self, text: str) -> str:
+        """Generate a bullet list item (WeChat-safe section+p)."""
+        marked_text = self._mark_keywords(text)
+        html_text = self._convert_inline_markdown(marked_text)
+        return f'''    <p style="font-size:14px;line-height:{self.LINE_HEIGHT};color:{self.TEXT_MAIN};margin:0 0 10px;padding-left:18px;position:relative;font-weight:{self.BODY_WEIGHT};">
+      <span style="position:absolute;left:0;color:{self.PRIMARY};font-weight:700;">•</span>{html_text}
+    </p>'''
+
+    def _generate_subheading(self, text: str) -> str:
+        """Generate a ### subheading."""
+        marked_text = self._mark_keywords(text)
+        html_text = self._convert_inline_markdown(marked_text)
+        return f'''    <p style="font-size:16px;font-weight:700;color:{self.PRIMARY};margin:20px 0 10px;line-height:1.5;">
+      {html_text}
+    </p>'''
+
     def _generate_paragraph(self, text: str, is_intro: bool = False) -> str:
         """Generate paragraph with keyword highlighting."""
         # Mark keywords
@@ -308,7 +470,7 @@ class GzhConverter:
         # Convert markdown syntax
         html_text = self._convert_inline_markdown(marked_text)
         
-        return f'''    <p style="font-size:14px;line-height:1.9;color:#374151;margin:0 0 14px;">
+        return f'''    <p style="font-size:14px;line-height:{self.LINE_HEIGHT};color:{self.TEXT_MAIN};margin:0 0 14px;font-weight:{self.BODY_WEIGHT};">
       {html_text}
     </p>'''
     
@@ -402,6 +564,21 @@ class GzhConverter:
         html += '\n    </section>'
         
         return html
+    
+    
+    def _generate_summary_card(self, summary_text: str) -> str:
+        """Generate summary card component."""
+        return f'''
+  <section style="margin:0 20px {self.SECTION_MARGIN}px;">
+    <section style="background:linear-gradient(135deg,{self._rgba(0.04)} 0%,{self._rgba(0.08)} 100%);border-left:4px solid {self.PRIMARY};border-radius:12px;padding:20px 24px;box-shadow:0 2px 8px {self._rgba(0.08)};">
+      <section style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <span style="font-size:14px;font-weight:700;color:{self.PRIMARY};letter-spacing:2px;"><span leaf="">一句话版本</span></span>
+      </section>
+      <p style="font-size:14px;font-weight:500;color:{self.TEXT_MAIN};line-height:1.8;margin:0;letter-spacing:0.5px;">
+        <span leaf="">{self._escape_html(summary_text)}</span>
+      </p>
+    </section>
+  </section>'''
     
     def _generate_divider(self) -> str:
         """Generate divider."""

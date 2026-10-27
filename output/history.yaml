@@ -1,405 +1,435 @@
-# WeWrite 发布历史档案
-# 每次 preview / publish 后追加一条，由 Agent 自动维护
-# status: draft（草稿箱待发布）/ published（已在公众号发表）/ archived（放弃）
-# drafts.action 取值: 以此版发布 / 待删除 / 已删除。提醒删稿前先调 draft/batchget API 核对实时状态，用户确认删除后立即更新本档案
-
 publishes:
-  - id: 2026-10-10-xianxue-kongfu
-    date: "2026-10-10"
-    title: "献血前空腹血更干净？别再被骗了，饿着肚子去可能白跑一趟"
-    topic: "献血空腹谣言辟谣（热点抓取选题，综合评分 9.0，来源：科普中国 2026-10-07）"
-    article: "output/xianxue-kongfu.md"
-    theme: "warm-editorial"
-    humanness_score: 33.2
-    cover: "output/cover-xianxue.jpg"
-    inline_images:
-      - "output/xianxue-1.jpg"
-      - "output/xianxue-2.jpg"
-      - "output/xianxue-3.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "无内文配图，仅封面"
-        media_id: "q_zrQd1gVlCJUeajP8dHycglNMw6N6_T5IwaODJDtfWwl2UC8bm4tO5c33lcZRwq"
-        action: 已删除（2026-10-12 用户后台确认）
-      - version: v2
-        note: "加 3 张内文图，但献血场景图有 AI bug（血袋贴上臂、管路反向、游离针头）"
-        media_id: "q_zrQd1gVlCJUeajP8dHyXXbDAoePwyq8AJZZsUA6gpfeJJuOzpsm3iHWoLZbWok"
-        action: 已删除（2026-10-12 用户后台确认）
-      - version: v3
-        note: "献血场景图按真实采血流程重绘并自检通过，当前有效版本"
-        media_id: "q_zrQd1gVlCJUeajP8dHye4dgFwjLTbZEc53ZYmwrjgjkQGl1dw5YgcA4FSMnHWL"
-        action: 以此版发布
-
-  - id: 2026-10-12-fensuixing-guzhe
-    date: "2026-10-12"
-    title: "左膝粉碎性骨折冲上热搜，比\"碎\"更麻烦的，是后面三个月"
-    topic: "粉碎性骨折科普（热点抓取选题，周鸿祎左膝粉碎性骨折热搜 85.1 分，头条 2026-10-11）"
-    article: "output/fensuixing-guzhe.md"
-    theme: "warm-editorial"
-    humanness_score: 39.0
-    cover: "output/cover-fensuixing.jpg"
-    inline_images:
-      - "output/fensuixing-0.jpg"
-      - "output/fensuixing-1.jpg"
-      - "output/fensuixing-2.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "首次按 AI 配图 bug 自检流程执行：生成前先搜真实动作细节（直腿抬高要领），3 图读图自检一次通过"
-        media_id: "q_zrQd1gVlCJUeajP8dHyUkkL0ZEGY4OCuNXTlr2mB2mZ_fBzTZqV9kU8jowlnga"
-        action: 以此版发布
-
-  - id: 2026-10-12-jinshi-wangtuo
-    date: "2026-10-12"
-    title: "近视 200 度查出视网膜脱离，比度数更要命的是这四个信号"
-    topic: "视网膜脱离科普（热点抓取选题，近视200度查出视网膜脱离热搜 64.0 分，百度 2026-10-12）"
-    article: "output/jinshi-wangtuo.md"
-    theme: "warm-editorial"
-    humanness_score: 27.9
-    cover: "output/cover-jinshi.jpg"
-    inline_images:
-      - "output/jinshi-0.jpg"
-      - "output/jinshi-1.jpg"
-      - "output/jinshi-2.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "首次全程按更新后 SKILL.md 执行：humanness 45.3→45.1→45.3→54.0 四轮迭代至 27.9 入区间；配图前搜裂隙灯检查姿势，3 图自检一次通过"
-        media_id: "q_zrQd1gVlCJUeajP8dHyRljcFhv0LLBViNBl2i4TIakI6u4dlP-6inusoQiOPlc"
-        action: 以此版发布
-
-  - id: 2026-10-13-bazhen-anyazhi
-    date: "2026-10-13"
-    title: "拔针后手背青一块，多半是按压那几下没做对"
-    topic: "输液拔针按压护理科普（热点抓取选题，「儿子帮妈妈拔针步步做错」2026-10-13，评分 8.0，清单型框架）"
-    article: "output/bazhen-anyazhi.md"
-    theme: "warm-editorial"
-    humanness_score: 21.5
-    cover: "output/cover-bazhen.jpg"
-    inline_images:
-      - "output/bazhen-1.jpg"
-      - "output/bazhen-2.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "humanness 57.6→64.7→40.0→21.5；对齐达标样本（不用 --- 分隔 + 温度词 4/4 + 真实来源 9 处）。配图前搜真实按压手法，3 图自检：图2 首版双手交叠易误读为揉搓，重绘为单手平放后通过"
-        media_id: "q_zrQd1gVlCJUeajP8dHydRI_PRGbE1fdLXp6wabofERONVEzi0Pbim8s9KGGFq9"
-        action: 以此版发布
-
-  - id: 2026-10-14-baoshi-yixian
-    date: "2026-10-14"
-    title: "吃播网红去世，暴饮暴食最可怕的不是撑，是这个"
-    topic: "暴饮暴食致急性胰腺炎科普（热点抓取选题，「吃播网红干饭莹去世」微博 90.2 分 + 双节饮食急症，痛点型框架，密度强化策略）"
-    article: "output/baoshi-yixian.md"
-    theme: "warm-editorial"
-    humanness_score: 29.3
-    cover: "output/cover-baoshi.jpg"
-    inline_images:
-      - "output/baoshi-1.jpg"
-      - "output/baoshi-2.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "humanness 39.7→28.4→39.2→29.3；温度词 4/4、真实来源 9 处、QSS 表为收藏锚点。配图自检修复 3 个 AI bug：胰腺被画成肝脏（两次，改用真实器物规避）、报告单出现乱码文字（改为空白纸+红圈）、乳糜血试管按真实分层重绘通过"
-        media_id: "q_zrQd1gVlCJUeajP8dHySLhLOOPLH0QJa3ruO222ywxtTrAHzppnkm5e89fkVth"
-        action: 待删除（v1 漏传内文图，仅封面）
-      - version: v2
-        note: "补内文图重发：修复写作规范（配图以 Markdown 图片语法插入），2 张内文图经 cli 上传并替换为微信图床 URL"
-        media_id: "q_zrQd1gVlCJUeajP8dHydz_-CHlUxryRr2TbVKRCt6k1R0T0-kSWk0XSTTvA9cs"
-        action: 以此版发布
-
-  - id: 2026-10-14-ruxian-jiejie
-    date: "2026-10-14"
-    title: "6毫米乳腺结节确诊乳腺癌，报告单别只盯着大小"
-    topic: "乳腺结节 BI-RADS 分级科普（热点抓取选题，「女子6毫米结节确诊乳腺癌」微博 100 分，痛点型框架，密度强化策略）"
-    article: "output/ruxian-jiejie.md"
-    theme: "warm-editorial"
-    humanness_score: 30.9
-    cover: "output/cover-ruxian.jpg"
-    inline_images:
-      - "output/ruxian-1.jpg"
-      - "output/ruxian-2.jpg"
-      - "output/ruxian-3.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "humanness 30.6→30.9；温度词 4/4、真实来源、BI-RADS 分级表为收藏锚点。首次用新配图规则（图内允许文字但须正确）：ruxian-3 的中文数字 0-6 渲染完全正确；封面报告单若带文字必乱码，改用无文字信息图规避"
-        media_id: "q_zrQd1gVlCJUeajP8dHyWFp-87gwNjZZfGuoF8iNALjkm-ypFENzJlqd6AOCqRe"
-        action: 待删除（v1 漏传内文图，仅封面）
-      - version: v2
-        note: "补内文图重发：修复写作规范（配图以 Markdown 图片语法插入），3 张内文图经 cli 上传并替换为微信图床 URL"
-        media_id: "q_zrQd1gVlCJUeajP8dHyXRzwmgiHqC3n5w4D9VBnI0G7Kf6plPwW3WoIzj1_kYM"
-        action: 以此版发布
-
-  - id: 2026-10-15-lengkongqi-xueya
-    date: "2026-10-15"
-    title: "新一轮冷空气来了，最该防的不是感冒，是血压"
-    topic: "冷空气/降温与心脑血管科普（热点抓取选题，「新一轮冷空气影响多大」头条 100 分 + 秋冬血压管理，痛点型框架，密度强化策略）"
-    article: "output/lengkongqi-xueya.md"
-    theme: "warm-editorial"
-    humanness_score: 31.1
-    cover: "output/cover-lengkongqi.jpg"
-    inline_images:
-      - "output/lengkongqi-1.jpg"
-      - "output/lengkongqi-2.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "humanness 42.1→31.1；温度词补到 2/4 类（WARM 老实说/说白了/讲真 + WILD 踩坑/翻车）、real_sources 0.80（据…研究/数据/报告 4 处）、真实数据（降温 10℃ 收缩压升 6.2mmHg、秋冬脑卒中占比约半/高 30%+、脑出血 1 月死亡率 35%-52%、溶栓黄金 4.5h、每分损失约 190 万神经元）。配图自检：封面首版血压计屏幕乱码、二版构图跑偏、三版误生成手机，第四版改「人物+冷暖对比无设备」通过；内文图 1 血压袖带图合格、内文图 2 起床图合格。合规/SEO 0/0"
-        media_id: "q_zrQd1gVlCJUeajP8dHyT3vpXC9j-agP5439dKZG8zol32tA5sU48pGQizGYI_p"
-        action: 以此版发布
-
-  - id: 2026-10-16-heshui-zhongdu
-    date: "2026-10-16"
-    title: "\"喝大水\"火了，但有人喝进了急诊：水不是越多越好"
-    topic: "水中毒/科学饮水科普（热点抓取选题，2026 年\"喝大水\"潮流 搜狐健康 2026-10-10 + 纽约时报，稀释性低钠血症科普）"
-    article: "output/heshui-zhongdu.md"
-    theme: "bg-health-clinic-clean"
-    humanness_score: 38.7
-    cover: "output/cover-heshui.jpg"
-    inline_images:
-      - "output/heshui-1.jpg"
-      - "output/heshui-2.jpg"
-      - "output/heshui-3.jpg"
-      - "output/heshui-4.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "humanness 38.7；关键数据（肾每分钟滤水 16ml、每小时排 0.8-1L/天 20-28L、血钠 <135mmol/L、膳食指南 2022 男 1700ml/女 1500ml、每次 200-300ml）；配图 5 张人工读图核验通过（封面水瓶玻璃杯软尺、内文图细胞吸水前后对比、肾脏注水、尿液比色、心肾人体轮廓），均无文字无乱码；合规/SEO 0/0"
-        media_id: "q_zrQd1gVlCJUeajP8dHyW2_nGwF0eZLtyEiBBb3LtObOTF5oslf_DKjjM1zKClG"
-        action: 待删除（B 方案重构后回归验证重发，内容一致）
-      - version: v2
-        note: "目录重构（config/ + references/ 分组）后端到端回归验证发布，全链路正常"
-        media_id: "q_zrQd1gVlCJUeajP8dHyXgiJ3yl-VD9VZrBFiPgWCMW7fgCOy6sNghdoNs5d9EB"
-        action: 以此版发布
-
-  - id: 2026-10-16-jiuzuo-shanghai
-    date: "2026-10-16"
-    title: "久坐的伤，到底怎么抵消？答案不是\"多站起来\""
-    topic: "久坐危害与步数抵消科普（悉尼大学 BMJ 研究 72,174 人；2200/9000-10500/4000-4500 步数据；经济舱综合征/深静脉血栓；华中科技大学 33 万人队列；CCTV生活圈 2025-08-20 热点）"
-    article: "output/jiuzuo-shanghai.md"
-    theme: "warm-editorial"
-    humanness_score: 30.9
-    cover: "output/cover-jiuzuo.jpg"
-    inline_images:
-      - "output/jiuzuo-1.jpg"
-      - "output/jiuzuo-2.jpg"
-      - "output/jiuzuo-3.jpg"
-      - "output/jiuzuo-4.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "humanness 30.9；关键数据（每日>2200 步降风险、9000-10500 步最低死亡风险、4000-4500 步约 50% 益处、久坐>10h 走够 9000 步、坐满 4h 血栓风险）均可核实；配图 5 张人工读图核验通过（封面站起来走动、内文图下肢血液回流/绿色进度条/办公桌伸展/小腿肿胀疼痛），内文图2 首次生成出现乱码标题已重绘为无文字版；合规/SEO 0/0"
-        media_id: "q_zrQd1gVlCJUeajP8dHycjSA0uf0IpgmHr_s0ZxOmTUVFxYcoM8A8wmuyPaHh_C"
-        action: 以此版发布
-
-  - id: 2026-10-17-bujue-shuimianzhai
-    date: "2026-10-17"
-    title: "熬夜欠的\"睡眠债\"，周末真的能补回来吗"
-    topic: "熬夜后周末补觉科普（南京医科大学观察性研究 3400 人：工作日<6h+周末补觉>2h 心血管风险降 70%、补觉>1h 降 63%、工作日>8h 再补觉反而升；复旦 BMC Public Health 周末补 1-2h 降抑郁风险；中新网 2025-09-10 热点）"
-    article: "output/bujue-shuimianzhai.md"
-    theme: "warm-editorial"
-    humanness_score: 35.6
-    cover: "output/cover-bujue.jpg"
-    inline_images:
-      - "output/bujue-1.jpg"
-      - "output/bujue-2.jpg"
-      - "output/bujue-3.jpg"
-      - "output/bujue-4.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "humanness 35.6（首次用新增三项硬检测评分：flag_words 0 命中、negation_pairs 1 次、formulaic_rhetoric 0 次，均达标）；关键数据均可核实；配图 5 张人工读图核验通过（封面周末赖床、内文图疲惫→睡眠对比/生物钟曲线/起床伸展/睡眠债），内文图1 首次生成顶部文字截断不清已重绘为无文字版，内文图4'睡眠债'三字清晰正确保留；合规 0/0、SEO 0 error"
-        media_id: "q_zrQd1gVlCJUeajP8dHyQU6RCYm42RqKil9164K_tkYP9B8-kN3B04HpFKKVTDw"
-        action: 以此版发布
-
-  - id: 2026-10-18-dahulu-shuimian-huxi
-    date: "2026-10-18"
-    title: "打呼噜是睡得香？有人一晚上憋气几百次，自己却不知道"
-    topic: "阻塞性睡眠呼吸暂停（OSA）科普：女性/打鼾与高血压独立危险因素、高血压患者中患病率 30%-50%、难治性高血压达 80%、中国约 1.76 亿人患病、夜间间歇性缺氧机制、夜间猝死与心血管风险、多导睡眠监测金标准、CPAP 治疗；新华网/首都之窗/友谊医院/朝阳医院/人卫共识多源核实"
-    article: "output/dahulu-shuimian-huxi.md"
-    theme: "warm-editorial"
-    humanness_score: 34.0
-    cover: "output/cover-dahulu.jpg"
-    inline_images:
-      - "output/dahulu-1.jpg"
-      - "output/dahulu-2.jpg"
-      - "output/dahulu-3.jpg"
-      - "output/dahulu-4.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "humanness 34.0（三项硬检测均达标：flag_words 0、negation_pairs 1、formulaic_rhetoric 0）；关键数据均可核实；配图 5 张人工读图核验通过（封面夜间安睡、内文图上呼吸道剖面/夜间血氧下降曲线/CPAP 面罩安睡/睡眠监测），全部无乱码错字；合规 0/0、SEO 0 error"
-        media_id: "q_zrQd1gVlCJUeajP8dHyUFlJTKiwMLOBucU6eYuQysNkBJesiA4ReWofcuqL94r"
-        action: 以此版发布
-
-  - id: 2026-10-18-jiazhuangxian-jiejie
-    date: "2026-10-18"
-    title: "体检查出甲状腺结节，先别急着预约手术"
-    topic: "甲状腺结节科普：中国成人超声检出率约 20%、95% 良性/5%-10% 恶性、TI-RADS 分级（3 类<2%、4A 2%-10%、4B 10%-50%、4C 50%-90%、5 类>90%）、1cm 穿刺分水岭、乳头状癌占 80% 以上且预后好、值得警惕的超声描述、碘与辐射、家族史；北京市中医药管理局/清华长庚医院/新华医院/中华医学会多源核实"
-    article: "output/jiazhuangxian-jiejie.md"
-    theme: "warm-editorial"
-    humanness_score: 33.4
-    cover: "output/cover-jiazhuangxian.jpg"
-    inline_images:
-      - "output/jiazhuangxian-1.jpg"
-      - "output/jiazhuangxian-2.jpg"
-      - "output/jiazhuangxian-3.jpg"
-      - "output/jiazhuangxian-4.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "humanness 33.4（三项硬检测均达标：flag_words 0、negation_pairs 1、formulaic_rhetoric 0）；关键数据均可核实；配图 5 张人工读图核验通过（封面看报告担忧、内文图颈部甲状腺位置/超声检查/细针穿刺活检/日历随访），全部无乱码错字；合规 0/0、SEO 0 error"
-        media_id: "q_zrQd1gVlCJUeajP8dHyYFDTZW6r1FJrKccNn_jLFIoUEjLo-xdN-35pSHh9hU5"
-        action: 以此版发布
-
-  - id: 2026-10-21-aizheng-paixing
-    date: "2026-10-21"
-    title: "癌症发病前五公布，真正该看的是另一张榜"
-    topic: "国家癌症中心 2022 年数据（新发 482.47 万/死亡 257.42 万）发病前五（肺癌 106.06 万、结直肠 51.71 万、甲状腺 46.61 万、肝癌 36.77 万、胃癌 35.87 万，占 57.42%）与死亡前五（肺癌 73.33 万、肝癌 31.65 万、胃癌 26.04 万、结直肠 24.00 万、食管 18.75 万，占 67.5%）的错位：甲状腺癌发病第 3 却不在死亡前五，结直肠癌发病第 2、死亡第 4，食管癌只在死亡榜；媒体对第 5 位存在胃癌 35.87 万与女性乳腺癌 35.72 万的口径分歧"
-    article: "output/aizheng-paixing.md"
-    theme: "warm-editorial"
-    humanness_score: 32.96
-    cover: "output/cover-aizheng.jpg"
-    inline_images:
-      - "output/aizheng-1.jpg"
-      - "output/aizheng-2.jpg"
-      - "output/aizheng-3.jpg"
-      - "output/aizheng-4.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "humanness 32.96 in_range（flag_words 0、negation_pairs 0、formulaic_rhetoric 0）；合规 0 error/0 warn；SEO 0 error/2 warn（筛查未进标题与首段）；配图 5 张读图自检通过，落盘统一为真 JPEG（160-230KB）；标题已去掉无往年数据支撑的「换了」表述"
-        media_id: "q_zrQd1gVlCJUeajP8dHya7iTFd5z01lEZavpVkkejDtvnLu1wftn5BYSiPVBoPU"
-        action: 以此版发布
-
-  - id: 2026-10-22-shangyan-xiguan
-    date: "2026-10-22"
-    title: "5 个伤眼习惯，就藏在你以为的护眼里"
-    topic: "伤眼习惯/干眼症（微博热榜「5个伤眼习惯正在透支你的眼睛」，综合评分 8.4；央视新闻 2026-10-22 报道，数据经卫健委、疾控、同仁医院发布会核实）"
-    article: "output/shangyan-xiguan.md"
-    theme: "warm-editorial"
-    humanness_score: 37.91
-    cover: "output/cover-shangyan.jpg"
-    inline_images:
-      - "output/shangyan-1.jpg"
-      - "output/shangyan-2.jpg"
-      - "output/shangyan-3.jpg"
-      - "output/shangyan-4.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "验收跑：humanness 37.91 in_range（flag_words 0、negation_pairs 0、formulaic_rhetoric 0）；合规 0 error/0 warn；SEO 0 error/2 warn（次要词干眼/护眼未进标题前 12 字）；5 张图批量并发 19.6s 生成，图 3 伪文字痕迹重生成 1 次后通过；全篇图内无文字"
-        media_id: "q_zrQd1gVlCJUeajP8dHyTmI6-sg9iXvTr502xKvvApRScuImBxbtpeIfTg5kIFz"
-        action: 以此版发布
-
+- id: 2026-10-10-xianxue-kongfu
+  date: '2026-10-10'
+  title: 献血前空腹血更干净？别再被骗了，饿着肚子去可能白跑一趟
+  topic: 献血空腹谣言辟谣（热点抓取选题，综合评分 9.0，来源：科普中国 2026-10-07）
+  article: output/xianxue-kongfu.md
+  theme: warm-editorial
+  humanness_score: 33.2
+  cover: output/cover-xianxue.jpg
+  inline_images:
+  - output/xianxue-1.jpg
+  - output/xianxue-2.jpg
+  - output/xianxue-3.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 无内文配图，仅封面
+    media_id: q_zrQd1gVlCJUeajP8dHycglNMw6N6_T5IwaODJDtfWwl2UC8bm4tO5c33lcZRwq
+    action: 已删除（2026-10-12 用户后台确认）
+  - version: v2
+    note: 加 3 张内文图，但献血场景图有 AI bug（血袋贴上臂、管路反向、游离针头）
+    media_id: q_zrQd1gVlCJUeajP8dHyXXbDAoePwyq8AJZZsUA6gpfeJJuOzpsm3iHWoLZbWok
+    action: 已删除（2026-10-12 用户后台确认）
+  - version: v3
+    note: 献血场景图按真实采血流程重绘并自检通过，当前有效版本
+    media_id: q_zrQd1gVlCJUeajP8dHye4dgFwjLTbZEc53ZYmwrjgjkQGl1dw5YgcA4FSMnHWL
+    action: 以此版发布
+- id: 2026-10-12-fensuixing-guzhe
+  date: '2026-10-12'
+  title: 左膝粉碎性骨折冲上热搜，比"碎"更麻烦的，是后面三个月
+  topic: 粉碎性骨折科普（热点抓取选题，周鸿祎左膝粉碎性骨折热搜 85.1 分，头条 2026-10-11）
+  article: output/fensuixing-guzhe.md
+  theme: warm-editorial
+  humanness_score: 39.0
+  cover: output/cover-fensuixing.jpg
+  inline_images:
+  - output/fensuixing-0.jpg
+  - output/fensuixing-1.jpg
+  - output/fensuixing-2.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 首次按 AI 配图 bug 自检流程执行：生成前先搜真实动作细节（直腿抬高要领），3 图读图自检一次通过
+    media_id: q_zrQd1gVlCJUeajP8dHyUkkL0ZEGY4OCuNXTlr2mB2mZ_fBzTZqV9kU8jowlnga
+    action: 以此版发布
+- id: 2026-10-12-jinshi-wangtuo
+  date: '2026-10-12'
+  title: 近视 200 度查出视网膜脱离，比度数更要命的是这四个信号
+  topic: 视网膜脱离科普（热点抓取选题，近视200度查出视网膜脱离热搜 64.0 分，百度 2026-10-12）
+  article: output/jinshi-wangtuo.md
+  theme: warm-editorial
+  humanness_score: 27.9
+  cover: output/cover-jinshi.jpg
+  inline_images:
+  - output/jinshi-0.jpg
+  - output/jinshi-1.jpg
+  - output/jinshi-2.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 首次全程按更新后 SKILL.md 执行：humanness 45.3→45.1→45.3→54.0 四轮迭代至 27.9 入区间；配图前搜裂隙灯检查姿势，3 图自检一次通过
+    media_id: q_zrQd1gVlCJUeajP8dHyRljcFhv0LLBViNBl2i4TIakI6u4dlP-6inusoQiOPlc
+    action: 以此版发布
+- id: 2026-10-13-bazhen-anyazhi
+  date: '2026-10-13'
+  title: 拔针后手背青一块，多半是按压那几下没做对
+  topic: 输液拔针按压护理科普（热点抓取选题，「儿子帮妈妈拔针步步做错」2026-10-13，评分 8.0，清单型框架）
+  article: output/bazhen-anyazhi.md
+  theme: warm-editorial
+  humanness_score: 21.5
+  cover: output/cover-bazhen.jpg
+  inline_images:
+  - output/bazhen-1.jpg
+  - output/bazhen-2.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: humanness 57.6→64.7→40.0→21.5；对齐达标样本（不用 --- 分隔 + 温度词 4/4 + 真实来源 9 处）。配图前搜真实按压手法，3 图自检：图2 首版双手交叠易误读为揉搓，重绘为单手平放后通过
+    media_id: q_zrQd1gVlCJUeajP8dHydRI_PRGbE1fdLXp6wabofERONVEzi0Pbim8s9KGGFq9
+    action: 以此版发布
+- id: 2026-10-14-baoshi-yixian
+  date: '2026-10-14'
+  title: 吃播网红去世，暴饮暴食最可怕的不是撑，是这个
+  topic: 暴饮暴食致急性胰腺炎科普（热点抓取选题，「吃播网红干饭莹去世」微博 90.2 分 + 双节饮食急症，痛点型框架，密度强化策略）
+  article: output/baoshi-yixian.md
+  theme: warm-editorial
+  humanness_score: 29.3
+  cover: output/cover-baoshi.jpg
+  inline_images:
+  - output/baoshi-1.jpg
+  - output/baoshi-2.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: humanness 39.7→28.4→39.2→29.3；温度词 4/4、真实来源 9 处、QSS 表为收藏锚点。配图自检修复 3 个 AI bug：胰腺被画成肝脏（两次，改用真实器物规避）、报告单出现乱码文字（改为空白纸+红圈）、乳糜血试管按真实分层重绘通过
+    media_id: q_zrQd1gVlCJUeajP8dHySLhLOOPLH0QJa3ruO222ywxtTrAHzppnkm5e89fkVth
+    action: 已删除（2026-10-27 batchget 核验草稿箱已不存在）
+  - version: v2
+    note: 补内文图重发：修复写作规范（配图以 Markdown 图片语法插入），2 张内文图经 cli 上传并替换为微信图床 URL
+    media_id: q_zrQd1gVlCJUeajP8dHydz_-CHlUxryRr2TbVKRCt6k1R0T0-kSWk0XSTTvA9cs
+    action: 以此版发布
+- id: 2026-10-14-ruxian-jiejie
+  date: '2026-10-14'
+  title: 6毫米乳腺结节确诊乳腺癌，报告单别只盯着大小
+  topic: 乳腺结节 BI-RADS 分级科普（热点抓取选题，「女子6毫米结节确诊乳腺癌」微博 100 分，痛点型框架，密度强化策略）
+  article: output/ruxian-jiejie.md
+  theme: warm-editorial
+  humanness_score: 30.9
+  cover: output/cover-ruxian.jpg
+  inline_images:
+  - output/ruxian-1.jpg
+  - output/ruxian-2.jpg
+  - output/ruxian-3.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: humanness 30.6→30.9；温度词 4/4、真实来源、BI-RADS 分级表为收藏锚点。首次用新配图规则（图内允许文字但须正确）：ruxian-3 的中文数字 0-6 渲染完全正确；封面报告单若带文字必乱码，改用无文字信息图规避
+    media_id: q_zrQd1gVlCJUeajP8dHyWFp-87gwNjZZfGuoF8iNALjkm-ypFENzJlqd6AOCqRe
+    action: 已删除（2026-10-27 batchget 核验草稿箱已不存在）
+  - version: v2
+    note: 补内文图重发：修复写作规范（配图以 Markdown 图片语法插入），3 张内文图经 cli 上传并替换为微信图床 URL
+    media_id: q_zrQd1gVlCJUeajP8dHyXRzwmgiHqC3n5w4D9VBnI0G7Kf6plPwW3WoIzj1_kYM
+    action: 以此版发布
+- id: 2026-10-15-lengkongqi-xueya
+  date: '2026-10-15'
+  title: 新一轮冷空气来了，最该防的不是感冒，是血压
+  topic: 冷空气/降温与心脑血管科普（热点抓取选题，「新一轮冷空气影响多大」头条 100 分 + 秋冬血压管理，痛点型框架，密度强化策略）
+  article: output/lengkongqi-xueya.md
+  theme: warm-editorial
+  humanness_score: 31.1
+  cover: output/cover-lengkongqi.jpg
+  inline_images:
+  - output/lengkongqi-1.jpg
+  - output/lengkongqi-2.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: humanness 42.1→31.1；温度词补到 2/4 类（WARM 老实说/说白了/讲真 + WILD 踩坑/翻车）、real_sources 0.80（据…研究/数据/报告 4
+      处）、真实数据（降温 10℃ 收缩压升 6.2mmHg、秋冬脑卒中占比约半/高 30%+、脑出血 1 月死亡率 35%-52%、溶栓黄金 4.5h、每分损失约 190 万神经元）。配图自检：封面首版血压计屏幕乱码、二版构图跑偏、三版误生成手机，第四版改「人物+冷暖对比无设备」通过；内文图
+      1 血压袖带图合格、内文图 2 起床图合格。合规/SEO 0/0
+    media_id: q_zrQd1gVlCJUeajP8dHyT3vpXC9j-agP5439dKZG8zol32tA5sU48pGQizGYI_p
+    action: 以此版发布
+- id: 2026-10-16-heshui-zhongdu
+  date: '2026-10-16'
+  title: '"喝大水"火了，但有人喝进了急诊：水不是越多越好'
+  topic: 水中毒/科学饮水科普（热点抓取选题，2026 年"喝大水"潮流 搜狐健康 2026-10-10 + 纽约时报，稀释性低钠血症科普）
+  article: output/heshui-zhongdu.md
+  theme: bg-health-clinic-clean
+  humanness_score: 38.7
+  cover: output/cover-heshui.jpg
+  inline_images:
+  - output/heshui-1.jpg
+  - output/heshui-2.jpg
+  - output/heshui-3.jpg
+  - output/heshui-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: humanness 38.7；关键数据（肾每分钟滤水 16ml、每小时排 0.8-1L/天 20-28L、血钠 <135mmol/L、膳食指南 2022 男 1700ml/女 1500ml、每次
+      200-300ml）；配图 5 张人工读图核验通过（封面水瓶玻璃杯软尺、内文图细胞吸水前后对比、肾脏注水、尿液比色、心肾人体轮廓），均无文字无乱码；合规/SEO 0/0
+    media_id: q_zrQd1gVlCJUeajP8dHyW2_nGwF0eZLtyEiBBb3LtObOTF5oslf_DKjjM1zKClG
+    action: 已删除（2026-10-27 batchget 核验草稿箱已不存在）
+  - version: v2
+    note: 目录重构（config/ + references/ 分组）后端到端回归验证发布，全链路正常
+    media_id: q_zrQd1gVlCJUeajP8dHyXgiJ3yl-VD9VZrBFiPgWCMW7fgCOy6sNghdoNs5d9EB
+    action: 以此版发布
+- id: 2026-10-16-jiuzuo-shanghai
+  date: '2026-10-16'
+  title: 久坐的伤，到底怎么抵消？答案不是"多站起来"
+  topic: 久坐危害与步数抵消科普（悉尼大学 BMJ 研究 72,174 人；2200/9000-10500/4000-4500 步数据；经济舱综合征/深静脉血栓；华中科技大学 33 万人队列；CCTV生活圈
+    2025-08-20 热点）
+  article: output/jiuzuo-shanghai.md
+  theme: warm-editorial
+  humanness_score: 30.9
+  cover: output/cover-jiuzuo.jpg
+  inline_images:
+  - output/jiuzuo-1.jpg
+  - output/jiuzuo-2.jpg
+  - output/jiuzuo-3.jpg
+  - output/jiuzuo-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: humanness 30.9；关键数据（每日>2200 步降风险、9000-10500 步最低死亡风险、4000-4500 步约 50% 益处、久坐>10h 走够 9000 步、坐满
+      4h 血栓风险）均可核实；配图 5 张人工读图核验通过（封面站起来走动、内文图下肢血液回流/绿色进度条/办公桌伸展/小腿肿胀疼痛），内文图2 首次生成出现乱码标题已重绘为无文字版；合规/SEO
+      0/0
+    media_id: q_zrQd1gVlCJUeajP8dHycjSA0uf0IpgmHr_s0ZxOmTUVFxYcoM8A8wmuyPaHh_C
+    action: 以此版发布
+- id: 2026-10-17-bujue-shuimianzhai
+  date: '2026-10-17'
+  title: 熬夜欠的"睡眠债"，周末真的能补回来吗
+  topic: 熬夜后周末补觉科普（南京医科大学观察性研究 3400 人：工作日<6h+周末补觉>2h 心血管风险降 70%、补觉>1h 降 63%、工作日>8h 再补觉反而升；复旦 BMC Public
+    Health 周末补 1-2h 降抑郁风险；中新网 2025-09-10 热点）
+  article: output/bujue-shuimianzhai.md
+  theme: warm-editorial
+  humanness_score: 35.6
+  cover: output/cover-bujue.jpg
+  inline_images:
+  - output/bujue-1.jpg
+  - output/bujue-2.jpg
+  - output/bujue-3.jpg
+  - output/bujue-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: humanness 35.6（首次用新增三项硬检测评分：flag_words 0 命中、negation_pairs 1 次、formulaic_rhetoric 0 次，均达标）；关键数据均可核实；配图
+      5 张人工读图核验通过（封面周末赖床、内文图疲惫→睡眠对比/生物钟曲线/起床伸展/睡眠债），内文图1 首次生成顶部文字截断不清已重绘为无文字版，内文图4'睡眠债'三字清晰正确保留；合规 0/0、SEO
+      0 error
+    media_id: q_zrQd1gVlCJUeajP8dHyQU6RCYm42RqKil9164K_tkYP9B8-kN3B04HpFKKVTDw
+    action: 以此版发布
+- id: 2026-10-18-dahulu-shuimian-huxi
+  date: '2026-10-18'
+  title: 打呼噜是睡得香？有人一晚上憋气几百次，自己却不知道
+  topic: 阻塞性睡眠呼吸暂停（OSA）科普：女性/打鼾与高血压独立危险因素、高血压患者中患病率 30%-50%、难治性高血压达 80%、中国约 1.76 亿人患病、夜间间歇性缺氧机制、夜间猝死与心血管风险、多导睡眠监测金标准、CPAP
+    治疗；新华网/首都之窗/友谊医院/朝阳医院/人卫共识多源核实
+  article: output/dahulu-shuimian-huxi.md
+  theme: warm-editorial
+  humanness_score: 34.0
+  cover: output/cover-dahulu.jpg
+  inline_images:
+  - output/dahulu-1.jpg
+  - output/dahulu-2.jpg
+  - output/dahulu-3.jpg
+  - output/dahulu-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: humanness 34.0（三项硬检测均达标：flag_words 0、negation_pairs 1、formulaic_rhetoric 0）；关键数据均可核实；配图 5 张人工读图核验通过（封面夜间安睡、内文图上呼吸道剖面/夜间血氧下降曲线/CPAP
+      面罩安睡/睡眠监测），全部无乱码错字；合规 0/0、SEO 0 error
+    media_id: q_zrQd1gVlCJUeajP8dHyUFlJTKiwMLOBucU6eYuQysNkBJesiA4ReWofcuqL94r
+    action: 以此版发布
+- id: 2026-10-18-jiazhuangxian-jiejie
+  date: '2026-10-18'
+  title: 体检查出甲状腺结节，先别急着预约手术
+  topic: 甲状腺结节科普：中国成人超声检出率约 20%、95% 良性/5%-10% 恶性、TI-RADS 分级（3 类<2%、4A 2%-10%、4B 10%-50%、4C 50%-90%、5 类>90%）、1cm
+    穿刺分水岭、乳头状癌占 80% 以上且预后好、值得警惕的超声描述、碘与辐射、家族史；北京市中医药管理局/清华长庚医院/新华医院/中华医学会多源核实
+  article: output/jiazhuangxian-jiejie.md
+  theme: warm-editorial
+  humanness_score: 33.4
+  cover: output/cover-jiazhuangxian.jpg
+  inline_images:
+  - output/jiazhuangxian-1.jpg
+  - output/jiazhuangxian-2.jpg
+  - output/jiazhuangxian-3.jpg
+  - output/jiazhuangxian-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: humanness 33.4（三项硬检测均达标：flag_words 0、negation_pairs 1、formulaic_rhetoric 0）；关键数据均可核实；配图 5 张人工读图核验通过（封面看报告担忧、内文图颈部甲状腺位置/超声检查/细针穿刺活检/日历随访），全部无乱码错字；合规
+      0/0、SEO 0 error
+    media_id: q_zrQd1gVlCJUeajP8dHyYFDTZW6r1FJrKccNn_jLFIoUEjLo-xdN-35pSHh9hU5
+    action: 以此版发布
+- id: 2026-10-21-aizheng-paixing
+  date: '2026-10-21'
+  title: 癌症发病前五公布，真正该看的是另一张榜
+  topic: 国家癌症中心 2022 年数据（新发 482.47 万/死亡 257.42 万）发病前五（肺癌 106.06 万、结直肠 51.71 万、甲状腺 46.61 万、肝癌 36.77 万、胃癌
+    35.87 万，占 57.42%）与死亡前五（肺癌 73.33 万、肝癌 31.65 万、胃癌 26.04 万、结直肠 24.00 万、食管 18.75 万，占 67.5%）的错位：甲状腺癌发病第
+    3 却不在死亡前五，结直肠癌发病第 2、死亡第 4，食管癌只在死亡榜；媒体对第 5 位存在胃癌 35.87 万与女性乳腺癌 35.72 万的口径分歧
+  article: output/aizheng-paixing.md
+  theme: warm-editorial
+  humanness_score: 32.96
+  cover: output/cover-aizheng.jpg
+  inline_images:
+  - output/aizheng-1.jpg
+  - output/aizheng-2.jpg
+  - output/aizheng-3.jpg
+  - output/aizheng-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: humanness 32.96 in_range（flag_words 0、negation_pairs 0、formulaic_rhetoric 0）；合规 0 error/0 warn；SEO
+      0 error/2 warn（筛查未进标题与首段）；配图 5 张读图自检通过，落盘统一为真 JPEG（160-230KB）；标题已去掉无往年数据支撑的「换了」表述
+    media_id: q_zrQd1gVlCJUeajP8dHya7iTFd5z01lEZavpVkkejDtvnLu1wftn5BYSiPVBoPU
+    action: 以此版发布
+- id: 2026-10-22-shangyan-xiguan
+  date: '2026-10-22'
+  title: 5 个伤眼习惯，就藏在你以为的护眼里
+  topic: 伤眼习惯/干眼症（微博热榜「5个伤眼习惯正在透支你的眼睛」，综合评分 8.4；央视新闻 2026-10-22 报道，数据经卫健委、疾控、同仁医院发布会核实）
+  article: output/shangyan-xiguan.md
+  theme: warm-editorial
+  humanness_score: 37.91
+  cover: output/cover-shangyan.jpg
+  inline_images:
+  - output/shangyan-1.jpg
+  - output/shangyan-2.jpg
+  - output/shangyan-3.jpg
+  - output/shangyan-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 验收跑：humanness 37.91 in_range（flag_words 0、negation_pairs 0、formulaic_rhetoric 0）；合规 0 error/0
+      warn；SEO 0 error/2 warn（次要词干眼/护眼未进标题前 12 字）；5 张图批量并发 19.6s 生成，图 3 伪文字痕迹重生成 1 次后通过；全篇图内无文字
+    media_id: q_zrQd1gVlCJUeajP8dHyTmI6-sg9iXvTr502xKvvApRScuImBxbtpeIfTg5kIFz
+    action: 以此版发布
+- id: 2026-10-24-duanjuchengyin
+  date: '2026-10-24'
+  title: 卸载5次又装回，短剧成瘾不是你意志力差
+  topic: 红果短剧沉迷科普（热点抓取选题，综合评分 7.7，多平台热搜 10 月中旬起 + 红果 10-23 上线防沉迷机制）
+  article: output/duanjuchengyin.md
+  theme: warm-editorial
+  humanness_score: 20.3
+  cover: output/cover-duanjuchengyin.jpg
+  inline_images:
+  - output/duanjuchengyin-1.jpg
+  - output/duanjuchengyin-2.jpg
+  - output/duanjuchengyin-3.jpg
+  - output/duanjuchengyin-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: D1-D5 修复后首篇全流程验证；SEO 0 error / 3 warn（防沉迷为次级词可接受）
+    media_id: q_zrQd1gVlCJUeajP8dHyfxCukAf_rfPanBlBSXMjY6nC2v0CHauQbmxD7htFctD
+    action: 以此版发布
+- id: 2026-10-24-theme-integration
+  date: '2026-10-24'
+  title: 集成 gzh-design 摸鱼绿主题
+  topic: 工具增强（集成 gzh-design skill 视觉主题为 cli.py publish -t moyu-green，程序化实现自动编号+关键词标记+封面智能拆分）
+  article: output/test_visual_a.md
+  theme: moyu-green
+  humanness_score: null
+  cover: output/test_visual_a_cover.jpg
+  inline_images: []
+  status: draft
+  drafts:
+  - version: v1
+    note: 方便面文章测试完整流程，HTML 合规校验 PASS（2 WARNING：渐变+标点）
+    media_id: q_zrQd1gVlCJUeajP8dHyRm-r4L1UVfChSRgrGM2ZbejkBOk5WQdyRTdbnma1AC3
+    action: 测试验证完成
+  - version: v2
+    note: 商演习惯文章复验，完整流程一次通过
+    media_id: q_zrQd1gVlCJUeajP8dHyU8UAaddcUIiYSgk-E4WYrnpPb0c2PHARvDiUZRz-k8L
+    action: 测试验证完成
+  implementation_notes:
+  - GzhConverter 新增 443 行，核心能力：自动章节编号（01/02/03 渐变徽章）、关键词提取（jieba TF-IDF top 8）+ 绿色下划线标记、封面标题智能拆分（核心词绿色高亮、其余白色
+    runs）、签名区（作者信息）、span leaf 包裹与微信合规
+  - 集成方式：cli.py publish -t moyu-green 调用，默认保留 WeChatConverter 快速发布；返回 ConvertResult 类型兼容原接口
+  - 关键词标记逻辑：精确词匹配（jieba 分词结果），不拆分多字词；封面标题拆分：主语/宾语/核心名词取 top 3 高亮，其余按 2-3 字拆段适配封面设计器 cover_runs
+  - gzh-design skill 外部依赖已移除，.gitignore 排除相关目录；image_gen.py 增加 OpenAI provider 健壮性（先检查 status_code 再解
+    JSON）
+- id: 2026-10-26-yangsheng-trendtruth
+  date: '2026-10-26'
+  title: 养生热潮下的真相：年轻人正在踩的三大坑
+  topic: 年轻人养生误区科普（热点新闻分析，83.7%年轻消费者 + 35倍草本茶增长 + 中医学术背书）
+  article: output/养生热潮的三大误区.md
+  theme: moyu-green
+  humanness_score: 28.5
+  cover: output/cover-yangsheng.jpg
+  inline_images: []
+  status: draft
+  drafts:
+  - version: v1
+    note: 完整 8 步流程发布：选题-框架-写作-合规-配图-排版-发布。文章 2892 字，3 张配图已生成，摸鱼绿主题排版，手动推送到公众号草稿箱
+    media_id: q_zrQd1gVlCJUeajP8dHyStTkV0CYcsdEGxqIap95e6THZTl1OTARgR-C2wuG57T
+    thumb_media_id: q_zrQd1gVlCJUeajP8dHyRDLiyIjf1Z-VcuXG0T_FxvqMQv1ir5htxpNKWUPiWFf
+    action: 等待用户后台确认发布
+- id: 2026-10-27-huoguo-dratang-piaoling
+  date: '2026-10-27'
+  title: 火锅汤煮30分钟，嘌呤翻10倍：想喝汤的先看这条时间线
+  topic: 火锅喝大汤 × 高尿酸/痛风科普（热点抓取选题，#火锅正式进入喝大汤时代# 2026-10-20 热搜 + 海底捞藕汤 150 万份；西安市第五医院清汤锅底嘌呤 7.38→80mg/100g、100g
+    久煮汤升尿酸 133μmol/L；《中国高尿酸血症与痛风诊疗指南（2024）》420/360 诊断线；白皮书 1.77 亿/18-35 岁占 60%/18-29 岁男性 32.3%；痛点型框架，密度强化策略，喝汤时间线速查表收藏元素）
+  article: output/火锅喝大汤误区.md
+  theme: moyu-green
+  humanness_score: 23.78
+  cover: output/cover-huoguo.jpg
+  inline_images:
+  - output/huoguo-1.jpg
+  - output/huoguo-2.jpg
+  - output/huoguo-3.jpg
+  - output/huoguo-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 完整 8 步流程一次通过：热点抓取-选题评分 7.8（同题 90 天仅 2 篇）-数据 WebSearch 核实-写作 1942 字-反AI 23.78 在区间-合规 0error-SEO
+      0error-配图 5 张批量生成+1 轮自检重生成-摸鱼绿排版 v1-推送草稿箱
+    media_id: q_zrQd1gVlCJUeajP8dHyfhbdV2OXvEqfEUnIn_hdnuYdhlvJTFVJA2X2A6P3JYR
+    thumb_media_id: q_zrQd1gVlCJUeajP8dHyUbaieLbaAWpY46qktwk3eLh6_9d4V5jwFni4oGn8KHU
+    action: 已删除（2026-10-27 draft/delete 执行并核验）
+  - version: v2
+    note: 新增 --theme auto 内容自动选型 + 汤底暖橙(hotpot-warm)定制主题：命中特征词 火锅/汤/饮食，按内容重排版后重发；头部尚有绿色硬编码残留
+    media_id: q_zrQd1gVlCJUeajP8dHyeBtzjLyu2ieizUSCJGE9m6Zg8GyDiaSOnlzPToxyU6o
+    action: 已删除（2026-10-27 draft/delete 执行并核验）
+  - version: v3
+    note: 修复 gzh_converter 三处摸鱼绿硬编码 rgba，全部改为从主题主色派生(_rgba 辅助方法)；汤底暖橙全主题色 100% 跟随配置
+    media_id: q_zrQd1gVlCJUeajP8dHyTb39ASgNPD4fT43k7dxmzy7HZ-RdUG9eKrbjxGGYn_P
+    action: 已删除（2026-10-27 draft/delete 执行并核验）
+  - version: v4
+    note: '升级为生成式设计引擎：内容驱动配色（类别:饮食 得分37，语义+封面混合色相 25°，主色 #AD6632 / 浅色 #E2D7CE / 强调 #C19338）+ 排版自适应（间距
+      36px / 行高 1.85 / 标题 800 / 正文 400）+ 修复 markdown --- 分隔线误渲染（解析跳过 hr 标记），引言段落末尾干净结束无三点装饰'
+    media_id: q_zrQd1gVlCJUeajP8dHyb-mg5t38hja4I8kbgyO-jpMPL0ZTn0wcjhDCr9i3WVn
+    thumb_media_id: q_zrQd1gVlCJUeajP8dHyQi5ClDT-R5zH365Y4ydPHraImkqnpgZ08SJSuvKTzam
+    action: 已删除（2026-10-27 draft/delete 执行并核验）
+  - version: v5
+    note: 修复封面图右上角边框裁切问题：重新生成封面，prompt 增加「装饰元素距边缘 80px 安全边距 + 主体居中」约束，避免微信裁切损失边角装饰；色相 21° (#AD5E32) 暖橙色系
+    media_id: q_zrQd1gVlCJUeajP8dHycLJ-W0w7Zpf2nsIABB9vb-GrX9ktm2FcuQIHrUY7gAd
+    thumb_media_id: q_zrQd1gVlCJUeajP8dHyZRvch-dte3MKS8AxJZdo1OZPfa5-LAKsVWgPXqU5aG9
+    action: 已删除（2026-10-27 draft/delete 执行并核验）
+  - version: v6
+    note: 修复 :::summary 容器解析与渲染：新增 _generate_summary_card 方法，在结尾渲染「一句话版本」卡片（渐变背景+左侧主色边框），:::summary 标记正确解析并从
+      HTML 中移除。色相 19° (#AD5A32)
+    media_id: q_zrQd1gVlCJUeajP8dHyTZXnNwyWTlTB1twTGQViR4Gh_3rfqGwBpdhb7qInh0J
+    thumb_media_id: q_zrQd1gVlCJUeajP8dHyUy9MfMQ4Azm9HtA-rsCBWiJju9uat6CGZDW2Onx7zW6
+    action: 已删除（2026-10-27 draft/delete 执行并核验）
+  - version: v7
+    note: 修复开头标题重复渲染BUG：删除重复的 title section（第 304-312 行），调整账号信息 section 层级到卡片内部，标题只渲染一次。色相 19° (#AD5A32)
+    media_id: q_zrQd1gVlCJUeajP8dHyYwjibW1vE8_Nnj3-2RUIvMCug5ItBsEkTj6BFMDFUJM
+    action: 以此版发布
+- id: 2026-10-27-hongyan-shengcai-dabao
+  date: '2026-10-27'
+  title: 婚宴剩菜打包回家，先记住 3 条线：2 小时、4℃、75℃
+  topic: 婚宴剩菜打包 × 食品安全科普（热点抓取选题，#参加婚礼吃了一桌子外卖# 2026-10-20 微博热搜 98.1；FDA 2小时规则/危险温度区间 4-60℃、亚硝酸盐 12h 20mg/kg→24h 100mg/kg+、组胺耐热 100℃、蜡样芽孢杆菌耐热毒素、打包盒三角标 5=PP 可微波 / 6=PS 不可；痛点型框架，倒叙开头+画面收束，三条线速查收藏元素）
+  article: output/婚宴剩菜打包.md
+  theme: auto
+  humanness_score: 31.6
+  cover: output/cover-huayan.jpg
+  inline_images:
+  - output/huayan-1.jpg
+  - output/huayan-2.jpg
+  - output/huayan-3.jpg
+  - output/huayan-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 完整 8 步流程一次通过：热点抓取-Sogou 反爬降级 WebSearch 核数据-倒叙开头+画面收束-反AI 31.6 在区间-合规 0error-SEO 0error（首轮 1194 字 SEO error，补来源指标+温度词后通过）-配图 5 张批量生成+逐张读回自检-自适应主题 22°（主色 #AD6032 / 浅色 #E2D6CE / 强调 #C18C38）-同时验证全项目 BUG 修复：:::summary 卡片 ×1、::: 残留 0、标题 ×1、bullet ×3、图片 ×4
+    media_id: q_zrQd1gVlCJUeajP8dHyRxJFyiDJKtHncw03wAssVV3YkiWf3MSndw-xrzl_QlI
+    thumb_media_id: q_zrQd1gVlCJUeajP8dHyaoigYOfzCVcf5eCiuiIDMJdRPs8ZOks5Kwde-h39wLt
+    action: 以此版发布
 style_sources:
-  - date: "2026-10-10"
-    note: "从账号 9 篇已发文章学习写作与配图风格"
-    articles: "references/source_articles/ref-01.md ~ ref-09.md"
-    exemplars: "references/exemplars/"
-    style_docs:
-      - "personas/xiaokepuoao.yaml"
-      - "writing-config.yaml"
-      - "references/xiaokepuoao-style.md"
-
-  - id: 2026-10-24-duanjuchengyin
-    date: "2026-10-24"
-    title: "卸载5次又装回，短剧成瘾不是你意志力差"
-    topic: "红果短剧沉迷科普（热点抓取选题，综合评分 7.7，多平台热搜 10 月中旬起 + 红果 10-23 上线防沉迷机制）"
-    article: "output/duanjuchengyin.md"
-    theme: "warm-editorial"
-    humanness_score: 20.3
-    cover: "output/cover-duanjuchengyin.jpg"
-    inline_images:
-      - "output/duanjuchengyin-1.jpg"
-      - "output/duanjuchengyin-2.jpg"
-      - "output/duanjuchengyin-3.jpg"
-      - "output/duanjuchengyin-4.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "D1-D5 修复后首篇全流程验证；SEO 0 error / 3 warn（防沉迷为次级词可接受）"
-        media_id: "q_zrQd1gVlCJUeajP8dHyfxCukAf_rfPanBlBSXMjY6nC2v0CHauQbmxD7htFctD"
-        action: 以此版发布
-
-  - id: 2026-10-24-theme-integration
-    date: "2026-10-24"
-    title: "集成 gzh-design 摸鱼绿主题"
-    topic: "工具增强（集成 gzh-design skill 视觉主题为 cli.py publish -t moyu-green，程序化实现自动编号+关键词标记+封面智能拆分）"
-    article: "output/test_visual_a.md"
-    theme: "moyu-green"
-    humanness_score: null
-    cover: "output/test_visual_a_cover.jpg"
-    inline_images: []
-    status: draft
-    drafts:
-      - version: v1
-        note: "方便面文章测试完整流程，HTML 合规校验 PASS（2 WARNING：渐变+标点）"
-        media_id: "q_zrQd1gVlCJUeajP8dHyRm-r4L1UVfChSRgrGM2ZbejkBOk5WQdyRTdbnma1AC3"
-        action: 测试验证完成
-      - version: v2
-        note: "商演习惯文章复验，完整流程一次通过"
-        media_id: "q_zrQd1gVlCJUeajP8dHyU8UAaddcUIiYSgk-E4WYrnpPb0c2PHARvDiUZRz-k8L"
-        action: 测试验证完成
-    implementation_notes:
-      - "GzhConverter 新增 443 行，核心能力：自动章节编号（01/02/03 渐变徽章）、关键词提取（jieba TF-IDF top 8）+ 绿色下划线标记、封面标题智能拆分（核心词绿色高亮、其余白色 runs）、签名区（作者信息）、span leaf 包裹与微信合规"
-      - "集成方式：cli.py publish -t moyu-green 调用，默认保留 WeChatConverter 快速发布；返回 ConvertResult 类型兼容原接口"
-      - "关键词标记逻辑：精确词匹配（jieba 分词结果），不拆分多字词；封面标题拆分：主语/宾语/核心名词取 top 3 高亮，其余按 2-3 字拆段适配封面设计器 cover_runs"
-      - "gzh-design skill 外部依赖已移除，.gitignore 排除相关目录；image_gen.py 增加 OpenAI provider 健壮性（先检查 status_code 再解 JSON）"
-
-  - id: 2026-10-26-yangsheng-trendtruth
-    date: "2026-10-26"
-    title: "养生热潮下的真相：年轻人正在踩的三大坑"
-    topic: "年轻人养生误区科普（热点新闻分析，83.7%年轻消费者 + 35倍草本茶增长 + 中医学术背书）"
-    article: "output/养生热潮的三大误区.md"
-    theme: "moyu-green"
-    humanness_score: 28.5
-    cover: "output/cover-yangsheng.jpg"
-    inline_images: []
-    status: draft
-    drafts:
-      - version: v1
-        note: "完整 8 步流程发布：选题-框架-写作-合规-配图-排版-发布。文章 2892 字，3 张配图已生成，摸鱼绿主题排版，手动推送到公众号草稿箱"
-        media_id: "q_zrQd1gVlCJUeajP8dHyStTkV0CYcsdEGxqIap95e6THZTl1OTARgR-C2wuG57T"
-        thumb_media_id: "q_zrQd1gVlCJUeajP8dHyRDLiyIjf1Z-VcuXG0T_FxvqMQv1ir5htxpNKWUPiWFf"
-        action: 等待用户后台确认发布
-
-
-  - id: 2026-10-27-huoguo-dratang-piaoling
-    date: "2026-10-27"
-    title: "火锅汤煮30分钟，嘌呤翻10倍：想喝汤的先看这条时间线"
-    topic: "火锅喝大汤 × 高尿酸/痛风科普（热点抓取选题，#火锅正式进入喝大汤时代# 2026-10-20 热搜 + 海底捞藕汤 150 万份；西安市第五医院清汤锅底嘌呤 7.38→80mg/100g、100g 久煮汤升尿酸 133μmol/L；《中国高尿酸血症与痛风诊疗指南（2024）》420/360 诊断线；白皮书 1.77 亿/18-35 岁占 60%/18-29 岁男性 32.3%；痛点型框架，密度强化策略，喝汤时间线速查表收藏元素）"
-    article: "output/火锅喝大汤误区.md"
-    theme: "moyu-green"
-    humanness_score: 23.78
-    cover: "output/cover-huoguo.jpg"
-    inline_images:
-      - "output/huoguo-1.jpg"
-      - "output/huoguo-2.jpg"
-      - "output/huoguo-3.jpg"
-      - "output/huoguo-4.jpg"
-    status: draft
-    drafts:
-      - version: v1
-        note: "完整 8 步流程一次通过：热点抓取-选题评分 7.8（同题 90 天仅 2 篇）-数据 WebSearch 核实-写作 1942 字-反AI 23.78 在区间-合规 0error-SEO 0error-配图 5 张批量生成+1 轮自检重生成-摸鱼绿排版 v1-推送草稿箱"
-        media_id: "q_zrQd1gVlCJUeajP8dHyfhbdV2OXvEqfEUnIn_hdnuYdhlvJTFVJA2X2A6P3JYR"
-        thumb_media_id: "q_zrQd1gVlCJUeajP8dHyUbaieLbaAWpY46qktwk3eLh6_9d4V5jwFni4oGn8KHU"
-        action: 待删除
-
-      - version: v2
-        note: "新增 --theme auto 内容自动选型 + 汤底暖橙(hotpot-warm)定制主题：命中特征词 火锅/汤/饮食，按内容重排版后重发；头部尚有绿色硬编码残留"
-        media_id: "q_zrQd1gVlCJUeajP8dHyeBtzjLyu2ieizUSCJGE9m6Zg8GyDiaSOnlzPToxyU6o"
-        action: 待删除
-
-      - version: v3
-        note: "修复 gzh_converter 三处摸鱼绿硬编码 rgba，全部改为从主题主色派生(_rgba 辅助方法)；汤底暖橙全主题色 100% 跟随配置"
-        media_id: "q_zrQd1gVlCJUeajP8dHyTb39ASgNPD4fT43k7dxmzy7HZ-RdUG9eKrbjxGGYn_P"
-        action: 待删除
-
-      - version: v4
-        note: "升级为生成式设计引擎：内容驱动配色（类别:饮食 得分37，语义+封面混合色相 19°，主色 #AD5A32 / 浅色 #E2D5CE / 强调 #C18638）+ 排版自适应（饮食类松弛间距 36px / 行高 1.85 / 标题 800 / 正文 400），全主题参数参数化无硬编码"
-        media_id: "q_zrQd1gVlCJUeajP8dHyS42lKGzA3UgJUh1OVjKnuIBElX7rZMo8iMzvyyvpUtJ"
-        thumb_media_id: "q_zrQd1gVlCJUeajP8dHyeuS4iwLMsXcVjsjUbEf8o09vSc6pFLizM2-4BPNilOz"
-        action: 以此版发布
+- date: '2026-10-10'
+  note: 从账号 9 篇已发文章学习写作与配图风格
+  articles: references/source_articles/ref-01.md ~ ref-09.md
+  exemplars: references/exemplars/
+  style_docs:
+  - personas/xiaokepuoao.yaml
+  - writing-config.yaml
+  - references/xiaokepuoao-style.md

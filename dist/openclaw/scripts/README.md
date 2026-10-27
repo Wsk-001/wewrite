@@ -39,6 +39,12 @@ python3 {skill_dir}/scripts/<脚本名>.py [参数]
 | `learn_theme.py` | 从微信文章 URL 学习排版主题 |
 | `extract_exemplar.py` | 从范文提取风格 exemplar；`--list` 查看范文库 |
 
+## 运维类（草稿箱管理）
+
+| 脚本 | 用途 |
+|------|------|
+| `delete_drafts.py` | 按 media_id 删除草稿箱草稿（删除前先 batchget 核对，用户确认后执行，随后更新 history.yaml） |
+
 ## 构建类（打包产物）
 
 | 脚本 | 用途 |
