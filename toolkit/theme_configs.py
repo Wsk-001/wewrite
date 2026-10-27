@@ -35,6 +35,10 @@ class ThemeConfig:
     suitable_for: str = ""  # Recommended use cases
     description: str = ""  # Brief description
 
+    # 版式个性变体（决定 section 标题/列表/卡片的结构风格）
+    # classic: 渐变圆角卡片；editorial: 大数字编辑风；clinical: 直角临床风
+    style_variant: str = "classic"
+
 
 # Theme definitions
 THEMES = {
@@ -141,6 +145,8 @@ THEMES = {
 # 内容语义 → 色相 映射（HSL hue 0-1 范围）
 CONTENT_HUE_MAP = {
     "饮食": (0.06, ["火锅", "美食", "汤", "饮食", "烹饪", "三餐", "食材", "吃喝", "锅底", "涮", "外卖"]),
+    "食品安全": (0.47, ["食品安全", "剩菜", "打包", "冰箱", "冷藏", "冷冻", "保鲜", "细菌", "变质", "中毒", "保存", "保质期", "加热", "微波", "亚硝酸盐", "沙门氏菌", "分装", "隔夜"]),
+    "节庆": (0.985, ["婚宴", "婚礼", "年夜饭", "春节", "团圆", "过节", "宴席", "喜庆"]),
     "心血管": (0.97, ["心血管", "血压", "心脏", "心梗", "中风", "急救", "胸痛"]),
     "睡眠": (0.62, ["睡眠", "熬夜", "失眠", "作息", "褪黑素", "打鼾", "睡眠质量"]),
     "心理": (0.75, ["心理", "情绪", "焦虑", "抑郁", "压力", "成瘾", "手机依赖", "心境"]),
@@ -152,13 +158,33 @@ CONTENT_HUE_MAP = {
     "用药": (0.58, ["疫苗", "用药", "药物", "抗生素", "副作用", "处方"]),
 }
 
+# 类别 → 版式个性变体
+CATEGORY_VARIANT = {
+    "食品安全": "clinical",
+    "体检": "clinical",
+    "用药": "clinical",
+    "心血管": "clinical",
+    "呼吸": "clinical",
+    "饮食": "classic",
+    "节庆": "classic",
+    "皮肤": "classic",
+    "睡眠": "editorial",
+    "心理": "editorial",
+    "通用": "editorial",
+}
+
+
+def _hue_distance(h1: float, h2: float) -> float:
+    """圆周上的色相距离（0-0.5，0.5 即 180°）。"""
+    return min(abs(h1 - h2), 1.0 - abs(h1 - h2))
+
 
 def analyze_content_hue(title: str, content: str) -> tuple:
-    """分析内容语义，返回 (category, base_hue, score)。"""
+    """分析内容语义，返回 (category, base_hue, score, runner_up_category)。"""
     from collections import Counter
     scores = Counter()
     title_text = title or ""
-    
+
     for category, (hue, keywords) in CONTENT_HUE_MAP.items():
         for kw in keywords:
             if kw in title_text:
@@ -166,13 +192,15 @@ def analyze_content_hue(title: str, content: str) -> tuple:
             hits = content.count(kw)
             if hits:
                 scores[category] += min(hits, 8)
-    
+
     if not scores:
-        return "通用", 0.43, 0  # 默认品牌绿 hue
-    
-    best_cat, top_score = scores.most_common(1)[0]
+        return "通用", 0.43, 0, None  # 默认品牌绿 hue
+
+    ranked = scores.most_common(2)
+    best_cat, top_score = ranked[0]
     base_hue = CONTENT_HUE_MAP[best_cat][0]
-    return best_cat, base_hue, top_score
+    runner_up = ranked[1][0] if len(ranked) > 1 and ranked[1][1] > 0 else None
+    return best_cat, base_hue, top_score, runner_up
 
 
 def extract_cover_hue(cover_path) -> Optional[float]:
@@ -204,8 +232,8 @@ def extract_cover_hue(cover_path) -> Optional[float]:
         return None
 
 
-def generate_adaptive_theme(title: str, content: str, cover_path=None) -> ThemeConfig:
-    """根据内容自动生成专属主题配色。"""
+def generate_adaptive_theme(title: str, content: str, cover_path=None) -> tuple:
+    """根据内容自动生成专属主题配色。返回 (ThemeConfig, design_report_str)。"""
     import colorsys
     
     # 1. 语义色相

@@ -9,8 +9,10 @@ Usage:
 """
 
 import argparse
+import os
 import re
 import sys
+import traceback
 import webbrowser
 from pathlib import Path
 from urllib.parse import unquote
@@ -155,7 +157,7 @@ def _validate_publish_inputs(args) -> None:
 
 def cmd_preview(args):
     """Generate HTML preview and open in browser."""
-    theme_name = _resolve_theme(args.theme, args.input)
+    theme_name = _resolve_theme(args.theme, args.input, cover_path=args.cover)
     if not _is_gzh_theme(theme_name):
         print(f"Error: unknown gzh theme: {theme_name}", file=sys.stderr)
         print(f"Available themes: {', '.join(GZH_THEMES)} (or 'auto')", file=sys.stderr)
@@ -504,6 +506,7 @@ def main():
     p_preview.add_argument("input", help="Markdown file path")
     p_preview.add_argument("-t", "--theme", default="moyu-green", help="GZH theme name, or 'auto' to match content")
     p_preview.add_argument("-o", "--output", help="Output HTML file path")
+    p_preview.add_argument("--cover", help="Cover image path (used by 'auto' theme for color extraction)")
     p_preview.add_argument("--no-open", action="store_true", help="Don't open browser")
 
     p_publish = sub.add_parser("publish", help="Convert and publish as WeChat draft")
@@ -584,6 +587,8 @@ def main():
             cmd_gallery(args)
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
+        if os.environ.get("WEWRITE_DEBUG"):
+            traceback.print_exc()
         sys.exit(1)
 
 
