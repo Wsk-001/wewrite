@@ -165,7 +165,7 @@ image_analysis 任务后统一收结果），一次性按清单核对；不通�
 
 ### [7/8] 排版
 
-将 Markdown 转换为微信排版，应用 gzh-design 主题（6 套：moyu-green/red-white/graphite-minimal/zen-whitespace/moyu-ticket/olive-journal）。
+将 Markdown 转换为微信排版。主题库共 106 套（核心 6 套 + hotpot-warm + 扩充库 99 套），全部可用 `--theme {id}` 指定；完整清单见 `python3 {baseDir}/toolkit/cli.py themes`，视觉样例见 `output/theme-samples/index.html` 与 `output/theme-samples/library/index.html`。auto 模式按内容自动配色。
 
 ```
 读取: {baseDir}/references/pipeline/formatting-styles.md

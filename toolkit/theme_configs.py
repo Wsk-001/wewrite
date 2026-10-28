@@ -4,40 +4,9 @@ Theme configurations for GZH Design themes.
 Extracted from gzh-design skill references.
 """
 
-from dataclasses import dataclass
 from typing import Optional
 
-
-@dataclass
-class ThemeConfig:
-    """Theme configuration data."""
-    identifier: str  # moyu-green, red-white, etc.
-    display_name: str
-    
-    # Core colors
-    primary_color: str  # Main brand color
-    primary_light: str  # Light variant (for gradients)
-    accent_color: str  # Optional accent (default: primary_light)
-    text_color: str  # Main text color
-    secondary_color: str  # Secondary text / gray
-    
-    # Highlight styles
-    highlight_bg: str  # Background for highlighted text
-    underline_css: str  # CSS for keyword underline
-    
-    # Layout parameters (adaptive themes)
-    section_margin: int = 32  # Section bottom margin (px)
-    line_height: float = 1.75  # Body line-height
-    title_weight: int = 900  # Title font-weight (700-900)
-    body_weight: int = 400  # Body font-weight (400-500)
-    
-    # Metadata
-    suitable_for: str = ""  # Recommended use cases
-    description: str = ""  # Brief description
-
-    # 版式个性变体（决定 section 标题/列表/卡片的结构风格）
-    # classic: 渐变圆角卡片；editorial: 大数字编辑风；clinical: 直角临床风
-    style_variant: str = "classic"
+from theme_base import ThemeConfig
 
 
 # Theme definitions
@@ -140,6 +109,11 @@ THEMES = {
         description="汤底暖橙渐变，为饮食健康类内容定制"
     ),
 }
+
+# 合并扩充主题库（99 套，来自开源公众号排版项目）
+from theme_library import LIBRARY_THEMES  # noqa: E402
+
+THEMES.update(LIBRARY_THEMES)
 
 
 # 内容语义 → 色相 映射（HSL hue 0-1 范围）

@@ -57,6 +57,11 @@ class GzhConverter:
         self.TITLE_WEIGHT = self.theme_cfg.title_weight
         self.BODY_WEIGHT = self.theme_cfg.body_weight
 
+        # Typography: font stack / page background / letter spacing
+        self.FONT_FAMILY = self.theme_cfg.font_family or ThemeConfig.DEFAULT_SANS
+        self.PAGE_BG = self.theme_cfg.page_bg
+        self.LETTER_SPACING = self.theme_cfg.letter_spacing
+
     def _rgba(self, alpha: float) -> str:
         """Derive rgba() string from the theme primary color."""
         h = self.PRIMARY.lstrip("#")
@@ -392,9 +397,9 @@ class GzhConverter:
         
         # Container start
         parts.append(
-            '<section style="max-width:677px;margin:0 auto;background:#ffffff;'
-            "font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;"
-            f'color:{self.TEXT_MAIN};line-height:{self.LINE_HEIGHT};letter-spacing:0.5px;overflow-x:hidden;">'
+            f'<section style="max-width:677px;margin:0 auto;background:{self.PAGE_BG};'
+            f"font-family:{self.FONT_FAMILY};"
+            f'color:{self.TEXT_MAIN};line-height:{self.LINE_HEIGHT};letter-spacing:{self.LETTER_SPACING}px;overflow-x:hidden;">'
         )
         
         # Cover (simplified version without image)
