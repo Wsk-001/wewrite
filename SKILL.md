@@ -177,7 +177,7 @@ image_analysis 任务后统一收结果），一次性按清单核对；不通�
 
 ### [7/8] 排版
 
-将 Markdown 转换为微信排版。主题库共 106 套（核心 6 套 + hotpot-warm + 扩充库 99 套），全部可用 `--theme {id}` 指定；完整清单见 `python3 {skill_dir}/toolkit/cli.py themes`，视觉样例见 `output/theme-samples/index.html` 与 `output/theme-samples/library/index.html`。auto 模式按内容自动配色。
+将 Markdown 转换为微信排版。主题库共 106 套（核心 6 套 + hotpot-warm + 扩充库 99 套），全部可用 `--theme {id}` 指定；每套主题绑定 8 种结构化版式之一（圆角徽章/杂志编辑/临床直角/色块刊头/极简/报纸/海报/侧栏书页），排版结构真正不同而非仅换色。完整清单见 `python3 {skill_dir}/toolkit/cli.py themes`，视觉样例见 `output/theme-samples/index.html` 与 `output/theme-samples/library/index.html`。auto 模式按内容自动配色。
 
 ```
 读取: {skill_dir}/references/pipeline/formatting-styles.md

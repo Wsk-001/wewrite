@@ -481,6 +481,51 @@ LIBRARY_SPECS = (
     + _MDWECHAT + _ACKS + _VISUAL_DIRECTOR
 )
 
+# 版式变体分配（structural layout，非仅配色）：
+# classic 圆角徽章 / editorial 杂志编辑 / clinical 临床直角 / magazine 色块刊头
+# minimal 极简 / newspaper 报纸 / poster 海报 / sidebar 侧栏书页
+VARIANT_OVERRIDES = {
+    # ya-pai
+    "yapai-bookish": "editorial", "yapai-tech-doc": "clinical", "yapai-cool-report": "sidebar",
+    "yapai-magazine": "magazine", "yapai-poster": "poster", "yapai-minimal": "minimal",
+    "yapai-lecture": "sidebar", "yapai-timeline": "sidebar", "yapai-newspaper": "newspaper",
+    "yapai-letter": "editorial", "yapai-terminal": "clinical",
+    # laomao
+    "laomao-airy-cobalt": "classic", "laomao-airy-graphite": "minimal", "laomao-airy-violet": "magazine",
+    "laomao-clay-indigo": "editorial", "laomao-clay-pine": "sidebar", "laomao-clay-terracotta": "magazine",
+    "laomao-forest-lake": "classic", "laomao-forest-leaf": "minimal", "laomao-forest-pine": "sidebar",
+    "laomao-grid-cobalt": "clinical", "laomao-grid-safety": "clinical", "laomao-grid-signal": "clinical",
+    "laomao-journal-cherry": "editorial", "laomao-journal-grass": "editorial", "laomao-journal-ink": "editorial",
+    "laomao-masthead-mint": "magazine", "laomao-masthead-signal": "magazine", "laomao-masthead-volt": "magazine",
+    # gzh-archive
+    "cardnote": "classic", "cream": "magazine", "datainfo": "clinical", "dianlan": "classic",
+    "graphite": "minimal", "heibaihui": "editorial", "heikeji": "clinical", "hongbai": "poster",
+    "hupo": "magazine", "jiaotang": "editorial", "lvkeji": "clinical", "magfeature": "magazine",
+    "meigui": "editorial", "mistblue": "minimal", "qingshiban": "newspaper", "rich_hongbai": "poster",
+    "rich_morandi": "editorial", "rich_terminal": "clinical", "rich_zen": "minimal",
+    "tianlan": "classic", "zise": "classic",
+    # single
+    "mono-blue-editorial": "editorial", "wxmd-modi": "clinical",
+    # raphael
+    "rp-stripe": "clinical", "rp-retro": "newspaper", "rp-dracula": "clinical", "rp-sakura": "editorial",
+    "rp-bauhaus": "poster", "rp-claude": "editorial", "rp-lavender": "minimal",
+    # md-wechat
+    "swiss-index": "poster", "night-film": "clinical", "white-cube": "minimal", "pixel-quest": "clinical",
+    "velocity-report": "poster", "klein": "poster", "xuanzhi": "editorial", "morandi-green": "minimal",
+    "midnight-gold": "magazine", "mint-soda": "classic", "brick-industry": "clinical", "blueprint": "clinical",
+    "lemon-sea": "magazine", "hk-neon": "magazine", "latte": "editorial", "candy-pop": "poster",
+    # ACKS
+    "acks-gold": "editorial", "acks-receipt": "magazine", "acks-dopamine": "poster", "acks-maximalism": "poster",
+    "acks-collage": "magazine", "acks-guochao": "editorial", "ms-social": "classic", "ms-aireport": "clinical",
+    "ms-euro": "editorial", "ms-cnclassic": "editorial", "ms-cnvertical": "sidebar", "ms-poster": "poster",
+    "ms-academic": "editorial",
+    # visual-director
+    "vd-light-reading": "minimal", "vd-warm-humanist": "editorial", "vd-youth-campus": "magazine",
+    "vd-editorial": "newspaper", "vd-structured": "clinical", "vd-future-tech": "clinical",
+    "vd-oriental": "sidebar", "vd-pop-poster": "poster", "vd-natural-atlas": "magazine",
+    "vd-business": "magazine", "vd-cinematic": "editorial",
+}
+
 SOURCE_CREDITS = {
     "yapai": "github.com/Walksu/ya-pai",
     "laomao": "github.com/laomao-ai/wechat-gzh-publish",
@@ -527,7 +572,7 @@ def _build(spec: dict) -> ThemeConfig:
         letter_spacing=0.5,
         suitable_for=spec["use"],
         description=f"{spec['desc']}（{spec['use']}）",
-        style_variant=spec["var"],
+        style_variant=VARIANT_OVERRIDES.get(spec["id"], spec["var"]),
         source=_source_of(spec["id"]),
     )
 
