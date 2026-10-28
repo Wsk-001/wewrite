@@ -130,3 +130,51 @@ def test_end_to_end_smoke_all_elements():
     text = visible_text(r.html)
     assert "1." in text and "2." in text
     assert "一句话版本" in text
+
+
+def test_all_container_types_preserve_content():
+    """回归：:::callout / :::highlight / :::timeline / :::quote 曾被静默丢弃。"""
+    conv = make_converter()
+    md = (
+        "# 标题\n\n"
+        "## 第一节\n\n"
+        ":::callout 关键提醒\n"
+        "- 第一条要点\n"
+        "- 第二条要点\n"
+        ":::\n\n"
+        ":::highlight 重点结论\n"
+        "这里是正文\n"
+        ":::\n\n"
+        ":::timeline\n"
+        "72小时内冷敷\n"
+        "48小时后热敷\n"
+        ":::\n\n"
+        ":::quote\n"
+        "站得高才能看得远\n"
+        ":::\n"
+    )
+    r = conv.convert(md)
+    text = visible_text(r.html)
+    for kw in ["关键提醒", "第一条要点", "第二条要点", "重点结论", "这里是正文",
+               "72小时内冷敷", "48小时后热敷", "站得高才能看得远"]:
+        assert kw in text, f"容器内容丢失: {kw}"
+    assert ":::" not in text
+    assert r.residues == []
+
+
+def test_dialogue_container_renders_both_speakers():
+    conv = make_converter()
+    md = (
+        "# 标题\n\n"
+        ":::dialogue\n"
+        "读者：崴脚后先冷敷还是热敷？\n"
+        "医生：刚受伤的48小时内先冷敷。\n"
+        ":::\n"
+    )
+    r = conv.convert(md)
+    text = visible_text(r.html)
+    assert "读者" in text and "医生" in text
+    assert "崴脚后先冷敷还是热敷" in text
+    assert "刚受伤的48小时内先冷敷" in text
+    assert ":::" not in text
+    assert r.residues == []

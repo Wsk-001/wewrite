@@ -143,6 +143,7 @@ class GzhConverter:
         intro_done = False
         current_paragraph_lines = []
         in_container = None  # Track ::: container type (e.g., "summary")
+        container_label = ""  # Remember ":::callout 标题" 的标题部分
         container_lines = []
         skip_until = -1  # Table blocks consumed by lookahead
 
@@ -204,22 +205,30 @@ class GzhConverter:
             # Container fence (:::type or closing :::)
             if stripped.startswith(":::"):
                 if in_container:
-                    # Closing fence - save container content
+                    # Closing fence - materialize container
+                    content_lines = [l for l in container_lines if l.strip()]
                     if in_container == "summary":
-                        # Join container lines, skip the type label if present
-                        content_lines = [l for l in container_lines if not l.strip().startswith(":::")]
                         structure["summary"] = " ".join(content_lines).strip()
+                    elif content_lines:
+                        item = {
+                            "type": "container",
+                            "kind": in_container,
+                            "label": container_label,
+                            "lines": content_lines,
+                        }
+                        if current_section:
+                            current_section["content"].append(item)
+                        else:
+                            structure["intro_paragraphs"].append(item)
                     in_container = None
+                    container_label = ""
                     container_lines = []
                 else:
-                    # Opening fence - detect container type
-                    # Extract type from ":::type optional-label" -> "type"
+                    # Opening fence - detect container type and optional label
                     fence_text = stripped[3:].strip()  # Remove ":::"
-                    if fence_text:
-                        # Take first word as container type
-                        in_container = fence_text.split()[0] if fence_text.split() else "generic"
-                    else:
-                        in_container = "generic"
+                    parts = fence_text.split(maxsplit=1)
+                    in_container = parts[0] if parts else "generic"
+                    container_label = parts[1].strip() if len(parts) > 1 else ""
                     container_lines = []
                 continue
             
@@ -349,18 +358,20 @@ class GzhConverter:
         
         # Unclosed container at EOF - salvage content instead of dropping it
         if in_container:
-            if in_container == "summary" and container_lines:
-                content_lines = [l for l in container_lines if l.strip()]
+            content_lines = [l for l in container_lines if l.strip()]
+            if in_container == "summary" and content_lines:
                 structure["summary"] = " ".join(content_lines).strip()
-            elif container_lines:
-                # Treat remaining lines as a normal paragraph
-                text_lines = [l for l in container_lines if l.strip()]
-                if text_lines:
-                    para_text = self._join_paragraph(text_lines)
-                    if current_section:
-                        current_section["content"].append(para_text)
-                    elif not intro_done:
-                        structure["intro_paragraphs"].append(para_text)
+            elif content_lines:
+                item = {
+                    "type": "container",
+                    "kind": in_container,
+                    "label": container_label,
+                    "lines": content_lines,
+                }
+                if current_section:
+                    current_section["content"].append(item)
+                else:
+                    structure["intro_paragraphs"].append(item)
         
         return structure
     
@@ -790,8 +801,106 @@ class GzhConverter:
                 return self._generate_table(item)
             if t == "blockquote":
                 return self._generate_blockquote(item)
+            if t == "container":
+                return self._generate_container(item)
             return self._generate_paragraph(str(item))
         return self._generate_paragraph(item)
+
+    def _generate_container(self, item: Dict) -> str:
+        """Render :::callout / :::highlight / :::timeline / :::quote 容器。"""
+        kind = item.get("kind", "generic")
+        label = (item.get("label") or "").strip()
+        lines = [l for l in item.get("lines", []) if l.strip()]
+
+        def _inline(text):
+            return self._convert_inline_markdown(self._mark_keywords(text))
+
+        if kind == "callout":
+            title = label or "要点"
+            body = "".join(
+                f'<p style="font-size:14px;line-height:1.75;color:{self.TEXT_MAIN};margin:0 0 6px;font-weight:{self.BODY_WEIGHT};">{_inline(l.lstrip("-• ").strip())}</p>'
+                for l in lines
+            )
+            return f'''    <section style="margin:16px 0;padding:16px 18px;background:{self._rgba(0.05)};border:1px solid {self._rgba(0.18)};border-left:4px solid {self.PRIMARY};border-radius:{self.LAYOUT['radius']}px;">
+      <p style="font-size:13px;font-weight:700;color:{self.PRIMARY};margin:0 0 10px;letter-spacing:1px;">{_inline(title)}</p>
+      {body}
+    </section>'''
+
+        if kind == "highlight":
+            body_title = label or (lines[0] if lines else "")
+            rest = lines[1:] if not label and lines else lines
+            body = "".join(
+                f'<p style="font-size:14px;line-height:1.75;color:{self.TEXT_MAIN};margin:0 0 6px;font-weight:{self.BODY_WEIGHT};">{_inline(l.lstrip("-• ").strip())}</p>'
+                for l in rest
+            )
+            return f'''    <section style="margin:16px 0;padding:16px 18px;background:{self.theme_cfg.highlight_bg};border-radius:{self.LAYOUT['radius']}px;">
+      <p style="font-size:14px;font-weight:700;color:{self.PRIMARY};margin:0 0 8px;">{_inline(body_title)}</p>
+      {body}
+    </section>'''
+
+        if kind == "timeline":
+            rows = []
+            for i, l in enumerate(lines):
+                txt = l.lstrip("-• ").strip()
+                marker = f'<span style="display:inline-block;min-width:20px;height:20px;line-height:20px;text-align:center;border-radius:50%;background:{self.PRIMARY};color:#fff;font-size:11px;font-weight:700;margin-right:10px;">{i+1}</span>'
+                rows.append(
+                    f'<section style="display:flex;align-items:flex-start;margin:0 0 10px;">{marker}'
+                    f'<p style="font-size:14px;line-height:1.7;color:{self.TEXT_MAIN};margin:0;flex:1;font-weight:{self.BODY_WEIGHT};">{_inline(txt)}</p></section>'
+                )
+            return f'''    <section style="margin:16px 0;padding:16px 18px;background:{self._rgba(0.04)};border-radius:{self.LAYOUT['radius']}px;">
+      {''.join(rows)}
+    </section>'''
+
+        if kind == "quote":
+            body = "".join(
+                f'<p style="font-size:15px;line-height:1.85;color:{self.PRIMARY};margin:0 0 6px;font-style:italic;">{_inline(l.lstrip("-• ").strip())}</p>'
+                for l in lines
+            )
+            return f'''    <section style="margin:16px 0;padding:18px 20px;border-left:4px solid {self.PRIMARY};background:{self._rgba(0.03)};">
+      {body}
+    </section>'''
+
+        if kind == "dialogue":
+            speakers = []
+            rows = []
+            for raw in lines:
+                txt = raw.lstrip("-• ").strip()
+                m = re.match(r'^([^：:]{1,12})[：:]\s*(.+)$', txt)
+                if m:
+                    speaker, content = m.group(1).strip(), m.group(2).strip()
+                else:
+                    speaker, content = "", txt
+                if speaker and speaker not in speakers:
+                    speakers.append(speaker)
+                left = (not speakers) or speaker == speakers[0]
+                align = "flex-start" if left else "flex-end"
+                bubble_bg = self._rgba(0.06) if left else self.PRIMARY
+                text_color = self.TEXT_MAIN if left else "#ffffff"
+                name_html = (
+                    f'<p style="font-size:11px;color:{self.TEXT_GRAY};margin:0 0 3px;">{_inline(speaker)}</p>'
+                    if speaker else ""
+                )
+                rows.append(
+                    f'<section style="display:flex;flex-direction:column;align-items:{align};margin:0 0 12px;">'
+                    f'<section style="max-width:80%;">'
+                    f'{name_html}'
+                    f'<p style="font-size:14px;line-height:1.75;color:{text_color};margin:0;padding:10px 14px;'
+                    f'background:{bubble_bg};border-radius:{self.LAYOUT["radius"] or 12}px;font-weight:{self.BODY_WEIGHT};">{_inline(content)}</p>'
+                    f'</section></section>'
+                )
+            return f'''    <section style="margin:18px 0;padding:16px 18px;background:{self._rgba(0.02)};border-radius:{self.LAYOUT['radius']}px;">
+      {''.join(rows)}
+    </section>'''
+
+        # generic fallback - keep content, don't drop it
+        body = "".join(
+            f'<p style="font-size:14px;line-height:1.75;color:{self.TEXT_MAIN};margin:0 0 6px;font-weight:{self.BODY_WEIGHT};">{_inline(l.lstrip("-• ").strip())}</p>'
+            for l in lines
+        )
+        title_html = f'<p style="font-size:13px;font-weight:700;color:{self.PRIMARY};margin:0 0 8px;">{_inline(label)}</p>' if label else ""
+        return f'''    <section style="margin:16px 0;padding:14px 16px;background:{self._rgba(0.04)};border-radius:{self.LAYOUT['radius']}px;">
+      {title_html}{body}
+    </section>'''
 
     def _generate_list_item(self, item: Dict) -> str:
         """Generate a list item (WeChat-safe section+p). Ordered items keep their number."""
