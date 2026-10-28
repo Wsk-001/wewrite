@@ -481,17 +481,21 @@ _ALL_SPECS = (
     + _MDWECHAT + _ACKS + _VISUAL_DIRECTOR
 )
 
-# 去重：同一种结构化版式只保留 1 套代表主题，剔除仅配色不同的重复项。
-# 选择标准：浅色底 + 设计辨识度 + 版式契合度。
+# 去重：按「排版+配色+字体」综合相似度 >50% 即剔除，保留 43 套库内代表。
+# 与核心 7 套合计 50 套，8 种版式全覆盖、来源多样、全部浅色。
+# 选择算法见脚本：按核心优先贪心保留互异主题（CIE-Lab 色差 + 版式 + 字体 + 亮度 + 排版度量加权）。
 REPRESENTATIVE_IDS = {
-    "cardnote",                # classic   圆角徽章
-    "yapai-bookish",           # editorial 杂志编辑
-    "yapai-tech-doc",          # clinical  临床直角
-    "laomao-masthead-signal",  # magazine  色块刊头
-    "mistblue",                # minimal   极简
-    "qingshiban",              # newspaper 报纸
-    "yapai-poster",            # poster    海报
-    "yapai-cool-report",       # sidebar   侧栏书页
+    "yapai-bookish", "yapai-tech-doc", "laomao-airy-cobalt", "lemon-sea",
+    "candy-pop", "laomao-forest-pine", "rp-lavender", "ms-poster",
+    "qingshiban", "graphite", "rp-retro", "lvkeji", "morandi-green",
+    "vd-youth-campus", "klein", "vd-oriental", "laomao-masthead-signal",
+    "mono-blue-editorial", "meigui", "hk-neon", "ms-aireport",
+    "laomao-journal-grass", "heikeji", "cream", "yapai-poster",
+    "white-cube", "laomao-forest-lake", "acks-gold", "laomao-forest-leaf",
+    "yapai-minimal", "vd-structured", "laomao-masthead-volt", "heibaihui",
+    "rich_morandi", "yapai-cool-report", "ms-academic", "tianlan",
+    "midnight-gold", "laomao-grid-cobalt", "mint-soda", "yapai-newspaper",
+    "laomao-masthead-mint", "vd-pop-poster",
 }
 
 LIBRARY_SPECS = [s for s in _ALL_SPECS if s["id"] in REPRESENTATIVE_IDS]
