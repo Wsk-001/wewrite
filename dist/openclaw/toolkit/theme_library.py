@@ -475,11 +475,26 @@ _VISUAL_DIRECTOR = [
           desc="暮紫电影质感"),
 ]
 
-# 汇总全部 spec（保持分组顺序）
-LIBRARY_SPECS = (
+# 汇总全部 spec（保持分组顺序）——保留为来源存档，便于日后按需扩充
+_ALL_SPECS = (
     _YAPAI + _LAOMAO + _GZH_ARCHIVE + _SINGLE + _RAPHAEL
     + _MDWECHAT + _ACKS + _VISUAL_DIRECTOR
 )
+
+# 去重：同一种结构化版式只保留 1 套代表主题，剔除仅配色不同的重复项。
+# 选择标准：浅色底 + 设计辨识度 + 版式契合度。
+REPRESENTATIVE_IDS = {
+    "cardnote",                # classic   圆角徽章
+    "yapai-bookish",           # editorial 杂志编辑
+    "yapai-tech-doc",          # clinical  临床直角
+    "laomao-masthead-signal",  # magazine  色块刊头
+    "mistblue",                # minimal   极简
+    "qingshiban",              # newspaper 报纸
+    "yapai-poster",            # poster    海报
+    "yapai-cool-report",       # sidebar   侧栏书页
+}
+
+LIBRARY_SPECS = [s for s in _ALL_SPECS if s["id"] in REPRESENTATIVE_IDS]
 
 # 版式变体分配（structural layout，非仅配色）：
 # classic 圆角徽章 / editorial 杂志编辑 / clinical 临床直角 / magazine 色块刊头
