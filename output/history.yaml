@@ -424,6 +424,44 @@ publishes:
     media_id: q_zrQd1gVlCJUeajP8dHyRxJFyiDJKtHncw03wAssVV3YkiWf3MSndw-xrzl_QlI
     thumb_media_id: q_zrQd1gVlCJUeajP8dHyaoigYOfzCVcf5eCiuiIDMJdRPs8ZOks5Kwde-h39wLt
     action: 以此版发布
+- id: 2026-10-28-waijiao-lengfu-reshu
+  date: '2026-10-28'
+  title: 崴脚后先冷敷还是热敷？前 48 小时做反，肿得更久
+  topic: 崴脚冷热敷科普（常青选题，wechat_search 命中 0 篇；PEACE & LOVE 2019 BJSM、渥太华踝关节规则、冷敷 15-20 分钟/48-72 小时后热敷；个人场景开头+互动问句收束，含 callout/timeline/highlight/dialogue/summary）
+  article: output/waijiao-lengfu-reshu.md
+  theme: laomao-grid-cobalt
+  humanness_score: 25.8
+  cover: output/waijiao-cover.jpg
+  inline_images:
+  - output/waijiao-1.jpg
+  - output/waijiao-2.jpg
+  - output/waijiao-3.jpg
+  - output/waijiao-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 8 步流程完成；流程中发现并修复 :::callout/highlight/timeline/quote/dialogue 容器内容被静默丢弃的解析 BUG，回归测试 86 项通过；配图 5 张批量生成+逐张读回自检
+    media_id: q_zrQd1gVlCJUeajP8dHyW-7cqM6BE8uTQoD4rq-qFulHgRmZCrOpGqKjpbPt_ul
+    action: 以此版发布
+- id: 2026-10-29-yinziyan
+  date: '2026-10-29'
+  title: 隐形盐藏在哪：没往菜里撒盐，一天还是吃进 8 克
+  topic: 隐形盐/高盐科普（热点选题，百度热榜「高盐刺客就在你的餐桌上」94.0；wechat_search 被搜狗反爬拦截，按规则降级 WebSearch 核数据；数据：2020 报告日均烹调盐 9.3g、膳食指南 5g、76% 钠来自家庭烹饪、400mg 钠≈1g 盐、高钠>600mg/100g、低钠≤120mg/100g、生抽 15ml≈1.6g 盐、蚝油 15g≈1.7g、低钠盐 75%NaCl+25%KCl；痛点型+一天账单表，数据冲击开头+画面收束）
+  article: output/yinziyan.md
+  theme: yapai-newspaper
+  humanness_score: 25.6
+  cover: output/yinziyan-cover.jpg
+  inline_images:
+  - output/yinziyan-1.jpg
+  - output/yinziyan-2.jpg
+  - output/yinziyan-3.jpg
+  - output/yinziyan-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 8 步流程完成；合规 0 error、SEO 0 error、反AI 25.6 在区间；报纸版式；配图 5 张批量生成+逐张读回自检，无图内文字乱码
+    media_id: q_zrQd1gVlCJUeajP8dHyZ4TftkhID7fcWnk7Q9wK-Cw4TX4kPcfHtrb_HEkAoXU
+    action: 以此版发布
 style_sources:
 - date: '2026-10-10'
   note: 从账号 9 篇已发文章学习写作与配图风格
