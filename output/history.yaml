@@ -462,6 +462,29 @@ publishes:
     note: 8 步流程完成；合规 0 error、SEO 0 error、反AI 25.6 在区间；报纸版式；配图 5 张批量生成+逐张读回自检，无图内文字乱码
     media_id: q_zrQd1gVlCJUeajP8dHyZ4TftkhID7fcWnk7Q9wK-Cw4TX4kPcfHtrb_HEkAoXU
     action: 以此版发布
+  - version: v2
+    note: 去AI味测试稿（humanizer-zh 改写+保留人味），综合分 25.8；用于草稿箱渲染预览，非正式发布版本
+    media_id: q_zrQd1gVlCJUeajP8dHyUoma-RoMAGMmXbJMRB21k8jOZW76sbtxcODozF5sBqN
+    action: 测试稿，待删除
+- id: 2026-10-29-xueya-jiangwen
+  date: '2026-10-29'
+  title: 天一冷血压就高，别急着加药，把早晨这个数测对
+  topic: 降温血压科普（常青选题，秋冬降温场景；wechat_search 因搜狗 IP 级反爬不可用，按规则降级 WebSearch 核数据；数据：2018 指南冬季收缩压平均高 5-10 mmHg、2024 指南家庭血压 135/85、连续 5-7 天早晚测量、成人患病率约 27.5%；痛点型+三种“高”对照+测量步骤，场景开头+画面收束）
+  article: output/xueya-jiangwen.md
+  theme: moyu-green
+  humanness_score: 23.7
+  cover: output/cover-xueya.jpg
+  inline_images:
+  - output/xueya-1.jpg
+  - output/xueya-2.jpg
+  - output/xueya-3.jpg
+  - output/xueya-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 8 步流程完成；合规 0 error、SEO 0 error（2 个次要关键词位置警告）、反AI 23.7 在区间；配图 5 张批量生成+逐张读回自检，修正袖带位置、多余红线、封面双人袖带后定稿；容器标题加粗，避免 jieba 拆词高亮
+    media_id: q_zrQd1gVlCJUeajP8dHyT2IFT7eS5r1ETBEmgihKMnqO_elCnqkxiV8DXMfFMmC
+    action: 以此版发布
 style_sources:
 - date: '2026-10-10'
   note: 从账号 9 篇已发文章学习写作与配图风格
