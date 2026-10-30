@@ -58,13 +58,15 @@ graph TD
 | 文件 | 职责 |
 |------|------|
 | `cli.py` | 命令行入口：preview / publish / themes / gallery / image-post / learn-theme |
-| `converter.py` | Markdown → 微信内联样式 HTML，含容器语法与整页背景 |
-| `theme.py` | 主题加载与校验 |
-| `themes/*.yaml` | 排版主题定义 |
+| `gzh_converter.py` | Markdown → 微信内联样式 HTML，含容器语法、8 种版式与整页背景 |
+| `theme_base.py` | 主题共享数据类 `ThemeConfig` |
+| `theme_configs.py` | 50 套主题注册（核心 7 套 + 库内代表 43 套）与 `auto` 自适应配色 |
+| `theme_library.py` | 库内主题 spec、排版去重与 `ThemeConfig` 构建 |
 | `publisher.py` | 草稿箱 API 封装 |
 | `wechat_api.py` | 上传图片/封面色块 |
-| `image_gen.py` | AI 配图生成（多 provider） |
-| `config.py` | 统一配置加载器 |
+| `image_gen.py` | AI 配图生成（多 provider，支持 `--batch`） |
+| `config_manager.py` | 配置加载、校验与单例缓存 |
+| `config.py` | 配置加载统一出口，兼容旧调用 |
 
 ## scripts/（工具脚本）
 

@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 ## 视觉主题
 
-集成 gzh-design 主题系统：**支持内容自适应配色**和 7 套固定主题。
+集成 gzh-design 主题系统：**支持内容自适应配色**和 50 套固定主题（核心 7 套 + 库内代表 43 套）。
 
 ### 自适应生成（推荐）
 
@@ -46,9 +46,9 @@ python toolkit/cli.py preview article.md --theme auto
 #   排版: 间距 36px / 行高 1.85 / 标题 800 / 正文 400
 ```
 
-### 固定主题库
+### 固定主题库（50 套）
 
-仍可显式指定主题：
+50 套主题均可通过 `--theme {id}` 显式指定。下表只列 7 套核心主题，完整清单运行 `python3 toolkit/cli.py themes` 查看。
 
 | 主题 | 标识符 | 适用场景 |
 |-----|--------|---------|
@@ -63,7 +63,7 @@ python toolkit/cli.py preview article.md --theme auto
 使用示例：
 
 ```bash
-# 显式指定固定主题
+# 显式指定固定主题（可用 cli.py themes 查看全部 50 套）
 python toolkit/cli.py preview article.md --theme red-white
 
 # 发布到公众号（auto 推荐）

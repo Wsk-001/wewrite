@@ -68,3 +68,8 @@ CLAUDE.md
 # gzh-design skill (external)
 .ai-ready/skills/gzh-design/
 *.zip
+
+# Local project snapshots and temporary uploads
+*.tar.gz
+test_bad_config/
+.monkeycode-tmp-files/
