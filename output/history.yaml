@@ -485,6 +485,25 @@ publishes:
     note: 8 步流程完成；合规 0 error、SEO 0 error（2 个次要关键词位置警告）、反AI 23.7 在区间；配图 5 张批量生成+逐张读回自检，修正袖带位置、多余红线、封面双人袖带后定稿；容器标题加粗，避免 jieba 拆词高亮
     media_id: q_zrQd1gVlCJUeajP8dHyT2IFT7eS5r1ETBEmgihKMnqO_elCnqkxiV8DXMfFMmC
     action: 以此版发布
+- id: 2026-10-31-qiantangjiang-luoshui
+  date: '2026-10-31'
+  title: 钱塘江潮水卷走钓鱼男子：岸上4分钟怎么救命
+  topic: 溺水急救科普（热点选题，2026-10-30 嘉绍大桥东侧钓鱼男子被钱塘江涌潮卷走生还；钱塘江涌潮最大流速 6.7 m/s、传播 8 m/s、冲击力 3-7 吨/㎡；WHO 全球年约 30 万溺亡、每小时约 34 人、5 岁以下占近 1/4；中国疾控 1-14 岁儿童第一位伤害死因；叫叫伸抛、先吹气再按压、30:2、避免控水；热点解读型+岸上救援时间线）
+  article: output/qiantangjiang-luoshui.md
+  theme: moyu-green
+  humanness_score: 35.8
+  cover: output/qiantangjiang-cover.jpg
+  inline_images:
+  - output/qiantangjiang-1.jpg
+  - output/qiantangjiang-2.jpg
+  - output/qiantangjiang-3.jpg
+  - output/qiantangjiang-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 8 步流程完成；合规 0 error、SEO 0 error（标题压到 21 字）、反 AI 35.77 在区间、正文 2500 字；配图 5 张批量生成+逐张读回自检，第 2 张首版仰漂被误读为游泳，且人像场景触发内容审核，改为“水里的异常信号”信息图后通过；草稿标题经 draft/update 改为短标题，作者与摘要已核验
+    media_id: q_zrQd1gVlCJUeajP8dHyatDiMhyS-vvp-0OqGhDBRs0UfjOpnImN5a1GjF1SGdG
+    action: 以此版发布
 style_sources:
 - date: '2026-10-10'
   note: 从账号 9 篇已发文章学习写作与配图风格
