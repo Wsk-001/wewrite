@@ -13,6 +13,8 @@ from pathlib import Path
 import requests
 import yaml
 
+from image_prompt_builder import BriefError, build_prompt
+
 CONNECT_TIMEOUT = 10
 READ_TIMEOUT = 120
 
@@ -601,7 +603,30 @@ def _generate_with_retry(provider, prompt: str, size: str, retries: int = 2) -> 
     raise last_error
 
 
-def generate_image(prompt: str, output_path: str, size: str = "cover", config: dict = None) -> str:
+def _compile_brief(brief, label: str = "brief") -> str:
+    try:
+        return build_prompt(brief)
+    except BriefError as exc:
+        raise ValueError(f"{label}: {exc}") from exc
+
+
+def _task_prompt(task: dict, label: str) -> str:
+    """批量任务支持两种输入：结构化 brief，或已写好的 prompt。"""
+    brief = task.get("brief")
+    if brief is not None:
+        return _compile_brief(brief, f"{label}.brief")
+    prompt = task.get("prompt")
+    if not isinstance(prompt, str) or not prompt.strip():
+        raise ValueError(f"{label} needs 'brief' or a non-empty 'prompt'")
+    return prompt
+
+
+def generate_image(prompt: str, output_path: str, size: str = "cover", config: dict = None,
+                   brief: dict = None) -> str:
+    if brief is not None:
+        prompt = _compile_brief(brief, "brief")
+    elif not isinstance(prompt, str) or not prompt.strip():
+        raise ValueError("prompt must be a non-empty string")
     if config is None:
         config = _load_config()
     chain = _build_provider_chain(config)
@@ -641,7 +666,9 @@ def generate_images_batch(
 ) -> dict:
     """并发生成多张图，消除逐张串行等待。
 
-    tasks: [{"prompt": str, "output": str, "size": str(可选 cover/article/vertical/square/WxH)}]
+    tasks: [{"prompt": str 或 "brief": dict, "output": str,
+             "size": str(可选 cover/article/vertical/square/WxH)}]
+    传 brief 时由 image_prompt_builder 编译成 prompt。
     返回 {"ok": {output: path}, "failed": {output: error_msg}}
     """
     if config is None:
@@ -654,10 +681,11 @@ def generate_images_batch(
         futures = {
             pool.submit(
                 generate_image,
-                t["prompt"],
+                t.get("prompt", ""),
                 t["output"],
                 t.get("size", "cover"),
                 config,
+                t.get("brief"),
             ): t["output"]
             for t in tasks
         }
@@ -672,21 +700,48 @@ def generate_images_batch(
     return results
 
 
-def _run_batch(batch_path: str, max_workers: int, provider_override: str = None):
-    with open(batch_path, "r", encoding="utf-8") as f:
-        tasks = json.load(f)
+def _run_batch(batch_path: str, max_workers: int, provider_override: str = None,
+               dry_run: bool = False):
+    try:
+        with open(batch_path, "r", encoding="utf-8") as f:
+            tasks = json.load(f)
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"Error: cannot read batch file: {exc}", file=sys.stderr)
+        sys.exit(1)
     if not isinstance(tasks, list) or not tasks:
         print("Error: batch file must be a non-empty JSON array", file=sys.stderr)
         sys.exit(1)
-    for i, t in enumerate(tasks):
-        if not t.get("prompt") or not t.get("output"):
-            print(f"Error: task[{i}] needs both 'prompt' and 'output'", file=sys.stderr)
+
+    normalized = []
+    for i, task in enumerate(tasks):
+        if not isinstance(task, dict):
+            print(f"Error: task[{i}] must be an object", file=sys.stderr)
             sys.exit(1)
+        if not task.get("output"):
+            print(f"Error: task[{i}] needs 'output'", file=sys.stderr)
+            sys.exit(1)
+        try:
+            prompt = _task_prompt(task, f"task[{i}]")
+        except ValueError as exc:
+            print(f"Error: {exc}", file=sys.stderr)
+            sys.exit(1)
+        normalized.append(
+            {
+                "prompt": prompt,
+                "output": task["output"],
+                "size": task.get("size", "cover"),
+            }
+        )
+
+    if dry_run:
+        print(json.dumps(normalized, ensure_ascii=False, indent=2))
+        return
+
     config = _load_config()
     if provider_override:
         config.setdefault("image", {})["provider"] = provider_override
     t0 = time.time()
-    results = generate_images_batch(tasks, config=config, max_workers=max_workers)
+    results = generate_images_batch(normalized, config=config, max_workers=max_workers)
     elapsed = time.time() - t0
     print(
         f"Batch finished in {elapsed:.1f}s: {len(results['ok'])} ok, {len(results['failed'])} failed",
@@ -705,21 +760,38 @@ def main():
     ap.add_argument("--provider", default=None, help=f"Override provider ({', '.join(PROVIDERS)})")
     ap.add_argument(
         "--batch", default=None,
-        help="JSON file: [{prompt, output, size?}, ...]; generates concurrently",
+        help="JSON file: [{output, prompt | brief, size?}, ...]; generates concurrently",
     )
+    ap.add_argument("--brief", default=None, help="JSON brief file for a single image")
+    ap.add_argument("--dry-run", action="store_true", help="Print compiled prompts, do not call providers")
     ap.add_argument("--workers", type=int, default=5, help="Concurrent workers for --batch (default 5)")
     args = ap.parse_args()
     try:
         if args.batch:
-            _run_batch(args.batch, args.workers, args.provider)
+            _run_batch(args.batch, args.workers, args.provider, dry_run=args.dry_run)
             return
-        if not args.prompt or not args.output:
-            print("Error: --prompt/--output required (or use --batch)", file=sys.stderr)
+        if not args.output or (not args.prompt and not args.brief):
+            print("Error: --output plus --prompt or --brief required (or use --batch)", file=sys.stderr)
             sys.exit(1)
+        brief = None
+        if args.brief:
+            brief = json.loads(Path(args.brief).read_text(encoding="utf-8"))
+        if args.dry_run:
+            print(json.dumps(
+                {
+                    "output": args.output,
+                    "size": args.size,
+                    "prompt": _compile_brief(brief, "brief") if brief else args.prompt,
+                },
+                ensure_ascii=False,
+                indent=2,
+            ))
+            return
         config = _load_config()
         if args.provider:
             config.setdefault("image", {})["provider"] = args.provider
-        path = generate_image(args.prompt, args.output, size=args.size, config=config)
+        path = generate_image(args.prompt or "", args.output, size=args.size,
+                              config=config, brief=brief)
         print(f"Image saved: {path}")
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)

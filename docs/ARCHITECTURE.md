@@ -64,7 +64,8 @@ graph TD
 | `theme_library.py` | 库内主题 spec、排版去重与 `ThemeConfig` 构建 |
 | `publisher.py` | 草稿箱 API 封装 |
 | `wechat_api.py` | 上传图片/封面色块 |
-| `image_gen.py` | AI 配图生成（多 provider，支持 `--batch`） |
+| `image_gen.py` | AI 配图生成（多 provider，支持 `--batch`、`--brief`、`--dry-run`） |
+| `image_prompt_builder.py` | 结构化 brief → 中文提示词（5 类模板，含文字白名单与负面约束） |
 | `config_manager.py` | 配置加载、校验与单例缓存 |
 | `config.py` | 配置加载统一出口，兼容旧调用 |
 

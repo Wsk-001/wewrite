@@ -24,6 +24,7 @@ COPY_FILES = [
     "requirements.txt",
     "install.sh",
     "VERSION",
+    "THIRD_PARTY_NOTICES.md",
 ]
 
 STRIP_FRONTMATTER_KEYS = {"allowed-tools"}

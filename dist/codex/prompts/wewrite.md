@@ -142,24 +142,32 @@
 
 ```
 读取: {skill_dir}/references/pipeline/visual-prompts.md
-按 visual-prompts.md 生成配图，并强制执行其中两节：
+按 visual-prompts.md 写结构化 brief，用 image_prompt_builder 编译提示词，并强制执行其中三节：
 - 「生成前：场景实况检索」——配图涉及真实场景/动作/流程/器物时，先 websearch 查清
-  真实细节（动作要领、器物方位、步骤顺序）写进提示词，再生成
+  真实细节（动作要领、器物方位、步骤顺序）写进 brief，再编译
+- 「图内文字规范」——只允许 brief 里的 title/模块文案/data/text 出现在画面里，
+  生成后逐字核对，出现乱码就减字或整图去文字
 - 「生成后：视觉 bug 自检闭环」——每张图生成后必须读图自检（按清单逐项核对），
-  不通过则修订提示词重生成，全部通过才允许进入 Step 7
+  不通过则改 brief 重生成，全部通过才允许进入 Step 7
 
 多张配图（封面 + 正文图）必须一次批量并发生成，逐张串行调用会被判为流程错误：
-1. 写 batch 文件 {skill_dir}/output/.imgbatch.json：
-   [{"prompt": "...", "output": "{skill_dir}/output/xxx-1.jpg", "size": "article"},
-    {"prompt": "...", "output": "{skill_dir}/output/cover-xxx.jpg", "size": "cover"}]
-2. 运行: python3 {skill_dir}/toolkit/image_gen.py --batch {skill_dir}/output/.imgbatch.json --workers 5
-3. 读 stdout JSON 确认 ok/failed；failed 的图修 prompt 后单独重跑该张
-4. 自检不通过的图只重生成该一张，其余不动
+1. 写 batch 文件 {skill_dir}/output/.imgbatch.json，每项直接放 brief：
+   [{"brief": {"template": "cover", "subject": "...", "key_points": ["..."]},
+     "output": "{skill_dir}/output/cover-xxx.jpg", "size": "cover"},
+    {"brief": {"template": "flowchart", "subject": "...", "modules": [{"title": "..."}]},
+     "output": "{skill_dir}/output/xxx-1.jpg", "size": "article"}]
+2. 先 dry-run 看编译结果: python3 {skill_dir}/toolkit/image_gen.py --batch {skill_dir}/output/.imgbatch.json --dry-run
+3. 运行: python3 {skill_dir}/toolkit/image_gen.py --batch {skill_dir}/output/.imgbatch.json --workers 5
+4. 读 stdout JSON 确认 ok/failed；failed 的图改 brief 后单独重跑该张
+5. 自检不通过的图只重生成该一张，其余不动
+
+5 类模板（infographic / scientific-scale / nature-science-poster / illustration /
+scene）的字段与示例见 visual-prompts.md。`--dry-run` 只编译提示词、不调用 provider。
 
 视觉自检同样禁止逐张串行：把本批全部图片在同一条消息里并行读图（或并行建
 image_analysis 任务后统一收结果），一次性按清单核对；不通过的收集成第二批，
 一次 batch 重生成后再并发复检。整个 Step 6 只允许「批量生成 → 并发自检 →
-批量重生成 → 复检」一轮循环，超过两轮说明提示词本身有系统性问题，回头修提示词模板。
+批量重生成 → 复检」一轮循环，超过两轮说明 brief 或模板有系统性问题，回头修模板。
 ```
 
 ---
