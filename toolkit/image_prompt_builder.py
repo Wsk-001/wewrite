@@ -333,6 +333,7 @@ def _render_nature_science_poster(
 ) -> tuple[list[str], list[str], list[str]]:
     title = _optional_text(brief, "title") or subject
     subtitle = _optional_text(brief, "subtitle")
+    scene = _optional_text(brief, "scene")
     points = _text_list(brief, "key_points")
     if len(points) > 4:
         raise BriefError("field 'key_points' supports at most 4 items")
@@ -346,6 +347,8 @@ def _render_nature_science_poster(
     ]
     if subtitle:
         lines.append(f"副标题文字：「{subtitle}」")
+    if scene:
+        lines.append(f"场景：{scene}")
     lines.extend(
         [
             "构图：主体占据画面 45%-65%，标题区留白，视觉中心明确。",

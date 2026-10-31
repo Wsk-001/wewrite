@@ -46,7 +46,7 @@
   `audience` 可选。
 - `scientific-scale`：`scale_steps` 4-8 项，每项 `name` 必填，`detail`、`unit` 可选；
   `direction` 默认“从微观到宏观”。
-- `nature-science-poster`：`key_points` 最多 4 条短标签；`subtitle` 可选。
+- `nature-science-poster`：`key_points` 最多 4 条短标签；`subtitle`、`scene` 可选。
 - `illustration`：`scene` 必填；`mood` 可选，默认克制温和。
 - `scene`：`action`、`environment` 必填；`camera`、`lighting` 可选。
 
@@ -74,6 +74,18 @@
 - 未提供任何文字时，编译器明确要求画面不出现文字、字母、数字或伪文字。
 - 生成后必须读图核对：文字逐字正确、数字与原文一致、没有乱码/错字/伪英文。
 - 文字出错时先改 brief 或减少文字量重生成；仍不稳定就整图去文字，改用图形与图标。
+
+### 实测结论（z-image-turbo）
+
+2026-10-31 用 `nature-science-poster` 封面实测：标题“久坐一小时”正确，但三个短标签
+出现“肌肉停工”变“肌肉肉修工”、额外多出“腰肉修工”等错字。当前 provider 对多段
+中文的逐字还原不稳定，因此：
+
+- 封面默认走无字路线：用 `illustration` 表达概念，或 `nature-science-poster` 时
+  省略 `key_points`，只保留标题。
+- 需要带字时，图内文字总量控制在 2 条以内（标题 + 1 个短标签），每条不超过 8 字。
+- 关键数字优先放进正文或信息图正文，封面只做视觉钩子。
+- 任何一处错字都要减字重生成；两轮仍错就切无字版本。
 
 ## 四、生成前：场景实况检索
 

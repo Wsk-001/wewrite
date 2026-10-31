@@ -69,6 +69,19 @@ def test_poster_rejects_more_than_four_key_points():
         build_prompt(brief)
 
 
+def test_poster_scene_anchor_and_no_key_points():
+    prompt = build_prompt(
+        {
+            "template": "cover",
+            "subject": "久坐",
+            "title": "久坐一小时",
+            "scene": "办公室工位，人物保持坐姿，侧身中景",
+        }
+    )
+    assert "场景：办公室工位" in prompt
+    assert "图中文字：只允许逐字出现以下内容：「久坐一小时」" in prompt
+
+
 def test_illustration_without_text_declares_no_text():
     prompt = build_prompt(
         {
