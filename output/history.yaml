@@ -523,6 +523,27 @@ publishes:
     note: 8 步流程完成；合规 0 error、SEO 0 error（3 个次要关键词位置警告）、反 AI 26.81 在区间、正文 2057 字；配图 5 张批量生成+并发读图自检，第 4 张首版涂错部位（涂到脚背），改为脚后跟朝镜头重生成后通过；草稿已核验标题 20 字、作者、摘要、4 图、无 Markdown 残留
     media_id: q_zrQd1gVlCJUeajP8dHyQFe_h7Ndakgoqo8d0Wr_xr96ESe8MOMwFVirLLvHO2C
     action: 以此版发布
+tietu:
+- id: 2026-11-01-niaosu-tietu
+  date: '2026-11-01'
+  kind: tietu-newspic
+  title: 9块9的尿素霜，别往脸上乱涂
+  article: output/niaosu-shuang.md
+  article_title: 几块钱的尿素霜火了，20%那款别往脸上涂
+  storyboard: output/niaosu-tietu/storyboard.json
+  images:
+  - output/niaosu-tietu/tietu-1.jpg
+  - output/niaosu-tietu/tietu-2.jpg
+  - output/niaosu-tietu/tietu-3.jpg
+  - output/niaosu-tietu/tietu-4.jpg
+  - output/niaosu-tietu/tietu-5.jpg
+  - output/niaosu-tietu/tietu-6.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 6 格漫画贴图 1080x1440，图片与正文均无 AI 字样；raw-1 重生成两次（带标签瓶罐→无手静物）、raw-2 重生成（乳霜质地无手）；第 6 格缩略图改用原始底图，去掉小字噪声
+    media_id: q_zrQd1gVlCJUeajP8dHyTj5NJbC8QMa3KEGXaYkPZpHjrxwvdN1LolQhUeDzpG7
+    action: 待文章发布后补原文链接再发布
 style_sources:
 - date: '2026-10-10'
   note: 从账号 9 篇已发文章学习写作与配图风格
