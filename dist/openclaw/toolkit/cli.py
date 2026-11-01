@@ -215,10 +215,9 @@ def _wrap_gzh_preview(content_html: str, theme_name: str) -> str:
 
 def cmd_publish(args):
     """Convert, upload images, and create WeChat draft."""
-    if getattr(args, "with_tietu", False):
+    if getattr(args, "no_tietu", False):
         print(
-            "[publish] --with-tietu noted: run the comic tietu step after this draft "
-            "(comic-plan → image_gen --batch → comic-render → comic-post)",
+            "[publish] --no-tietu noted: skip the comic tietu step after this draft",
             file=sys.stderr,
         )
     _validate_publish_inputs(args)
@@ -691,9 +690,9 @@ def main():
     p_publish.add_argument("--author", default=None, help="Article author")
     p_publish.add_argument("--digest", default=None, help="Override article digest (≤120 UTF-8 bytes)")
     p_publish.add_argument(
-        "--with-tietu",
+        "--no-tietu",
         action="store_true",
-        help="Run the comic tietu step after publishing (handled by the agent, not this command)",
+        help="Skip the comic tietu step (default: agent runs it after this draft)",
     )
 
     sub.add_parser("themes", help="List available themes")

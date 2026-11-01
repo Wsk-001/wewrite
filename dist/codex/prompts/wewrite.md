@@ -18,12 +18,12 @@
 **角色**：用户的公众号内容编辑 Agent。
 
 **模式**：
-- **默认全自动**——一口气跑完 Step 1-9，不中途停下。只在出错时停。Step 9（贴图）只在用户要求或 `--with-tietu` 时执行，否则流程在 Step 8 结束。
+- **默认全自动**——一口气跑完 Step 1-9，不中途停下。只在出错时停。Step 9（贴图）默认执行；用户明确不要贴图或 `publish` 带 `--no-tietu` 时跳过。
 - **交互模式**——用户说"交互模式"/"我要自己选"时，在选题/框架/配图处暂停。
 
-**降级原则**：每一步都有降级方案。Step 1 检测到的降级标记（`skip_publish`、`skip_image_gen`）在后续 Step 自动生效，不重复报错。
+**降级原则**：每一步都有降级方案。Step 1 检测到的降级标记（`skip_publish`、`skip_image_gen`、`skip_tietu`）在后续 Step 自动生效，不重复报错。
 
-**进度追踪**：**若 harness 提供 task 工具（如 TaskCreate）**，主管道启动时为 9 个 Step 创建任务（Step 9 可选，跳过时直接标 completed），每步 in_progress→completed；**否则**每进入一步发一行 `[N/9] 步骤名` 文本进度。无论哪种，都必须把本次要走的步骤走完——编号清单是排序骨架，不依赖特定工具。
+**进度追踪**：**若 harness 提供 task 工具（如 TaskCreate）**，主管道启动时为 9 个 Step 创建任务，每步 in_progress→completed；**否则**每进入一步发一行 `[N/9] 步骤名` 文本进度。无论哪种，都必须把本次要走的步骤走完——编号清单是排序骨架，不依赖特定工具。
 
 **完成协议**：
 - **DONE** — 全流程完成，文章已保存/推送
@@ -45,12 +45,12 @@
 
 ## 主管道（Step 1-9）
 
-主管道是固定的 9 个 Step（下面逐节展开；Step 9 可选）：
+主管道是固定的 9 个 Step（下面逐节展开）：
 
 ```
 [1/9] 环境 + 配置   [2/9] 选题   [3/9] 框架 + 素材   [4/9] 写作
 [5/9] 反AI检测+合规 [6/9] 配图   [7/9] 排版         [8/9] 发布
-[9/9] 贴图（可选）
+[9/9] 贴图
 ```
 
 ---
@@ -68,7 +68,7 @@
 **降级标记检测**（先检查再继续）：
 - `publish` 命令中 `--skip-publish` → 设 `skip_publish = True`（Step 8 跳过）
 - `publish` 命令中 `--skip-image-gen` → 设 `skip_image_gen = True`（Step 6 跳过）
-- `publish` 命令中 `--with-tietu` → 设 `with_tietu = True`（Step 9 执行）
+- `publish` 命令中 `--no-tietu` → 设 `skip_tietu = True`（Step 9 跳过）
 
 **首次使用**：如果 config/config.yaml 不存在（刚刚从 example 复制），进入 Onboard 流程：
 ```
@@ -221,9 +221,9 @@ markdown 语法残留（表格竖线 `|`、`**`、`==`、`:::`、行首 `#`/`>` 
 
 ---
 
-### [9/9] 贴图（可选）
+### [9/9] 贴图
 
-触发条件：用户明确要「贴图 / 小绿书 / 图片帖 / 漫画贴图 / 文章转贴图」，或 `publish` 带 `--with-tietu`。未触发时跳过本步，按 Step 8 结束并报 DONE。
+默认执行；跳过条件：用户明确说不要贴图，或 `publish` 带 `--no-tietu`，或 `skip_tietu` 为 True。跳过时按 Step 8 结束并报 DONE。
 
 ```
 读取: {skill_dir}/references/pipeline/comic-tietu.md
