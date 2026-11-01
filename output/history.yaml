@@ -504,6 +504,25 @@ publishes:
     note: 8 步流程完成；合规 0 error、SEO 0 error（标题压到 21 字）、反 AI 35.77 在区间、正文 2500 字；配图 5 张批量生成+逐张读回自检，第 2 张首版仰漂被误读为游泳，且人像场景触发内容审核，改为“水里的异常信号”信息图后通过；草稿标题经 draft/update 改为短标题，作者与摘要已核验
     media_id: q_zrQd1gVlCJUeajP8dHyatDiMhyS-vvp-0OqGhDBRs0UfjOpnImN5a1GjF1SGdG
     action: 以此版发布
+- id: 2026-11-01-niaosu-shuang
+  date: '2026-11-01'
+  title: 几块钱的尿素霜火了，20%那款别往脸上涂
+  topic: 尿素霜浓度与部位科普（热点选题，微博「几块钱尿素霜爆火别乱用」热度 88.2；90 天公众号同题仅 2 篇，无饱和；核心：尿素是皮肤天然保湿因子、≤10% 保湿 >10% 去角质、面部 2%-5%/身体 5%-10%/20%-30% 局部厚皮、破皮炎症禁用、不叠加酸类/A醇、看国药准字/妆字号与浓度）
+  article: output/niaosu-shuang.md
+  theme: moyu-green
+  humanness_score: 26.8
+  cover: output/niaosu-cover.jpg
+  inline_images:
+  - output/niaosu-1.jpg
+  - output/niaosu-2.jpg
+  - output/niaosu-3.jpg
+  - output/niaosu-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 8 步流程完成；合规 0 error、SEO 0 error（3 个次要关键词位置警告）、反 AI 26.81 在区间、正文 2057 字；配图 5 张批量生成+并发读图自检，第 4 张首版涂错部位（涂到脚背），改为脚后跟朝镜头重生成后通过；草稿已核验标题 20 字、作者、摘要、4 图、无 Markdown 残留
+    media_id: q_zrQd1gVlCJUeajP8dHyQFe_h7Ndakgoqo8d0Wr_xr96ESe8MOMwFVirLLvHO2C
+    action: 以此版发布
 style_sources:
 - date: '2026-10-10'
   note: 从账号 9 篇已发文章学习写作与配图风格
