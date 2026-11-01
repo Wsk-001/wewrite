@@ -1,9 +1,10 @@
 ---
 name: wewrite
 description: |
-  微信公众号内容全流程助手：热点抓取 → 选题 → 框架 → 内容增强 → 写作 → SEO → 视觉AI → 排版推送草稿箱。
+  微信公众号内容全流程助手：热点抓取 → 选题 → 框架 → 内容增强 → 写作 → SEO → 视觉AI → 排版推送草稿箱 → 贴图。
   触发关键词：公众号、推文、微信文章、微信推文、草稿箱、微信排版、选题、热搜、
-  热点抓取、封面图、配图、写公众号、写一篇、主题画廊、排版主题、容器语法。
+  热点抓取、封面图、配图、写公众号、写一篇、主题画廊、排版主题、容器语法、
+  贴图、小绿书、图片帖、漫画贴图、文章转贴图。
   也覆盖：markdown 转微信格式、学习用户改稿风格、文章数据复盘、风格设置、
   主题预览/切换、:::dialogue/:::timeline/:::callout/:::highlight/:::summary 容器语法。
   不应被通用的"写文章"、blog、邮件、PPT、抖音/短视频、网站 SEO 触发——
@@ -29,12 +30,12 @@ allowed-tools:
 **角色**：用户的公众号内容编辑 Agent。
 
 **模式**：
-- **默认全自动**——一口气跑完 Step 1-8，不中途停下。只在出错时停。
+- **默认全自动**——一口气跑完 Step 1-9，不中途停下。只在出错时停。Step 9（贴图）只在用户要求或 `--with-tietu` 时执行，否则流程在 Step 8 结束。
 - **交互模式**——用户说"交互模式"/"我要自己选"时，在选题/框架/配图处暂停。
 
 **降级原则**：每一步都有降级方案。Step 1 检测到的降级标记（`skip_publish`、`skip_image_gen`）在后续 Step 自动生效，不重复报错。
 
-**进度追踪**：**若 harness 提供 task 工具（如 TaskCreate）**，主管道启动时为 8 个 Step 创建任务，每步 in_progress→completed；**否则**每进入一步发一行 `[N/8] 步骤名` 文本进度。无论哪种，都必须把 8 步走完——编号清单是排序骨架，不依赖特定工具。
+**进度追踪**：**若 harness 提供 task 工具（如 TaskCreate）**，主管道启动时为 9 个 Step 创建任务（Step 9 可选，跳过时直接标 completed），每步 in_progress→completed；**否则**每进入一步发一行 `[N/9] 步骤名` 文本进度。无论哪种，都必须把本次要走的步骤走完——编号清单是排序骨架，不依赖特定工具。
 
 **完成协议**：
 - **DONE** — 全流程完成，文章已保存/推送
@@ -54,18 +55,19 @@ allowed-tools:
 
 ---
 
-## 主管道（Step 1-8）
+## 主管道（Step 1-9）
 
-主管道是固定的 8 个 Step（下面逐节展开）：
+主管道是固定的 9 个 Step（下面逐节展开；Step 9 可选）：
 
 ```
-[1/8] 环境 + 配置   [2/8] 选题   [3/8] 框架 + 素材   [4/8] 写作
-[5/8] 反AI检测+合规 [6/8] 配图   [7/8] 排版         [8/8] 发布
+[1/9] 环境 + 配置   [2/9] 选题   [3/9] 框架 + 素材   [4/9] 写作
+[5/9] 反AI检测+合规 [6/9] 配图   [7/9] 排版         [8/9] 发布
+[9/9] 贴图（可选）
 ```
 
 ---
 
-### [1/8] 环境 + 配置
+### [1/9] 环境 + 配置
 
 ```
 读取: {skill_dir}/config/config.yaml（若不存在则从 config/config.example.yaml 复制）
@@ -78,6 +80,7 @@ allowed-tools:
 **降级标记检测**（先检查再继续）：
 - `publish` 命令中 `--skip-publish` → 设 `skip_publish = True`（Step 8 跳过）
 - `publish` 命令中 `--skip-image-gen` → 设 `skip_image_gen = True`（Step 6 跳过）
+- `publish` 命令中 `--with-tietu` → 设 `with_tietu = True`（Step 9 执行）
 
 **首次使用**：如果 config/config.yaml 不存在（刚刚从 example 复制），进入 Onboard 流程：
 ```
@@ -88,7 +91,7 @@ allowed-tools:
 
 ---
 
-### [2/8] 选题
+### [2/9] 选题
 
 ```
 读取: {skill_dir}/references/pipeline/topic-selection.md
@@ -100,7 +103,7 @@ allowed-tools:
 
 ---
 
-### [3/8] 框架 + 素材
+### [3/9] 框架 + 素材
 
 ```
 读取: {skill_dir}/references/pipeline/frameworks.md
@@ -109,7 +112,7 @@ allowed-tools:
 
 ---
 
-### [4/8] 写作
+### [4/9] 写作
 
 ```
 读取: {skill_dir}/references/pipeline/writing-guide.md
@@ -124,7 +127,7 @@ allowed-tools:
 
 ---
 
-### [5/8] 反AI检测 + 合规扫描
+### [5/9] 反AI检测 + 合规扫描
 
 ```
 运行: python3 {skill_dir}/scripts/humanness_score.py {skill_dir}/output/{文章}.md --json
@@ -147,7 +150,7 @@ allowed-tools:
 
 ---
 
-### [6/8] 配图
+### [6/9] 配图
 
 如果 `skip_image_gen` 为 True，跳过此 Step。
 
@@ -183,7 +186,7 @@ image_analysis 任务后统一收结果），一次性按清单核对；不通�
 
 ---
 
-### [7/8] 排版
+### [7/9] 排版
 
 将 Markdown 转换为微信排版。主题库共 50 套（核心 7 套 + 库内代表 43 套），全部可用 `--theme {id}` 指定；按排版相似度去重后覆盖 8 种结构化版式（圆角徽章/杂志编辑/临床直角/色块刊头/极简/报纸/海报/侧栏书页），排版结构真正不同而非仅换色。完整清单见 `python3 {skill_dir}/toolkit/cli.py themes`，视觉样例见 `output/theme-samples/index.html` 与 `output/theme-samples/library/index.html`。auto 模式按内容自动配色。
 
@@ -195,7 +198,7 @@ image_analysis 任务后统一收结果），一次性按清单核对；不通�
 
 ---
 
-### [8/8] 发布
+### [8/9] 发布
 
 如果 `skip_publish` 为 True，跳过此 Step。
 
@@ -227,6 +230,36 @@ markdown 语法残留（表格竖线 `|`、`**`、`==`、`:::`、行首 `#`/`>` 
 - 同一文章重发新版本时，在 `drafts` 下追加新版本，旧版本 `action` 改为 `待删除`
 
 **草稿箱清理提醒**：微信 publish 每次新建草稿、不覆盖旧稿。提醒用户清理前，**先调 `draft/batchget` API 查询草稿箱实时列表**，只提醒本档案中 `action: 待删除` 且在实时列表中真实存在的旧版——档案可能与实际不同步，实时 API 为准；用户确认删除后，立即把对应版本的 `action` 更新为 `已删除`，避免重复提醒。
+
+---
+
+### [9/9] 贴图（可选）
+
+触发条件：用户明确要「贴图 / 小绿书 / 图片帖 / 漫画贴图 / 文章转贴图」，或 `publish` 带 `--with-tietu`。未触发时跳过本步，按 Step 8 结束并报 DONE。
+
+```
+读取: {skill_dir}/references/pipeline/comic-tietu.md
+按 comic-tietu.md 的 schema 写 {skill_dir}/output/{文章slug}-tietu/storyboard.json
+运行: python3 {skill_dir}/toolkit/cli.py comic-plan {storyboard}
+运行: python3 {skill_dir}/toolkit/image_gen.py --batch {storyboard 目录}/batch.json --workers 5
+并发读图自检: 按 comic-tietu.md「自检清单」一次性核对全部底图
+运行: python3 {skill_dir}/toolkit/cli.py comic-render {storyboard}
+检查: preview.jpg / preview.html 的叠字、错字、裁切、回顾卡缩略图
+运行: python3 {skill_dir}/toolkit/cli.py comic-post {storyboard}
+```
+
+**要点**：
+- 5-8 格，默认 6 格；首图即封面，微信图片帖上限 9 张
+- 目标 1080x1440；生图用 1152x1536（宽高须为 16 的倍数），渲染时居中裁切
+- `caption` 是唯一允许出现在画面里的文案来源；底图 prompt 必须禁止文字、字母、数字
+- 图片和正文一律不加「AI 生成」字样；平台侧如需声明，由发布时勾选
+- 自检不通过只改 brief 重生成那一张，其余不动；禁止逐张串行生成
+- 文章已发布：在后台给贴图补原文链接再发布；文章仍是草稿：可以先建贴图草稿，
+  在 `manifest.json` 的 `note` 写明「文章发布后补原文链接再发布」
+- 群发通知一天只有一次：文章 D0 群发、贴图 D1 群发；同日发就关掉贴图的群发通知
+
+**贴图归档**（必须执行）：在 `{skill_dir}/output/history.yaml` 的 `tietu:` 列表追加
+记录，字段见 comic-tietu.md「八、归档」；同一贴图重发时在 `drafts` 下追加版本。
 
 ---
 

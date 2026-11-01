@@ -18,7 +18,7 @@ graph TD
 
 | 目录 / 文件 | 职责 | 是否入库 |
 |------------|------|---------|
-| `SKILL.md` | 技能主定义：8 步主管道 + 行为声明 + 路径约定 | 是 |
+| `SKILL.md` | 技能主定义：9 步主管道（Step 9 贴图可选）+ 行为声明 + 路径约定 | 是 |
 | `README.md` | 对外说明与快速开始 | 是 |
 | `install.sh` | 创建 `.venv` 并安装依赖 | 是 |
 | `requirements.txt` | Python 依赖清单 | 是 |
@@ -48,7 +48,7 @@ graph TD
 
 | 子目录 | 内容 |
 |--------|------|
-| `pipeline/` | 主管道文档：选题、框架、写作指南、内容增强、排版样式、视觉提示、实时核查 |
+| `pipeline/` | 主管道文档：选题、框架、写作指南、内容增强、排版样式、视觉提示、实时核查、贴图 |
 | `compliance/` | 合规与 SEO：SEO 规则、微信限制 |
 | `guides/` | 使用指南：上手、命令分发、风格模板、改稿学习、效果复盘 |
 | `examples/` | 范文库：exemplars/、source_articles/、exemplar-seeds（用户内容 gitignore） |
@@ -57,7 +57,7 @@ graph TD
 
 | 文件 | 职责 |
 |------|------|
-| `cli.py` | 命令行入口：preview / publish / themes / gallery / image-post / learn-theme |
+| `cli.py` | 命令行入口：preview / publish / themes / gallery / image-post / comic-plan / comic-render / comic-post / learn-theme |
 | `gzh_converter.py` | Markdown → 微信内联样式 HTML，含容器语法、8 种版式与整页背景 |
 | `theme_base.py` | 主题共享数据类 `ThemeConfig` |
 | `theme_configs.py` | 50 套主题注册（核心 7 套 + 库内代表 43 套）与 `auto` 自适应配色 |
@@ -66,6 +66,7 @@ graph TD
 | `wechat_api.py` | 上传图片/封面色块 |
 | `image_gen.py` | AI 配图生成（多 provider，支持 `--batch`、`--brief`、`--dry-run`） |
 | `image_prompt_builder.py` | 结构化 brief → 中文提示词（5 类模板，含文字白名单与负面约束） |
+| `comic.py` | 贴图流水线：storyboard 校验、batch 构建、叠字渲染、回顾卡、预览页 |
 | `config_manager.py` | 配置加载、校验与单例缓存 |
 | `config.py` | 配置加载统一出口，兼容旧调用 |
 

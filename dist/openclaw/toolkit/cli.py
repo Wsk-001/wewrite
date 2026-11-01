@@ -9,11 +9,13 @@ Usage:
 """
 
 import argparse
+import json
 import os
 import re
 import sys
 import traceback
 import webbrowser
+from datetime import date
 from pathlib import Path
 from urllib.parse import unquote
 
@@ -213,6 +215,12 @@ def _wrap_gzh_preview(content_html: str, theme_name: str) -> str:
 
 def cmd_publish(args):
     """Convert, upload images, and create WeChat draft."""
+    if getattr(args, "with_tietu", False):
+        print(
+            "[publish] --with-tietu noted: run the comic tietu step after this draft "
+            "(comic-plan → image_gen --batch → comic-render → comic-post)",
+            file=sys.stderr,
+        )
     _validate_publish_inputs(args)
 
     cfg = load_config()
@@ -354,6 +362,143 @@ def cmd_image_post(args):
     print(f"  images: {result.image_count}")
     print(f"  title: {title}")
     print("  \u8bf7\u5230\u516c\u4f17\u53f7\u540e\u53f0\u8349\u7a3f\u7bb1\u68c0\u67e5\u5e76\u53d1\u5e03")
+
+
+def cmd_comic_plan(args):
+    """Build an image-gen batch file from a comic storyboard."""
+    from comic import load_storyboard, validate_storyboard, build_batch
+
+    sb = load_storyboard(args.storyboard)
+    warnings = validate_storyboard(sb)
+    base = Path(args.storyboard).resolve().parent
+    raw_dir = Path(args.raw_dir) if args.raw_dir else base / "raw"
+    batch_path = Path(args.batch) if args.batch else base / "batch.json"
+
+    tasks = build_batch(sb, raw_dir)
+    if not tasks:
+        print("Error: storyboard has no AI panels to generate", file=sys.stderr)
+        sys.exit(1)
+    batch_path.parent.mkdir(parents=True, exist_ok=True)
+    batch_path.write_text(
+        json.dumps(tasks, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    for warning in warnings:
+        print(f"[comic-plan] warning: {warning}", file=sys.stderr)
+    print(
+        json.dumps(
+            {
+                "batch": str(batch_path),
+                "raw_dir": str(raw_dir),
+                "tasks": len(tasks),
+                "size": tasks[0]["size"],
+                "warnings": warnings,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
+    print(
+        f"Next: python3 toolkit/image_gen.py --batch {batch_path} --workers 5",
+        file=sys.stderr,
+    )
+
+
+def cmd_comic_render(args):
+    """Render captioned comic panels, recap card, and local preview."""
+    from comic import load_storyboard, validate_storyboard, render
+
+    sb = load_storyboard(args.storyboard)
+    warnings = validate_storyboard(sb)
+    base = Path(args.storyboard).resolve().parent
+    raw_dir = Path(args.raw_dir) if args.raw_dir else base / "raw"
+    out_dir = Path(args.out_dir) if args.out_dir else base
+
+    result = render(sb, raw_dir, out_dir, width=args.width, height=args.height)
+    result["warnings"] = warnings
+    for warning in warnings:
+        print(f"[comic-render] warning: {warning}", file=sys.stderr)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    print(f"Preview: {result['preview_html']}", file=sys.stderr)
+
+
+def cmd_comic_post(args):
+    """Create a WeChat image-post draft from rendered comic panels."""
+    from comic import load_storyboard, validate_storyboard, image_paths
+
+    sb = load_storyboard(args.storyboard)
+    warnings = validate_storyboard(sb)
+    base = Path(args.storyboard).resolve().parent
+    out_dir = Path(args.dir) if args.dir else base
+
+    images = image_paths(sb, out_dir)
+    missing = [str(p) for p in images if not p.exists()]
+    if missing:
+        print(f"Error: rendered panels not found: {', '.join(missing)}", file=sys.stderr)
+        sys.exit(1)
+
+    title = args.title or sb.get("post_title")
+    if not title:
+        print("Error: storyboard.post_title missing and --title not given", file=sys.stderr)
+        sys.exit(1)
+    if len(title) > 32:
+        print("Error: title exceeds 32 chars", file=sys.stderr)
+        sys.exit(1)
+    content = sb.get("post_body") or ""
+
+    cfg = load_config()
+    wechat_cfg = cfg.get("wechat", {})
+    appid = args.appid or wechat_cfg.get("appid")
+    secret = args.secret or wechat_cfg.get("secret")
+    if not appid or not secret:
+        print("Error: --appid and --secret required (or set in config.yaml)", file=sys.stderr)
+        sys.exit(1)
+
+    token = get_access_token(appid, secret)
+    print(f"Uploading {len(images)} comic panels as permanent materials...")
+    media_ids = []
+    for p in images:
+        print(f"  Uploading: {p.name}")
+        media_ids.append(upload_thumb(token, str(p)))
+        print(f"    -> {media_ids[-1]}")
+
+    result = create_image_post(
+        access_token=token,
+        title=title,
+        image_media_ids=media_ids,
+        content=content,
+        open_comment=True,
+    )
+
+    manifest = {
+        "date": date.today().isoformat(),
+        "kind": "tietu-newspic",
+        "status": "draft",
+        "draft_media_id": result.media_id,
+        "article_draft_media_id": args.article_draft_id or sb.get("article_draft_media_id"),
+        "article": sb.get("article"),
+        "article_title": sb.get("article_title"),
+        "post_title": title,
+        "post_body": content,
+        "image_count": result.image_count,
+        "image_media_ids": media_ids,
+        "images": [p.name for p in images],
+        "note": args.note or "",
+    }
+    (out_dir / "manifest.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    (out_dir / "clean-media-ids.json").write_text(
+        json.dumps(media_ids, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    for warning in warnings:
+        print(f"[comic-post] warning: {warning}", file=sys.stderr)
+
+    print("\nImage post draft created!")
+    print(f"  media_id: {result.media_id}")
+    print(f"  images: {result.image_count}")
+    print(f"  title: {title}")
+    print(f"  manifest: {out_dir / 'manifest.json'}")
+    print("  请到公众号后台草稿箱检查并发布")
 
 
 def cmd_gallery(args):
@@ -545,6 +690,11 @@ def main():
     p_publish.add_argument("--title", help="Override article title")
     p_publish.add_argument("--author", default=None, help="Article author")
     p_publish.add_argument("--digest", default=None, help="Override article digest (≤120 UTF-8 bytes)")
+    p_publish.add_argument(
+        "--with-tietu",
+        action="store_true",
+        help="Run the comic tietu step after publishing (handled by the agent, not this command)",
+    )
 
     sub.add_parser("themes", help="List available themes")
 
@@ -554,6 +704,27 @@ def main():
     p_imgpost.add_argument("-c", "--content", default="", help="Plain text description (max ~1000 chars)")
     p_imgpost.add_argument("--appid", default=None, help="WeChat AppID")
     p_imgpost.add_argument("--secret", default=None, help="WeChat AppSecret")
+
+    p_comic_plan = sub.add_parser("comic-plan", help="Build an image batch from a comic storyboard")
+    p_comic_plan.add_argument("storyboard", help="storyboard.json path")
+    p_comic_plan.add_argument("--raw-dir", default=None, help="Directory for raw-N.jpg (default: <storyboard dir>/raw)")
+    p_comic_plan.add_argument("--batch", default=None, help="Batch output path (default: <storyboard dir>/batch.json)")
+
+    p_comic_render = sub.add_parser("comic-render", help="Render captioned panels and preview from raw images")
+    p_comic_render.add_argument("storyboard", help="storyboard.json path")
+    p_comic_render.add_argument("--raw-dir", default=None, help="Directory containing raw-N.jpg")
+    p_comic_render.add_argument("--out-dir", default=None, help="Output directory (default: storyboard dir)")
+    p_comic_render.add_argument("--width", type=int, default=1080, help="Output width (default 1080)")
+    p_comic_render.add_argument("--height", type=int, default=1440, help="Output height (default 1440)")
+
+    p_comic_post = sub.add_parser("comic-post", help="Create a WeChat image-post draft from rendered panels")
+    p_comic_post.add_argument("storyboard", help="storyboard.json path")
+    p_comic_post.add_argument("--dir", default=None, help="Directory with tietu-N.jpg (default: storyboard dir)")
+    p_comic_post.add_argument("-t", "--title", default=None, help="Override storyboard.post_title")
+    p_comic_post.add_argument("--article-draft-id", default=None, help="Article draft media_id to record in manifest")
+    p_comic_post.add_argument("--note", default=None, help="Note for manifest.json")
+    p_comic_post.add_argument("--appid", default=None, help="WeChat AppID")
+    p_comic_post.add_argument("--secret", default=None, help="WeChat AppSecret")
 
     p_gallery = sub.add_parser("gallery", help="Open theme gallery in browser")
     p_gallery.add_argument("input", nargs="?", default=None, help="Markdown file (optional, uses sample if omitted)")
@@ -593,6 +764,12 @@ def main():
             cmd_themes(args)
         elif args.command == "image-post":
             cmd_image_post(args)
+        elif args.command == "comic-plan":
+            cmd_comic_plan(args)
+        elif args.command == "comic-render":
+            cmd_comic_render(args)
+        elif args.command == "comic-post":
+            cmd_comic_post(args)
         elif args.command == "gallery":
             cmd_gallery(args)
     except Exception as e:

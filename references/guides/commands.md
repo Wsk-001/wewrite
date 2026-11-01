@@ -13,7 +13,8 @@
 | 查看范文库 | `python3 {skill_dir}/scripts/extract_exemplar.py --list` |
 | 看看文章数据 | `读取: {skill_dir}/references/guides/effect-review.md` |
 | 看看有什么主题 / 主题画廊 | `python3 {skill_dir}/toolkit/cli.py gallery`（6 套 gzh-design 主题） |
-| 做一个小绿书 / 图片帖 | `python3 {skill_dir}/toolkit/cli.py image-post img1.jpg img2.jpg -t "标题"` |
+| 给这篇文章做贴图 / 漫画贴图 / 文章转贴图 | `读取: {skill_dir}/references/pipeline/comic-tietu.md`，按文档写 `output/<slug>-tietu/storyboard.json`，再依次跑 `comic-plan` → `image_gen.py --batch` → `comic-render` → `comic-post` |
+| 做一个小绿书 / 图片帖（已有成品图） | `python3 {skill_dir}/toolkit/cli.py image-post img1.jpg img2.jpg -t "标题"` |
 | 更新 / 更新 WeWrite / 升级 | 在 {skill_dir} 执行 `git pull origin main`，完成后告知版本变化 |
 | 检查一下 / 自检 / 这篇文章怎么样 | 见下方「自检报告」 |
 
