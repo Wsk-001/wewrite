@@ -542,7 +542,46 @@ publishes:
     note: 9 步流程完成；人味 30.5 在区间、合规 0、SEO 0 error、与库内查重 0.013；配图 5 张批量生成+并发自检，图1 首版模块重复且灯泡发光，重生成后通过；草稿核验标题、摘要、4 图、作者正确
     media_id: q_zrQd1gVlCJUeajP8dHyWdBzZgR5to8KyxKivd2djM2gjlsvYC9OMdYod21HblO
     action: 待发布
+- id: 2026-11-02-kaohongshu-tianta
+  date: '2026-11-02'
+  title: 烤红薯天塌了？香味是天然的，真正该注意的另有4件事
+  topic: 烤红薯香精恐慌辟谣（热点选题，综合评分 9.0，来源：百度热搜第2名，话题阅读量超2000万，11月1日博主爆料无实据）
+  article: output/kaohongshu.md
+  theme: moyu-green
+  humanness_score: 32.99
+  cover: output/cover-kaohongshu.jpg
+  inline_images:
+  - output/kaohongshu-1.jpg
+  - output/kaohongshu-2.jpg
+  - output/kaohongshu-3.jpg
+  - output/kaohongshu-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 9 步流程完成；人味 32.99 在区间（首轮 35.45 因负面情绪句占比 1% 偏高，补 2 处后 32.99）、合规 0、SEO 0 error；配图 5 张批量生成+并发自检，图1 标题「香味从哪来」首版顶部裁切，加边距约束重生成后通过；草稿核验标题 25 字、摘要、4 图、作者正确
+    media_id: q_zrQd1gVlCJUeajP8dHyb-YSvfzaaKWzS8lv4AE_fT2o0hUbmvzeH6g01ZyuU9i
+    action: 待发布
 tietu:
+- id: 2026-11-02-kaohongshu-tietu
+  date: '2026-11-02'
+  kind: tietu-newspic
+  title: 烤红薯天塌了？6张图看真相
+  article: output/kaohongshu.md
+  article_title: 烤红薯天塌了？香味是天然的，真正该注意的另有4件事
+  storyboard: output/kaohongshu-tietu/storyboard.json
+  images:
+  - output/kaohongshu-tietu/tietu-1.jpg
+  - output/kaohongshu-tietu/tietu-2.jpg
+  - output/kaohongshu-tietu/tietu-3.jpg
+  - output/kaohongshu-tietu/tietu-4.jpg
+  - output/kaohongshu-tietu/tietu-5.jpg
+  - output/kaohongshu-tietu/tietu-6.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 6 格贴图 1080x1440；5 张 AI 底图一次通过读图自检（流糖/干粉对比、黑斑细节、无文字无水印）；渲染后核对叠字与回顾卡均正确；图片与正文均无 AI 字样
+    media_id: q_zrQd1gVlCJUeajP8dHySONJlktt6ylF-EF83i7_a1iGM_5ScIUrMcGwPlIJ-rY
+    action: 待文章发布后补原文链接再发布
 - id: 2026-11-01-niaosu-tietu
   date: '2026-11-01'
   kind: tietu-newspic
