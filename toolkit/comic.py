@@ -12,7 +12,7 @@ Storyboard schema (see references/pipeline/comic-tietu.md):
 {
   "article": "output/foo.md",
   "article_title": "...",
-  "post_title": "...",              # <= 32 chars, used by comic-post
+  "post_title": "...",              # <= 32 chars (editor caps at 20), used by comic-post
   "post_body": "...",               # <= 1000 chars
   "style_anchor": "...",
   "size": "1152x1536",              # generation size, 16-multiples
@@ -157,8 +157,15 @@ def validate_storyboard(sb):
             raise ComicError(f"panel {no}.brief must be an object")
 
     title = sb.get("post_title")
-    if title is not None and len(title) > 32:
-        raise ComicError("storyboard.post_title must be <= 32 chars")
+    if title is not None:
+        if len(title) > 32:
+            raise ComicError("storyboard.post_title must be <= 32 chars")
+        if len(title) > 20:
+            warnings.append(
+                "post_title is "
+                f"{len(title)} chars; the WeChat image-post editor caps titles at "
+                "20 chars, so shorten it before publishing from the web UI"
+            )
     body = sb.get("post_body") or ""
     if len(body) > 1000:
         raise ComicError("storyboard.post_body must be <= 1000 chars")

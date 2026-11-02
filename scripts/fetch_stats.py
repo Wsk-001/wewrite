@@ -74,23 +74,31 @@ def _atomic_write_yaml(path: Path, data: dict):
         raise
 
 
+def _history_path() -> Path:
+    primary = SKILL_DIR / "output" / "history.yaml"
+    if primary.exists():
+        return primary
+    return SKILL_DIR / "history.yaml"
+
+
 def update_history(stats_list: list[dict]):
-    history_path = SKILL_DIR / "history.yaml"
+    history_path = _history_path()
     if not history_path.exists():
         print("No history.yaml found.")
         return
     with open(history_path, "r", encoding="utf-8") as f:
         history = yaml.safe_load(f) or {}
-    articles = history.get("articles", [])
-    if not articles:
+    publishes = history.get("publishes", [])
+    if not publishes:
         print("No articles in history to update.")
         return
     media_id_to_idx: dict[str, int] = {}
     title_to_idx: dict[str, int] = {}
-    for i, article in enumerate(articles):
-        mid = article.get("media_id", "")
-        if mid:
-            media_id_to_idx[mid] = i
+    for i, article in enumerate(publishes):
+        for draft in article.get("drafts", []) or []:
+            mid = draft.get("media_id", "")
+            if mid:
+                media_id_to_idx[mid] = i
         title = article.get("title", "")
         if title:
             title_to_idx[title] = i
@@ -108,7 +116,7 @@ def update_history(stats_list: list[dict]):
             reads = stat.get("int_page_read_count", 0)
             fav = stat.get("add_to_fav_count", 0)
             shares = stat.get("share_count", 0)
-            articles[idx]["stats"] = {
+            publishes[idx]["stats"] = {
                 "read_count": reads,
                 "share_count": shares,
                 "like_count": stat.get("old_like_count", 0) + stat.get("like_count", 0),
@@ -120,7 +128,7 @@ def update_history(stats_list: list[dict]):
             }
             updated += 1
     if updated > 0:
-        history["articles"] = articles
+        history["publishes"] = publishes
         _atomic_write_yaml(history_path, history)
         print(f"Updated stats for {updated} article(s).")
     else:

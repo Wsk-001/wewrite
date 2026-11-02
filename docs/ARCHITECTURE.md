@@ -57,7 +57,7 @@ graph TD
 
 | 文件 | 职责 |
 |------|------|
-| `cli.py` | 命令行入口：preview / publish / themes / gallery / image-post / comic-plan / comic-render / comic-post / learn-theme |
+| `cli.py` | 命令行入口：preview / publish / themes / gallery / image-post / comic-plan / comic-render / comic-post |
 | `gzh_converter.py` | Markdown → 微信内联样式 HTML，含容器语法、8 种版式与整页背景 |
 | `theme_base.py` | 主题共享数据类 `ThemeConfig` |
 | `theme_configs.py` | 50 套主题注册（核心 7 套 + 库内代表 43 套）与 `auto` 自适应配色 |

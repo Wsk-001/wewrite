@@ -48,7 +48,7 @@ python3 {skill_dir}/toolkit/cli.py comic-post   {skill_dir}/output/<slug>-tietu/
   "article": "output/foo.md",
   "article_title": "文章完整标题",
   "article_draft_media_id": "可选，文章草稿 media_id",
-  "post_title": "贴图标题，<= 32 字",
+  "post_title": "贴图标题，建议 <= 20 字（后台编辑上限），API 硬上限 32 字",
   "post_body": "贴图正文，<= 1000 字",
   "style_anchor": "统一画风与场景锚点",
   "environment": "默认环境描述，供未写 brief 的格子复用",
@@ -140,7 +140,7 @@ python3 {skill_dir}/toolkit/cli.py comic-post   {skill_dir}/output/<slug>-tietu/
 
 ## 七、发布
 
-- `post_title` <= 32 字，`post_body` <= 1000 字；正文里写清「完整内容见公众号文章」
+- `post_title` 建议 <= 20 字（后台编辑上限，API 硬上限 32），`post_body` <= 1000 字；正文里写清「完整内容见公众号文章」
 - 首图即封面，顺序按 `no` 排；发布前在后台确认 9 张以内
 - 图片和正文都不加「AI 生成」字样；平台侧如需声明，由发布时勾选
 - 文章已发布：在后台给贴图补原文链接，再发布

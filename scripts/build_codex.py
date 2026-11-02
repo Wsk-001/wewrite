@@ -18,6 +18,7 @@ Usage:
 
 import argparse
 import re
+import zipfile
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -32,7 +33,7 @@ CODEX_HEADER = """\
 若上面为空，先问用户要写什么主题/选题，再开始。
 
 **Codex 运行环境差异（相对 Claude Code 版）**：
-- 没有 TaskCreate/TaskUpdate 工具 —— 每进入一个 Step，用一句话报进度（如「[3/8] 框架 + 素材」）。
+- 没有 TaskCreate/TaskUpdate 工具 —— 每进入一个 Step，用一句话报进度（如「[3/9] 框架 + 素材」）。
 - 联网搜索用 Codex 的 `web_search`；读写文件、执行命令用 Codex 自带的 shell / 文件工具。
 - 所有 `python3` 命令见下方「Python 解释器约定」（优先用 {skill_dir}/.venv/bin/python3）。
 
@@ -93,7 +94,7 @@ python3 scripts/build_codex.py --install
 /wewrite 写一篇关于 AI Agent 的公众号文章
 ```
 
-prompt 会执行 SKILL.md 的 Step 1-8 全流程。所有 `python3` 调用自动使用
+prompt 会执行 SKILL.md 的 Step 1-9 全流程（Step 9 贴图，默认执行）。所有 `python3` 调用自动使用
 仓库内的 `.venv`，发布/生图等能力复用 `toolkit/`。
 
 > 注：Codex 没有 Claude Code 的 SKILL.md 自动触发机制，所以通过自定义 prompt
@@ -121,8 +122,18 @@ def build(output_dir: Path, install: bool):
         print(f"  {{skill_dir}} \u2192 {REPO_ROOT}")
         print(f"  在 Codex 里用 /{PROMPT_NAME} 触发。")
     else:
+        make_zip(output_dir, "wewrite-codex.zip")
         print(f"\nDone. Codex prompt at: {output_dir}")
         print("  装到 ~/.codex/prompts/ 请加 --install。")
+
+
+def make_zip(output_dir: Path, zip_name: str):
+    zip_path = output_dir.parent / zip_name
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        for path in sorted(output_dir.rglob("*")):
+            if path.is_file() and "__pycache__" not in path.parts:
+                zf.write(path, Path(output_dir.name) / path.relative_to(output_dir))
+    print(f"  {zip_path}")
 
 
 def main():

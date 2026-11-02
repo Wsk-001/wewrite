@@ -58,6 +58,17 @@ def test_more_than_nine_panels_warns():
     assert any("9-image" in w for w in warnings)
 
 
+def test_title_over_twenty_chars_warns_but_under_thirty_two_passes():
+    sb = _base_storyboard(post_title="x" * 25)
+    warnings = comic.validate_storyboard(sb)
+    assert any("caps titles at" in w for w in warnings)
+
+
+def test_title_over_thirty_two_chars_raises():
+    with pytest.raises(comic.ComicError, match="post_title"):
+        comic.validate_storyboard(_base_storyboard(post_title="x" * 33))
+
+
 def test_build_batch_skips_recap_and_adds_avoid(tmp_path):
     sb = _base_storyboard()
     tasks = comic.build_batch(sb, tmp_path / "raw")

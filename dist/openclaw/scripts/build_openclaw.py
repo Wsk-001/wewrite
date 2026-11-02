@@ -10,6 +10,7 @@ Usage:
 import argparse
 import re
 import shutil
+import zipfile
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -99,14 +100,25 @@ def build(output_dir: Path):
         if src.is_file():
             shutil.copy2(src, output_dir / f)
             print(f"  {f} \u2192 {output_dir / f}")
-    print(f"\nDone. OpenClaw skill at: {output_dir}")
+
+
+def make_zip(output_dir: Path, zip_name: str):
+    zip_path = output_dir.parent / zip_name
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        for path in sorted(output_dir.rglob("*")):
+            if path.is_file() and "__pycache__" not in path.parts:
+                zf.write(path, Path(output_dir.name) / path.relative_to(output_dir))
+    print(f"  {zip_path}")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Build OpenClaw-compatible WeWrite skill")
     parser.add_argument("-o", "--output", default=str(REPO_ROOT / "dist" / "openclaw"), help="Output directory (default: dist/openclaw/)")
     args = parser.parse_args()
-    build(Path(args.output))
+    output_dir = Path(args.output)
+    build(output_dir)
+    make_zip(output_dir, "wewrite-skill.zip")
+    print(f"\nDone. OpenClaw skill at: {output_dir}")
 
 
 if __name__ == "__main__":
