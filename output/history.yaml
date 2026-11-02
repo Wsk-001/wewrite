@@ -523,6 +523,25 @@ publishes:
     note: 8 步流程完成；合规 0 error、SEO 0 error（3 个次要关键词位置警告）、反 AI 26.81 在区间、正文 2057 字；配图 5 张批量生成+并发读图自检，第 4 张首版涂错部位（涂到脚背），改为脚后跟朝镜头重生成后通过；草稿已核验标题 20 字、作者、摘要、4 图、无 Markdown 残留
     media_id: q_zrQd1gVlCJUeajP8dHyQFe_h7Ndakgoqo8d0Wr_xr96ESe8MOMwFVirLLvHO2C
     action: 以此版发布
+- id: 2026-11-02-aiyanjing-tietou
+  date: '2026-11-02'
+  title: 一张6块6的贴纸，AI眼镜就能偷拍？4招当场识破
+  topic: AI眼镜遮光贴偷拍（热点选题，综合评分 8.3，来源：澎湃新闻 2026-11-02 实测报道）
+  article: output/aiyanjing.md
+  theme: moyu-green
+  humanness_score: 30.5
+  cover: output/cover-aiyanjing.jpg
+  inline_images:
+  - output/aiyanjing-1.jpg
+  - output/aiyanjing-2.jpg
+  - output/aiyanjing-3.jpg
+  - output/aiyanjing-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 9 步流程完成；人味 30.5 在区间、合规 0、SEO 0 error、与库内查重 0.013；配图 5 张批量生成+并发自检，图1 首版模块重复且灯泡发光，重生成后通过；草稿核验标题、摘要、4 图、作者正确
+    media_id: q_zrQd1gVlCJUeajP8dHyWdBzZgR5to8KyxKivd2djM2gjlsvYC9OMdYod21HblO
+    action: 待发布
 tietu:
 - id: 2026-11-01-niaosu-tietu
   date: '2026-11-01'
