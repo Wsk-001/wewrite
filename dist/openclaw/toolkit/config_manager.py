@@ -135,7 +135,7 @@ class ConfigManager:
         
         # 检查主题（可选，有默认值）
         if not config.get("theme"):
-            print("[WARNING] theme not set, will use default: moyu-green", file=sys.stderr)
+            print("[WARNING] theme not set, will use default: auto (content-matched)", file=sys.stderr)
         
         # 检查作者（可选）
         author = config.get("author") or wechat.get("author")
@@ -187,7 +187,7 @@ class ConfigManager:
                 print(f"[INFO]   Image Provider: {provider} ({model})", file=sys.stderr)
         
         # 显示主题
-        theme = config.get("theme", "moyu-green (default)")
+        theme = config.get("theme", "auto (default)")
         print(f"[INFO]   Theme: {theme}", file=sys.stderr)
         
         # 显示作者

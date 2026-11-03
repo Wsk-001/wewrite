@@ -622,6 +622,46 @@ tietu:
     note: 6 格贴图 1080x1440；5 张 AI 底图一次通过读图自检；回顾卡首版底部文案重复，改 recap_note 后重渲染；图片与正文均无 AI 字样
     media_id: q_zrQd1gVlCJUeajP8dHydVwNeJdRB_UZI_f3oFpt1ElHO06eBowt9VLEbGbIWEi
     action: 待文章发布后补原文链接再发布
+- id: 2026-11-03-daizhuangpaozhen
+  date: '2026-11-03'
+  title: 带状疱疹进入高发期：身上的疱别硬扛，72小时内用药最关键
+  topic: 带状疱疹秋冬高发科普（热点选题，综合评分 9.0，来源：百度热搜第6名/91.7，人民日报、央广网、中新网 10 小时内通稿）
+  article: output/daizhuangpaozhen.md
+  theme: auto→ms-academic（用药类自动匹配，得分 11）
+  humanness_score: 35.0
+  cover: output/cover-daizhuangpaozhen.jpg
+  cover_media_id: q_zrQd1gVlCJUeajP8dHyaNUWPbYN5I8rtzK7EeHFUlv6Q9hJ4tbMNJJzE9NbT5n
+  inline_images:
+  - output/daizhuangpaozhen-1.jpg
+  - output/daizhuangpaozhen-2.jpg
+  - output/daizhuangpaozhen-3.jpg
+  - output/daizhuangpaozhen-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 9 步流程完成；auto 主题匹配首跑（用药类 11 分 → ms-academic 学术论文版式）；人味 35.0 在区间、合规 0、SEO 0 error（核心词补进正文前 100 字后剩 4 条次级词位置 warn）、库内查重 0.012；配图 5 张批量生成+逐张读图自检，图4 前两版分别出现箭头残缺与上下裁切，根因为 provider 对 4:3 需求恒回 2048x1536 再中心裁切，第三版改用 --size 1536x1152 原生分辨率通过；草稿核验标题、摘要、4 图、作者正确
+    media_id: q_zrQd1gVlCJUeajP8dHyYzhkoes4KVO4WmcsC4WAAJmiKkZSpuXnd6Vq7NHm3nN
+    action: 待发布
+- id: 2026-11-03-daizhuangpaozhen-tietu
+  date: '2026-11-03'
+  kind: tietu-newspic
+  title: 身上的疱别硬扛，72小时是道坎
+  article: output/daizhuangpaozhen.md
+  article_title: 带状疱疹进入高发期：身上的疱别硬扛，72小时内用药最关键
+  storyboard: output/daizhuangpaozhen-tietu/storyboard.json
+  images:
+  - output/daizhuangpaozhen-tietu/tietu-1.jpg
+  - output/daizhuangpaozhen-tietu/tietu-2.jpg
+  - output/daizhuangpaozhen-tietu/tietu-3.jpg
+  - output/daizhuangpaozhen-tietu/tietu-4.jpg
+  - output/daizhuangpaozhen-tietu/tietu-5.jpg
+  - output/daizhuangpaozhen-tietu/tietu-6.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 6 格贴图 1080x1440；5 张 AI 底图一次通过读图自检（无伪文字/畸变，挂钟无数字）；叠字、回顾卡核对无错字无截断；图片与正文均无 AI 字样
+    media_id: q_zrQd1gVlCJUeajP8dHyckDVMBY9vrVfSN3DH0aGVNYXKaLPS_EAWdy9qEYbJL_
+    action: 待文章发布后补原文链接再发布
 style_sources:
 - date: '2026-10-10'
   note: 从账号 9 篇已发文章学习写作与配图风格

@@ -119,7 +119,7 @@ THEMES.update(LIBRARY_THEMES)
 # 内容语义 → 色相 映射（HSL hue 0-1 范围）
 CONTENT_HUE_MAP = {
     "饮食": (0.06, ["火锅", "美食", "汤", "饮食", "烹饪", "三餐", "食材", "吃喝", "锅底", "涮", "外卖"]),
-    "食品安全": (0.47, ["食品安全", "剩菜", "打包", "冰箱", "冷藏", "冷冻", "保鲜", "细菌", "变质", "中毒", "保存", "保质期", "加热", "微波", "亚硝酸盐", "沙门氏菌", "分装", "隔夜"]),
+    "食品安全": (0.47, ["食品安全", "剩菜", "打包", "冰箱", "冷藏", "冷冻", "保鲜", "细菌", "变质", "中毒", "保存", "保质期", "加热", "微波", "亚硝酸盐", "沙门氏菌", "分装", "隔夜", "香精", "添加剂", "食品添加剂", "防腐剂", "色素", "甜味剂", "霉变", "黑斑", "毒素", "致癌", "丙烯酰胺", "焦黑", "农残", "农药", "寄生虫", "生食"]),
     "节庆": (0.985, ["婚宴", "婚礼", "年夜饭", "春节", "团圆", "过节", "宴席", "喜庆"]),
     "心血管": (0.97, ["心血管", "血压", "心脏", "心梗", "中风", "急救", "胸痛"]),
     "睡眠": (0.62, ["睡眠", "熬夜", "失眠", "作息", "褪黑素", "打鼾", "睡眠质量"]),
@@ -130,6 +130,7 @@ CONTENT_HUE_MAP = {
     "骨骼": (0.33, ["骨骼", "久坐", "体态", "腰椎", "颈椎", "关节", "骨质", "运动"]),
     "皮肤": (0.05, ["皮肤", "脱发", "痘痘", "湿疹", "护肤", "光老化"]),
     "用药": (0.58, ["疫苗", "用药", "药物", "抗生素", "副作用", "处方"]),
+    "数码": (0.55, ["AI眼镜", "智能眼镜", "AR眼镜", "VR眼镜", "摄像头", "偷拍", "隐私", "语音助手", "智能手表", "蓝牙耳机", "数码", "电子产品", "智能设备"]),
 }
 
 # 类别 → 版式个性变体
@@ -146,11 +147,30 @@ CATEGORY_VARIANT = {
     "皮肤": "classic",
     "睡眠": "editorial",
     "心理": "editorial",
+    "数码": "clinical",
     "通用": "editorial",
 }
 
 # 语义得分低于该值视为弱命中，触发向次类别的色相混合
 WEAK_SEMANTIC_SCORE = 8
+
+# 类别 → 库内候选主题（auto 强命中时按标题哈希轮换取款，避免同类别撞款）
+# 均为浅色库主题，覆盖 8 种版式家族；深色主题永不自动匹配
+CURATED_THEME_CANDIDATES = {
+    "饮食": ["hotpot-warm", "cream", "lemon-sea"],
+    "食品安全": ["qingshiban", "yapai-newspaper", "laomao-grid-cobalt"],
+    "节庆": ["vd-oriental", "red-white", "candy-pop"],
+    "心血管": ["red-white", "laomao-masthead-signal", "yapai-poster"],
+    "睡眠": ["rp-lavender", "zen-whitespace", "morandi-green"],
+    "心理": ["rp-lavender", "meigui", "mono-blue-editorial"],
+    "眼科": ["tianlan", "laomao-grid-cobalt", "laomao-masthead-volt"],
+    "体检": ["ms-academic", "graphite-minimal", "laomao-grid-cobalt"],
+    "呼吸": ["laomao-forest-lake", "mint-soda", "laomao-masthead-mint"],
+    "骨骼": ["vd-structured", "laomao-forest-pine", "yapai-cool-report"],
+    "皮肤": ["meigui", "rich_morandi", "morandi-green"],
+    "用药": ["yapai-tech-doc", "ms-academic", "laomao-grid-cobalt"],
+    "数码": ["laomao-airy-cobalt", "ms-aireport", "yapai-tech-doc"],
+}
 
 
 def _hue_distance(h1: float, h2: float) -> float:
@@ -180,6 +200,25 @@ def analyze_content_hue(title: str, content: str) -> tuple:
     base_hue = CONTENT_HUE_MAP[best_cat][0]
     runner_up = ranked[1][0] if len(ranked) > 1 and ranked[1][1] > 0 else None
     return best_cat, base_hue, top_score, runner_up
+
+
+def match_library_theme(title: str, content: str) -> tuple:
+    """按内容类别在主题库中匹配候选主题。
+
+    返回 (theme_id, category, score)；强命中（score >= WEAK_SEMANTIC_SCORE）
+    才返回主题 ID，弱命中返回 None，由调用方回退自适应生成。
+    同一类别内按标题 CRC32 轮换取款：同一篇文章稳定，同类别不同文章不撞款。
+    """
+    import zlib
+
+    category, _hue, score, _runner = analyze_content_hue(title, content)
+    if score < WEAK_SEMANTIC_SCORE:
+        return None, category, score
+    candidates = CURATED_THEME_CANDIDATES.get(category)
+    if not candidates:
+        return None, category, score
+    idx = zlib.crc32(title.encode("utf-8")) % len(candidates)
+    return candidates[idx], category, score
 
 
 def extract_cover_hue(cover_path) -> Optional[float]:
@@ -264,6 +303,7 @@ def generate_adaptive_theme(title: str, content: str, cover_path=None) -> tuple:
         "骨骼": {"margin": 32, "line_height": 1.75, "title_weight": 900, "body_weight": 400},
         "皮肤": {"margin": 32, "line_height": 1.75, "title_weight": 900, "body_weight": 400},
         "用药": {"margin": 32, "line_height": 1.75, "title_weight": 900, "body_weight": 400},
+        "数码": {"margin": 28, "line_height": 1.75, "title_weight": 900, "body_weight": 400},
         "通用": {"margin": 32, "line_height": 1.75, "title_weight": 900, "body_weight": 400},
     }
     layout = layout_rules.get(category, layout_rules["通用"])

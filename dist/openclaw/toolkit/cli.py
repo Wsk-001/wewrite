@@ -23,7 +23,12 @@ from wechat_api import get_access_token, upload_image, upload_thumb
 from publisher import create_draft, create_image_post
 from config import load_config
 from gzh_converter import GzhConverter, ConvertResult
-from theme_configs import THEMES as GZH_THEMES, generate_adaptive_theme
+from theme_configs import (
+    THEMES as GZH_THEMES,
+    generate_adaptive_theme,
+    match_library_theme,
+    get_theme,
+)
 
 
 def _is_gzh_theme(theme_name: str) -> bool:
@@ -32,23 +37,35 @@ def _is_gzh_theme(theme_name: str) -> bool:
 
 
 def _resolve_theme(theme_name: str, article_path, cover_path=None) -> str:
-    """Resolve `auto` theme by generating adaptive design from content; pass through otherwise."""
+    """Resolve `auto` theme by content: match library first, fall back to adaptive."""
     if theme_name != "auto":
         return theme_name
-    
+
     text = Path(article_path).read_text(encoding="utf-8")
     lines = text.splitlines()
     title = next((l.lstrip("# ").strip() for l in lines if l.startswith("# ")), "")
-    
-    # 查找封面图（优先使用显式传入的，否则查找同目录 cover-* 文件）
+
+    # 1) 库内匹配：强语义命中（score >= 8）按类别轮换取款
+    theme_id, category, score = match_library_theme(title, text)
+    if theme_id:
+        cfg = get_theme(theme_id)
+        print(
+            "[主题自动匹配]\n"
+            f"  类别: {category}（得分 {score}）\n"
+            f"  主题: {cfg.display_name}（{theme_id}，版式 {cfg.style_variant}）\n"
+            f"  依据: {cfg.suitable_for}"
+        )
+        return theme_id
+
+    # 2) 弱命中/无命中 → 自适应生成（按语义+封面色相现场配色）
     if cover_path is None:
         article_dir = Path(article_path).parent
         covers = list(article_dir.glob("cover-*.jpg")) + list(article_dir.glob("cover-*.png"))
         cover_path = covers[0] if covers else None
-    
+
     theme, design_report = generate_adaptive_theme(title, text, cover_path)
     print(design_report)
-    
+
     # 注册到全局 THEMES 以便 GzhConverter.get_theme 查找
     GZH_THEMES["adaptive"] = theme
     return "adaptive"
@@ -228,8 +245,8 @@ def cmd_publish(args):
     appid = args.appid or wechat_cfg.get("appid")
     secret = args.secret or wechat_cfg.get("secret")
     theme_name = _resolve_theme(
-        args.theme or cfg.get("theme", "moyu-green"), 
-        args.input, 
+        args.theme or cfg.get("theme", "auto"),
+        args.input,
         cover_path=args.cover
     )
     author = args.author or wechat_cfg.get("author") or cfg.get("author")
@@ -658,7 +675,7 @@ def main():
 
     p_preview = sub.add_parser("preview", help="Generate HTML and open in browser")
     p_preview.add_argument("input", help="Markdown file path")
-    p_preview.add_argument("-t", "--theme", default="moyu-green", help="GZH theme name, or 'auto' to match content")
+    p_preview.add_argument("-t", "--theme", default="auto", help="GZH theme name, or 'auto' to match content (default)")
     p_preview.add_argument("-o", "--output", help="Output HTML file path")
     p_preview.add_argument("--cover", help="Cover image path (used by 'auto' theme for color extraction)")
     p_preview.add_argument("--no-open", action="store_true", help="Don't open browser")
@@ -666,7 +683,7 @@ def main():
     p_publish = sub.add_parser("publish", help="Convert and publish as WeChat draft")
     p_publish.add_argument("input", help="Markdown file path")
     p_publish.add_argument("-t", "--theme", default=None,
-        help="GZH theme. Options: moyu-green (摸鱼绿), red-white (红白), graphite-minimal (石墨), zen-whitespace (禅意), moyu-ticket (票据), olive-journal (手记), hotpot-warm (汤底暖橙), or 'auto' to match content")
+        help="GZH theme id (50 in library, see `themes`), or 'auto' (default: content-matched library theme, falls back to adaptive generation)")
     p_publish.add_argument("--appid", default=None, help="WeChat AppID (or set in config.yaml)")
     p_publish.add_argument("--secret", default=None, help="WeChat AppSecret (or set in config.yaml)")
     p_publish.add_argument("--cover", help="Cover image file path")
