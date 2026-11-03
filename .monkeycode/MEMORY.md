@@ -180,3 +180,11 @@ Entries discovered by the Agent during task execution should follow this format:
    - toolkit/image_gen.py 改进：_load_config() 与 _build_provider_chain() 改用 config_manager，配置加载失败时立即抛异常而非静默降级；所有 provider 请求改用分离式超时 (CONNECT_TIMEOUT=10, READ_TIMEOUT=120)
    - toolkit/cli.py main() 函数改进：启动时显式调用 validate_config() 与 check_startup()，若配置无效输出警告信息至 stderr，继续执行但让用户知晓异常状态
    - 向后兼容性验证：旧的 from config import get_config 仍可用；新的 from config_manager import load_config 支持；旧 API 如 validate_config(cfg) 改为无参设计，config_manager 负责管理 cfg 对象
+
+[Project Knowledge Summary]
+- Date: 2026-11-03
+- Context: 带状疱疹篇图4两版翻车后排查发现（箭头残缺、上下裁切）
+- Category: Troubleshooting & Debugging
+- Instructions:
+  - 配图 provider 对 4:3 类 brief 恒返回 2048x1536 再被中心裁成 1792x1024，靠近边缘的标题/整框文字必被裁切；信息图类 brief 需直接传原生分辨率，如 image_gen.py --brief x.json --size 1536x1152（resolve_size 支持任意 WxH passthrough），不要靠堆「留出边距」类措辞补救
+  - image_gen.py --brief 只接受裸 brief JSON；带 output/size 外层包装会报 missing field: template
