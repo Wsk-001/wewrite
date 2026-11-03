@@ -188,7 +188,13 @@ image_analysis 任务后统一收结果），一次性按清单核对；不通�
 
 ### [7/9] 排版
 
-将 Markdown 转换为微信排版。主题库共 50 套（核心 7 套 + 库内代表 43 套），全部可用 `--theme {id}` 指定；按排版相似度去重后覆盖 8 种结构化版式（圆角徽章/杂志编辑/临床直角/色块刊头/极简/报纸/海报/侧栏书页），排版结构真正不同而非仅换色。完整清单见 `python3 {skill_dir}/toolkit/cli.py themes`，视觉样例见 `output/theme-samples/index.html` 与 `output/theme-samples/library/index.html`。auto 模式按内容自动配色。
+将 Markdown 转换为微信排版。主题库共 50 套（核心 7 套 + 库内代表 43 套），全部可用 `--theme {id}` 指定；按排版相似度去重后覆盖 8 种结构化版式（圆角徽章/杂志编辑/临床直角/色块刊头/极简/报纸/海报/侧栏书页），排版结构真正不同而非仅换色。完整清单见 `python3 {skill_dir}/toolkit/cli.py themes`，视觉样例见 `output/theme-samples/index.html` 与 `output/theme-samples/library/index.html`。
+
+默认（style.yaml `theme: "auto"`）按内容自动选型，两段式：
+1. **库内匹配**：语义关键词强命中（score ≥ 8）→ 按类别从候选主题轮换取款（同类别不同文章不撞款，深色主题永不自动匹配），日志打印 `[主题自动匹配]` 报告类别/得分/主题/依据；
+2. **自适应生成**：弱命中回退 `generate_adaptive_theme`（语义+封面色相现场配色），日志打印 `[自适应主题设计]` 报告。
+
+不要为省事固定传 `-t moyu-green`；显式指定仅用于用户点名某主题或匹配结果明显不合适时手动改选。
 
 ```
 读取: {skill_dir}/references/pipeline/formatting-styles.md

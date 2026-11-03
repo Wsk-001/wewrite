@@ -8,10 +8,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "toolkit"))
 from theme_configs import (
     analyze_content_hue,
     generate_adaptive_theme,
+    match_library_theme,
+    CURATED_THEME_CANDIDATES,
     CATEGORY_VARIANT,
     CONTENT_HUE_MAP,
     WEAK_SEMANTIC_SCORE,
 )
+from theme_configs import THEMES, get_theme
+from theme_library import DARK_THEME_IDS
 
 
 def test_analyze_returns_four_tuple():
@@ -59,6 +63,60 @@ def test_variant_mapping_exists_for_all_categories():
     """每个语义类别都有对应版式变体。"""
     for category in CONTENT_HUE_MAP:
         assert category in CATEGORY_VARIANT
+
+
+def test_curated_candidates_valid_and_light():
+    """候选主题必须存在于主题库且均为浅色主题。"""
+    for category, candidates in CURATED_THEME_CANDIDATES.items():
+        assert 2 <= len(candidates) <= 3, category
+        for tid in candidates:
+            assert tid in THEMES, f"{category}: unknown theme {tid}"
+            assert tid not in DARK_THEME_IDS, f"{category}: dark theme {tid}"
+
+
+def test_match_strong_hit_returns_theme():
+    """强语义命中返回库主题 ID，且命中候选表内。"""
+    title = "火锅汤煮30分钟嘌呤翻10倍：想喝汤的先看这条时间线"
+    content = ("火锅 汤底 涮 美食 汤底 涮 美食 火锅 汤 嘌呤" * 2) + " 外卖 食材 烹饪"
+    theme_id, category, score = match_library_theme(title, content)
+    assert score >= WEAK_SEMANTIC_SCORE
+    assert category == "饮食"
+    assert theme_id in CURATED_THEME_CANDIDATES["饮食"]
+
+
+def test_match_weak_hit_returns_none():
+    """弱语义命中返回 None，交由自适应生成兜底。"""
+    theme_id, category, score = match_library_theme("", "火锅 睡眠")
+    assert score < WEAK_SEMANTIC_SCORE
+    assert theme_id is None
+
+
+def test_match_no_hit_returns_none_generic():
+    """无关键词返回 None 且类别为通用。"""
+    theme_id, category, score = match_library_theme("无特征标题", "普通文本内容")
+    assert theme_id is None
+    assert category == "通用"
+    assert score == 0
+
+
+def test_match_stable_per_title_rotates_across_titles():
+    """同一标题结果稳定；同类别不同标题可轮换出不同主题。"""
+    content = "火锅 汤底 涮 美食 汤底 涮 美食 火锅 汤 嘌呤" * 2
+    t1 = match_library_theme("标题甲", content)
+    t1b = match_library_theme("标题甲", content)
+    assert t1[0] == t1b[0]
+    picks = {match_library_theme(t, content)[0] for t in ("标题甲", "标题乙", "标题丙")}
+    assert picks <= set(CURATED_THEME_CANDIDATES["饮食"])
+    assert len(picks) > 1, "3 个不同标题应至少轮换出 2 款主题"
+
+
+def test_matched_theme_resolves_in_converter():
+    """匹配出的库主题必须能被 GzhConverter/get_theme 解析。"""
+    for candidates in CURATED_THEME_CANDIDATES.values():
+        for tid in candidates:
+            cfg = get_theme(tid)
+            assert cfg is not None
+            assert cfg.identifier == tid
 
 
 def _solid_image(tmp_path, rgb):
