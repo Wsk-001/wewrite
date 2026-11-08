@@ -642,25 +642,45 @@ tietu:
     note: 9 步流程完成；auto 主题匹配首跑（用药类 11 分 → ms-academic 学术论文版式）；人味 35.0 在区间、合规 0、SEO 0 error（核心词补进正文前 100 字后剩 4 条次级词位置 warn）、库内查重 0.012；配图 5 张批量生成+逐张读图自检，图4 前两版分别出现箭头残缺与上下裁切，根因为 provider 对 4:3 需求恒回 2048x1536 再中心裁切，第三版改用 --size 1536x1152 原生分辨率通过；草稿核验标题、摘要、4 图、作者正确
     media_id: q_zrQd1gVlCJUeajP8dHyYzhkoes4KVO4WmcsC4WAAJmiKkZSpuXnd6Vq7NHm3nN
     action: 待发布
-- id: 2026-11-03-daizhuangpaozhen-tietu
-  date: '2026-11-03'
-  kind: tietu-newspic
-  title: 身上的疱别硬扛，72小时是道坎
-  article: output/daizhuangpaozhen.md
-  article_title: 带状疱疹进入高发期：身上的疱别硬扛，72小时内用药最关键
-  storyboard: output/daizhuangpaozhen-tietu/storyboard.json
-  images:
-  - output/daizhuangpaozhen-tietu/tietu-1.jpg
-  - output/daizhuangpaozhen-tietu/tietu-2.jpg
-  - output/daizhuangpaozhen-tietu/tietu-3.jpg
-  - output/daizhuangpaozhen-tietu/tietu-4.jpg
-  - output/daizhuangpaozhen-tietu/tietu-5.jpg
-  - output/daizhuangpaozhen-tietu/tietu-6.jpg
+- id: 2026-11-08-diwen-tangshang
+  date: '2026-11-08'
+  title: 低温烫伤不疼才可怕：44℃捂6小时，皮肤就被烫坏了
+  topic: 低温烫伤冬季取暖科普（时令选题，综合评分 8.4；90 天内公众号 0 篇同题；借 8 省暴雪热搜取暖场景，候选对比：清淡饮食 5.9、感冒药叠加 4.5）
+  article: output/diwen-tangshang.md
+  theme: auto→morandi-green（皮肤类自动匹配，得分 11）
+  humanness_score: 24.9
+  cover: output/diwen-tangshang-cover.jpg
+  cover_media_id: q_zrQd1gVlCJUeajP8dHySmrTVSrKIjF4XfLvPi5dQU03TPVBqyD8BY7xpQWGOxc
+  inline_images:
+  - output/diwen-tangshang-1.jpg
+  - output/diwen-tangshang-2.jpg
+  - output/diwen-tangshang-3.jpg
+  - output/diwen-tangshang-4.jpg
   status: draft
   drafts:
   - version: v1
-    note: 6 格贴图 1080x1440；5 张 AI 底图一次通过读图自检（无伪文字/畸变，挂钟无数字）；叠字、回顾卡核对无错字无截断；图片与正文均无 AI 字样
-    media_id: q_zrQd1gVlCJUeajP8dHyckDVMBY9vrVfSN3DH0aGVNYXKaLPS_EAWdy9qEYbJL_
+    note: 9 步流程完成；框架 A 痛点型（与上篇 E 热点解读轮换），收束用戛然而止短句（上篇互动问句）；人味 24.9 在区间、红旗词 0、合规 0/0、SEO 0 error 0 warn；配图 5 张批量并发一轮过检，图1 首版标题贴顶被裁，缩为「低温烫伤」重生成后信息完整；信息图统一 1792x1008 原生分辨率防中心裁切
+    media_id: q_zrQd1gVlCJUeajP8dHyS-RKRBxj-5gjvqE24Mi3Y-GUWerwEGNvE3XFENodjxb
+    action: 待发布
+- id: 2026-11-08-diwen-tangshang-tietu
+  date: '2026-11-08'
+  kind: tietu-newspic
+  title: 44℃捂6小时，不烫也能烫伤
+  article: output/diwen-tangshang.md
+  article_title: 低温烫伤不疼才可怕：44℃捂6小时，皮肤就被烫坏了
+  storyboard: output/diwen-tangshang-tietu/storyboard.json
+  images:
+  - output/diwen-tangshang-tietu/tietu-1.jpg
+  - output/diwen-tangshang-tietu/tietu-2.jpg
+  - output/diwen-tangshang-tietu/tietu-3.jpg
+  - output/diwen-tangshang-tietu/tietu-4.jpg
+  - output/diwen-tangshang-tietu/tietu-5.jpg
+  - output/diwen-tangshang-tietu/tietu-6.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 6 格 1080x1440；底图经 3 轮修正：raw-1 热气两版都飘到老人头顶（z-image 把「热气」画向人物头部的系统性倾向，删除热气元素后通过）、raw-3 从怪异剖面块改硬币对比（subject 字段残留「硬币」导致 avoid 失效，根因：改 brief 必须连 subject 一起改）再改创可贴隐喻、raw-5 首版管身乱码；成图 1/2/4 水彩叙事、3/5 实拍质感做警示格；叠字、回顾卡核对无错字无截断；图片与正文均无 AI 字样
+    media_id: q_zrQd1gVlCJUeajP8dHyc2NaHSvRE3soAolVQgRktBiFvDxLABn1WsFj1xI-lLw
     action: 待文章发布后补原文链接再发布
 style_sources:
 - date: '2026-10-10'

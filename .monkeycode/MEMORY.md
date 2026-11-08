@@ -188,3 +188,11 @@ Entries discovered by the Agent during task execution should follow this format:
 - Instructions:
   - 配图 provider 对 4:3 类 brief 恒返回 2048x1536 再被中心裁成 1792x1024，靠近边缘的标题/整框文字必被裁切；信息图类 brief 需直接传原生分辨率，如 image_gen.py --brief x.json --size 1536x1152（resolve_size 支持任意 WxH passthrough），不要靠堆「留出边距」类措辞补救
   - image_gen.py --brief 只接受裸 brief JSON；带 output/size 外层包装会报 missing field: template
+
+[Project Knowledge Summary]
+- Date: 2026-11-08
+- Context: 低温烫伤篇贴图 3 轮修正定位两处系统性问题
+- Category: Troubleshooting & Debugging
+- Instructions:
+  - z-image 对画面中的「热气/蒸汽」元素倾向画到人物头顶或头部附近，老人+热气会出现「冒烟/灵魂出窍」的死亡隐喻误读；人物+热源类场景 brief 直接不要热气元素，用光感表达温度
+  - image_prompt_builder 的 subject 是权重最高的核心对象字段，修正 brief 时 action/avoid 必须连 subject 一起改，只改后者时 provider 仍按 subject 画（低温烫伤篇 raw-3 连续两版硬币即此根因）
