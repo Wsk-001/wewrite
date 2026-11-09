@@ -196,3 +196,13 @@ Entries discovered by the Agent during task execution should follow this format:
 - Instructions:
   - z-image 对画面中的「热气/蒸汽」元素倾向画到人物头顶或头部附近，老人+热气会出现「冒烟/灵魂出窍」的死亡隐喻误读；人物+热源类场景 brief 直接不要热气元素，用光感表达温度
   - image_prompt_builder 的 subject 是权重最高的核心对象字段，修正 brief 时 action/avoid 必须连 subject 一起改，只改后者时 provider 仍按 subject 画（低温烫伤篇 raw-3 连续两版硬币即此根因）
+
+[Project Knowledge Summary]
+- Date: 2026-11-09
+- Context: 诺如病毒篇配图与贴图自检发现三处新系统性问题
+- Category: Troubleshooting & Debugging
+- Instructions:
+  - 器具标签是 z-image 乱码英文高发位（喷壶/凝胶瓶等瓶身会生成 KAHKts 式假英文标签），这类物件 brief 直接写「纯白无标签瓶身」并在 avoid 加标签贴纸，别指望 avoid「伪文字」能压住标签
+  - 画面顶部边缘贴边的物体（镜子、挂画、标语）会产生被裁切的黑色伪字块；构图类 brief 写明「顶部只保留瓷砖墙/墙面」，把镜子挂件等装饰全部排除
+  - 信息图模块竖排多行布局放进宽幅（1792x1008）时上下必被中心裁切；宽幅信息图在 style 里写明「横向 N 列并排布局」并在 avoid 加「模块上下堆叠」，四行竖排改横向四列后一次通过
+  - batch 任务 brief 必须带 template 字段（infographic/illustration/scene 等），infographic 需 subject+modules（每项含 title），字段名是 output 而非 out

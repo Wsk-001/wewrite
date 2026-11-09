@@ -682,6 +682,46 @@ tietu:
     note: 6 格 1080x1440；底图经 3 轮修正：raw-1 热气两版都飘到老人头顶（z-image 把「热气」画向人物头部的系统性倾向，删除热气元素后通过）、raw-3 从怪异剖面块改硬币对比（subject 字段残留「硬币」导致 avoid 失效，根因：改 brief 必须连 subject 一起改）再改创可贴隐喻、raw-5 首版管身乱码；成图 1/2/4 水彩叙事、3/5 实拍质感做警示格；叠字、回顾卡核对无错字无截断；图片与正文均无 AI 字样
     media_id: q_zrQd1gVlCJUeajP8dHyc2NaHSvRE3soAolVQgRktBiFvDxLABn1WsFj1xI-lLw
     action: 待文章发布后补原文链接再发布
+- id: 2026-11-09-nuru-bingdu
+  date: '2026-11-09'
+  title: 诺如病毒进入高发期：酒精杀不死它，这三件事才管用
+  topic: 诺如病毒秋冬高发科普（时令选题，综合评分 8.1；90 天内公众号 0 篇同题；时效锚点：中疾控 11-07 健康提示 + 宁波疾控 11-08 重点防范提醒；候选对比：一氧化碳中毒 6.9 与上篇取暖主题撞车、腌菜亚硝酸盐 4.9 时间线角度被同行 2 天前抢发）
+  article: output/nuru.md
+  theme: auto→clinical（用药类自动匹配，得分 2）
+  humanness_score: 25.5
+  cover: output/nuru-cover.jpg
+  cover_media_id: q_zrQd1gVlCJUeajP8dHycZHMv0lcpI9bih_g8HfQ2sL_XR_b01UTV31XbhDHcH8
+  inline_images:
+  - output/nuru-1.jpg
+  - output/nuru-2.jpg
+  - output/nuru-3.jpg
+  - output/nuru-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 框架 C 清单型（上篇 A 痛点型轮换），收束互动问句；人味 25.5 在区间（微调后 27.7→25.5）、合规 0/0、SEO 0 error 0 warn（密度 0.8% INFO）；配图 5 张 1792x1008：图1/2/封面一轮过检，图3 首版模块错字+顺序错乱+泄漏 avoid 说明段落（z-image 高文字密度翻车），缩短语标签重生成通过；图4 首版四行竖排被中心裁切（宽幅竖排布局系统性裁切风险），改横向四列通过；provider 本轮返回 2048x1152，size 参数生效
+    media_id: q_zrQd1gVlCJUeajP8dHyeLRRlrBbCqvpHrUK3Unwp_AMIT5oAaXhN5j4L81N3xj
+    action: 待发布
+- id: 2026-11-09-nuru-tietu
+  date: '2026-11-09'
+  kind: tietu-newspic
+  title: 酒精防不住诺如，这样做才管用
+  article: output/nuru.md
+  article_title: 诺如病毒进入高发期：酒精杀不死它，这三件事才管用
+  storyboard: output/nuru-tietu/storyboard.json
+  images:
+  - output/nuru-tietu/tietu-1.jpg
+  - output/nuru-tietu/tietu-2.jpg
+  - output/nuru-tietu/tietu-3.jpg
+  - output/nuru-tietu/tietu-4.jpg
+  - output/nuru-tietu/tietu-5.jpg
+  - output/nuru-tietu/tietu-6.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 6 格 1080x1440 水彩绘本风（薄荷绿奶油白）；底图 2 轮修正：raw-3 首版顶部边缘有被裁切伪字块+镜面黑斑（顶部贴边物体是伪字高风险位，brief 改为顶部只留瓷砖墙）后通过、raw-4 喷壶标签乱码英文（器具标签是 z-image 乱码高发位，改纯白无标签瓶身）后通过；raw-2 病毒球有刺突与 brief 无刺突不符但诺如衣壳本有凸起且画面语义清晰，保留；叠字、回顾卡核对无错字无截断；图片与正文均无 AI 字样
+    media_id: q_zrQd1gVlCJUeajP8dHyTGOGs6kTRSjOeqQZGFmbrw80z6nMkLP7gEEspuJBaCx
+    action: 待文章发布后补原文链接再发布
 style_sources:
 - date: '2026-10-10'
   note: 从账号 9 篇已发文章学习写作与配图风格
