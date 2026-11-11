@@ -206,3 +206,11 @@ Entries discovered by the Agent during task execution should follow this format:
   - 画面顶部边缘贴边的物体（镜子、挂画、标语）会产生被裁切的黑色伪字块；构图类 brief 写明「顶部只保留瓷砖墙/墙面」，把镜子挂件等装饰全部排除
   - 信息图模块竖排多行布局放进宽幅（1792x1008）时上下必被中心裁切；宽幅信息图在 style 里写明「横向 N 列并排布局」并在 avoid 加「模块上下堆叠」，四行竖排改横向四列后一次通过
   - batch 任务 brief 必须带 template 字段（infographic/illustration/scene 等），infographic 需 subject+modules（每项含 title），字段名是 output 而非 out
+
+[Project Knowledge Summary]
+- Date: 2026-11-11
+- Context: 流感篇贴图 raw 自检新发现两类伪文字载体
+- Category: Troubleshooting & Debugging
+- Instructions:
+  - avoid 里写「对话框」压不住空白对话气泡（z-image 对人物特写爱加漫画气泡），须同时加「气泡」一词并在 scene 里写「画面四周干净无任何气泡或装饰框」
+  - 墙面相框/装裱画是伪文字高发位（相框内生成乱码英文标题+乱码文字行），与顶部贴边伪字同源；人物场景 brief 统一写「画面上方只保留干净墙面无相框挂画」，纸片类道具写「空白白纸无字迹」

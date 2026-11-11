@@ -722,6 +722,46 @@ tietu:
     note: 6 格 1080x1440 水彩绘本风（薄荷绿奶油白）；底图 2 轮修正：raw-3 首版顶部边缘有被裁切伪字块+镜面黑斑（顶部贴边物体是伪字高风险位，brief 改为顶部只留瓷砖墙）后通过、raw-4 喷壶标签乱码英文（器具标签是 z-image 乱码高发位，改纯白无标签瓶身）后通过；raw-2 病毒球有刺突与 brief 无刺突不符但诺如衣壳本有凸起且画面语义清晰，保留；叠字、回顾卡核对无错字无截断；图片与正文均无 AI 字样
     media_id: q_zrQd1gVlCJUeajP8dHyTGOGs6kTRSjOeqQZGFmbrw80z6nMkLP7gEEspuJBaCx
     action: 待文章发布后补原文链接再发布
+- id: 2026-11-11-liugan-48h
+  date: '2026-11-11'
+  title: 都是发烧，普通感冒能扛，流感为什么拖不得？
+  topic: 流感秋冬流行季科普（时令选题，热点池无健康钩子转时令；时效锚点：中疾控 44 周周报 11-05（106 起暴发疫情、甲流 H1N1 51.2%/H3N2 48.8% 五五开）+ 新京报 11-06 阳性率跃居呼吸道病原第一 + 上观 11-07 本轮 H3N2 症状偏重；候选对比：一氧化碳中毒 误区+急救框架被荣成融媒 11-10 抢发、支原体无疫苗热点弱；90 天公众号同题 0 篇（搜狗反爬降级 WebSearch 确认，硬扛案例角度已被政务号 11-04 占用，差异化走 D 对比型+48小时自救）
+  article: output/liugan-48h.md
+  theme: auto→laomao-forest-lake（科普/健康自动匹配）
+  humanness_score: 29.7
+  cover: output/liugan-cover.jpg
+  cover_media_id: q_zrQd1gVlCJUeajP8dHyR9en52j9g9iy3-JBXx9FpkMYxmx47_fxdQaA5De4Wm4
+  inline_images:
+  - output/liugan-1.jpg
+  - output/liugan-2.jpg
+  - output/liugan-3.jpg
+  - output/liugan-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 框架 D 对比型（上两篇 A、C 轮换），收束戛然而止短句；人味 32.3→29.7 在区间（补 HOT 温度词上头、破句 4 处、负面情绪句）、合规 0/0、SEO 0 error 0 warn；配图 5 张一轮 4 过：图1 首版标题贴顶被裁（顶部贴边标题是裁切高发位），标题缩为「感冒 vs 流感」+顶部留白约束重生成通过；图2 时间线/图3 随餐静物/图4 重症四列/封面 体温计屏幕空白一轮过；草稿核验 4 图、摘要卡、无 AI 字样、无 ::: 残留
+    media_id: q_zrQd1gVlCJUeajP8dHycqOAMoTnTOQ5gYeXbEvJJ9WSTqnAnfN3qDZkmLEhQVk
+    action: 待发布
+- id: 2026-11-11-liugan-tietu
+  date: '2026-11-11'
+  kind: tietu-newspic
+  title: 流感拖不得，48小时是道坎
+  article: output/liugan-48h.md
+  article_title: 都是发烧，普通感冒能扛，流感为什么拖不得？
+  storyboard: output/liugan-tietu/storyboard.json
+  images:
+  - output/liugan-tietu/tietu-1.jpg
+  - output/liugan-tietu/tietu-2.jpg
+  - output/liugan-tietu/tietu-3.jpg
+  - output/liugan-tietu/tietu-4.jpg
+  - output/liugan-tietu/tietu-5.jpg
+  - output/liugan-tietu/tietu-6.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 6 格 1080x1440 水彩绘本风（暖米珊瑚橙灰蓝，与上篇薄荷绿区分）；底图 1 轮修正：raw-2 首版右上空白对话气泡（对话框 avoid 未压住，追加「气泡」词重生成）、raw-3 相框乱码英文标题+处方笺乱码行（顶部贴边相框是伪字高发位，改顶部只留干净墙面+白纸无字迹）、raw-5 体温计屏幕模糊伪字（改屏幕空白无显示）后均通过；raw-1 额温枪、raw-4 通风口罩一轮过检；叠字、回顾卡核对无错字无截断；图片与正文均无 AI 字样
+    media_id: q_zrQd1gVlCJUeajP8dHyQWlWKthpXuecvbpftDJ6VSwSI1UMjGgpGeY-943AmFG
+    action: 待文章发布后补原文链接再发布
 style_sources:
 - date: '2026-10-10'
   note: 从账号 9 篇已发文章学习写作与配图风格
