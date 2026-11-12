@@ -205,6 +205,7 @@ Entries discovered by the Agent during task execution should follow this format:
   - 器具标签是 z-image 乱码英文高发位（喷壶/凝胶瓶等瓶身会生成 KAHKts 式假英文标签），这类物件 brief 直接写「纯白无标签瓶身」并在 avoid 加标签贴纸，别指望 avoid「伪文字」能压住标签
   - 画面顶部边缘贴边的物体（镜子、挂画、标语）会产生被裁切的黑色伪字块；构图类 brief 写明「顶部只保留瓷砖墙/墙面」，把镜子挂件等装饰全部排除
   - 信息图模块竖排多行布局放进宽幅（1792x1008）时上下必被中心裁切；宽幅信息图在 style 里写明「横向 N 列并排布局」并在 avoid 加「模块上下堆叠」，四行竖排改横向四列后一次通过
+  - 数值型信息图模块文字密度过高（title+detail+icon 全带字）会整列翻车：detail 生成重复伪字串（「低低低平」「低儒」）且数值幻觉（52 写成 56）；模块 detail 缩为单字评级（高/中/低）、style 写明「全图文字元素尽量少」后一次通过
   - batch 任务 brief 必须带 template 字段（infographic/illustration/scene 等），infographic 需 subject+modules（每项含 title），字段名是 output 而非 out
 
 [Project Knowledge Summary]

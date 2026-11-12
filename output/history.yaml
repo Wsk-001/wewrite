@@ -762,6 +762,46 @@ tietu:
     note: 6 格 1080x1440 水彩绘本风（暖米珊瑚橙灰蓝，与上篇薄荷绿区分）；底图 1 轮修正：raw-2 首版右上空白对话气泡（对话框 avoid 未压住，追加「气泡」词重生成）、raw-3 相框乱码英文标题+处方笺乱码行（顶部贴边相框是伪字高发位，改顶部只留干净墙面+白纸无字迹）、raw-5 体温计屏幕模糊伪字（改屏幕空白无显示）后均通过；raw-1 额温枪、raw-4 通风口罩一轮过检；叠字、回顾卡核对无错字无截断；图片与正文均无 AI 字样
     media_id: q_zrQd1gVlCJUeajP8dHyQWlWKthpXuecvbpftDJ6VSwSI1UMjGgpGeY-943AmFG
     action: 待文章发布后补原文链接再发布
+- id: 2026-11-12-tangniaobing-tianshi
+  date: '2026-11-12'
+  title: 确诊糖尿病，就得跟甜食绝缘吗？答案没那么绝对
+  topic: 糖尿病甜食误区科普（热点选题，综合评分 8.2，百度热搜「确认糖尿病 是否彻底跟甜食绝缘」82.4；时效锚点：联合国糖尿病日 11-14 + 新华社 11-12 通稿（浙二郑超 控GI+整体平衡、华东医院蒋翠萍 一口原则）；90 天公众号同题 0 篇（搜狗反爬降级 WebSearch）；候选对比：刘欢膀胱癌热搜 98.0 因逝者当日安葬调性风险弃用）
+  article: output/tangniaobing-tianshi.md
+  theme: auto→adaptive 饮食类（色相 15°，主色 #C0491F 暖橘红）
+  humanness_score: 27.3
+  cover: output/tangniaobing-cover.jpg
+  cover_media_id: q_zrQd1gVlCJUeajP8dHyTsLQNf5qEPCqquzIrpXzqCQP8lfvnmWU72faSYREkzU
+  inline_images:
+  - output/tangniaobing-1.jpg
+  - output/tangniaobing-2.jpg
+  - output/tangniaobing-3.jpg
+  - output/tangniaobing-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 框架 E 热点解读型（上篇 D 对比型轮换），收束互动问句；人味 26.3→27.3 在区间、合规 0/0、SEO 0 error 3 warn（升糖未进标题前 12 字+密度 INFO，历篇同级）；配图 5 张一轮 4 过：图1 首版香蕉误写 56+四列下半重复伪文字块（高文字密度翻车），模块 detail 缩为单字评级重生成后数值全对；图2 无糖陷阱三列/图3 水果碗/图4 母女散步/封面 蛋糕草莓一轮过；草稿核验 22 字标题、作者、108 字节摘要、4 图、摘要卡、无 AI 字样
+    media_id: q_zrQd1gVlCJUeajP8dHyY2_Fh7JfIkz6zPJga_0JUH1NQmE3kjhRh3jaJ-B3OgB
+    action: 待发布
+- id: 2026-11-12-tangniaobing-tietu
+  date: '2026-11-12'
+  kind: tietu-newspic
+  title: 确诊糖尿病，甜食这样吃
+  article: output/tangniaobing-tianshi.md
+  article_title: 确诊糖尿病，就得跟甜食绝缘吗？答案没那么绝对
+  storyboard: output/tangniaobing-tietu/storyboard.json
+  images:
+  - output/tangniaobing-tietu/tietu-1.jpg
+  - output/tangniaobing-tietu/tietu-2.jpg
+  - output/tangniaobing-tietu/tietu-3.jpg
+  - output/tangniaobing-tietu/tietu-4.jpg
+  - output/tangniaobing-tietu/tietu-5.jpg
+  - output/tangniaobing-tietu/tietu-6.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 6 格 1080x1440 水彩绘本风（奶油白橄榄绿暖橘，与上篇暖米珊瑚橙灰蓝区分）；5 张底图一轮过检（老人蛋糕犹豫/锁甜品柜/馒头水果对比/窗边细嚼/饭后散步，无文字无气泡无相框）；渲染后核对叠字 caption 与回顾卡均正确无截断；图片与正文均无 AI 字样
+    media_id: q_zrQd1gVlCJUeajP8dHyTnAoAajUzxRiwMLXNg5YMAnKUCKa2VENnx9X09UZ31z
+    action: 待文章发布后补原文链接再发布
 style_sources:
 - date: '2026-10-10'
   note: 从账号 9 篇已发文章学习写作与配图风格
