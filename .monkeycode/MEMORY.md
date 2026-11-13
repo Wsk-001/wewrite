@@ -137,7 +137,7 @@ Entries discovered by the Agent during task execution should follow this format:
   - config.yaml 的 author 在根级，`cmd_publish` 曾只读 `wechat` 段导致草稿作者栏为空；改配置读取处要确认层级（根级 fallback 已补）
   - 图片落盘必须让字节格式与扩展名一致：`_center_crop_to_ratio` 比例匹配时原样返回 provider 的 PNG，会写出「.jpg 装 PNG」；微信靠嗅探仍显示，但从返回 URL 可验证（`mmbiz_png` 说明上传的是 PNG，`mmbiz_jpg` 才对），已在 generate_image 落盘前统一转码
   - PNG 存照片体积是 JPEG 的 10 倍（1.7-2.1MB vs 160-230KB），微信图片上限 2MB，转码同时也是体积兜底
-   - 调 `draft/get` 校验草稿时用 `r.content.decode("utf-8")`：微信返回 `Content-Type: text/plain` 无 charset，requests 会按 latin-1 解出乱码，误判成文章编码坏了；正文 `media_id` 写错或删稿用 `draft/delete`（errcode 0 即成功）
+   - 调 `draft/get` 校验草稿时用 `r.content.decode("utf-8")` 后 `json.loads`：微信返回 `Content-Type: text/plain` 无 charset，`r.json()` 与直接 print 都会按 latin-1 解出乱码，误判成编码坏了（2026-11-13 重犯一次，虚惊）；正文 `media_id` 写错或删稿用 `draft/delete`（errcode 0 即成功）
 
 [Project Knowledge Summary]
 - Date: 2026-10-21
@@ -182,36 +182,25 @@ Entries discovered by the Agent during task execution should follow this format:
    - 向后兼容性验证：旧的 from config import get_config 仍可用；新的 from config_manager import load_config 支持；旧 API 如 validate_config(cfg) 改为无参设计，config_manager 负责管理 cfg 对象
 
 [Project Knowledge Summary]
-- Date: 2026-11-03
-- Context: 带状疱疹篇图4两版翻车后排查发现（箭头残缺、上下裁切）
+- Date: 2026-11-08 ~ 2026-11-13
+- Context: 历篇配图/贴图自检积累的 z-image 生成器已知行为与 brief 修正方法（低温烫伤/诺如/流感/二手烟四篇合并）
 - Category: Troubleshooting & Debugging
 - Instructions:
-  - 配图 provider 对 4:3 类 brief 恒返回 2048x1536 再被中心裁成 1792x1024，靠近边缘的标题/整框文字必被裁切；信息图类 brief 需直接传原生分辨率，如 image_gen.py --brief x.json --size 1536x1152（resolve_size 支持任意 WxH passthrough），不要靠堆「留出边距」类措辞补救
-  - image_gen.py --brief 只接受裸 brief JSON；带 output/size 外层包装会报 missing field: template
+  - subject 是权重最高的核心字段：修正 brief 时 action/avoid 必须连 subject 一起改，只改后者 provider 仍按 subject 画
+  - avoid 列表堆到 15 项以上会稀释/反转负面提示（气泡/相框 7 轮连出，写进 style 主描述也压不住）；缩回基础 11 项（文字/字母/数字/标签/logo/水印/二维码/伪文字/对话框/血腥画面/相框）后立即全消；修 brief 先做减法再换构图
+  - 「两人交流」场景空白对话气泡执念最强，同向注视改法无效；根除靠单人+静物暗示（书包/绘本代替人物出镜）
+  - 人物+热源场景的热气会画到头顶成「冒烟/灵魂出窍」死亡隐喻，brief 直接去掉热气元素用光感表达温度
+  - 器具标签是乱码英文高发位（KAHKts 式假英文），瓶身类写「纯白无标签」并 avoid 标签贴纸；顶部贴边物（镜/画/标语）产生裁切伪字块，写「顶部只留干净墙面」；纸片道具写「空白白纸无字迹」；相框/挂画内易生成乱码文字行
+  - 玄关「进门」语义会生成汽车穿模进室内，室内场景避免「出门/进门」动作词，改衣帽间/桌面静物
+  - 宽幅信息图竖排多行必被中心裁切：style 写「横向 N 列并排」并 avoid「模块上下堆叠」；数值模块 detail 缩为单字评级（防伪字串+数值幻觉）
+  - batch brief 字段：infographic 需 subject+modules（每项含 title）；illustration 需 subject+scene（action/environment 报 missing field: scene）；字段名是 output 非 out
+  - 信息图需原生分辨率直传（--brief x.json --size 1536x1152，resolve_size 支持 WxH passthrough），4:3 类 brief 会被中心裁切；--brief 只收裸 brief JSON，带 output/size 包装报 missing field: template
 
 [Project Knowledge Summary]
-- Date: 2026-11-08
-- Context: 低温烫伤篇贴图 3 轮修正定位两处系统性问题
-- Category: Troubleshooting & Debugging
+- Date: 2026-11-13
+- Context: 二手烟篇主题选择（呼吸类 auto 强命中森林湖蓝与流感篇重复）与贴图 draft 核验
+- Category: Workflow & Collaboration
 - Instructions:
-  - z-image 对画面中的「热气/蒸汽」元素倾向画到人物头顶或头部附近，老人+热气会出现「冒烟/灵魂出窍」的死亡隐喻误读；人物+热源类场景 brief 直接不要热气元素，用光感表达温度
-  - image_prompt_builder 的 subject 是权重最高的核心对象字段，修正 brief 时 action/avoid 必须连 subject 一起改，只改后者时 provider 仍按 subject 画（低温烫伤篇 raw-3 连续两版硬币即此根因）
-
-[Project Knowledge Summary]
-- Date: 2026-11-09
-- Context: 诺如病毒篇配图与贴图自检发现三处新系统性问题
-- Category: Troubleshooting & Debugging
-- Instructions:
-  - 器具标签是 z-image 乱码英文高发位（喷壶/凝胶瓶等瓶身会生成 KAHKts 式假英文标签），这类物件 brief 直接写「纯白无标签瓶身」并在 avoid 加标签贴纸，别指望 avoid「伪文字」能压住标签
-  - 画面顶部边缘贴边的物体（镜子、挂画、标语）会产生被裁切的黑色伪字块；构图类 brief 写明「顶部只保留瓷砖墙/墙面」，把镜子挂件等装饰全部排除
-  - 信息图模块竖排多行布局放进宽幅（1792x1008）时上下必被中心裁切；宽幅信息图在 style 里写明「横向 N 列并排布局」并在 avoid 加「模块上下堆叠」，四行竖排改横向四列后一次通过
-  - 数值型信息图模块文字密度过高（title+detail+icon 全带字）会整列翻车：detail 生成重复伪字串（「低低低平」「低儒」）且数值幻觉（52 写成 56）；模块 detail 缩为单字评级（高/中/低）、style 写明「全图文字元素尽量少」后一次通过
-  - batch 任务 brief 必须带 template 字段（infographic/illustration/scene 等），infographic 需 subject+modules（每项含 title），字段名是 output 而非 out
-
-[Project Knowledge Summary]
-- Date: 2026-11-11
-- Context: 流感篇贴图 raw 自检新发现两类伪文字载体
-- Category: Troubleshooting & Debugging
-- Instructions:
-  - avoid 里写「对话框」压不住空白对话气泡（z-image 对人物特写爱加漫画气泡），须同时加「气泡」一词并在 scene 里写「画面四周干净无任何气泡或装饰框」
-  - 墙面相框/装裱画是伪文字高发位（相框内生成乱码英文标题+乱码文字行），与顶部贴边伪字同源；人物场景 brief 统一写「画面上方只保留干净墙面无相框挂画」，纸片类道具写「空白白纸无字迹」
+  - `--theme adaptive` 直传报 Unknown theme，adaptive 仅 auto 弱命中（库内最高分 <8）fallback 可达，不能当主题名用
+  - auto 强命中与近几篇主题重复时手选其他主题名，保持「六篇六款」轮换纪律
+  - 图片消息（贴图）draft 结构：单个 news_item，6 张图在 image_info.image_list（非 news_item 数组），content 是贴图背景介绍文字，digest 为空属正常

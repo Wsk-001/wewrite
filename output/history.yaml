@@ -802,6 +802,46 @@ tietu:
     note: 6 格 1080x1440 水彩绘本风（奶油白橄榄绿暖橘，与上篇暖米珊瑚橙灰蓝区分）；5 张底图一轮过检（老人蛋糕犹豫/锁甜品柜/馒头水果对比/窗边细嚼/饭后散步，无文字无气泡无相框）；渲染后核对叠字 caption 与回顾卡均正确无截断；图片与正文均无 AI 字样
     media_id: q_zrQd1gVlCJUeajP8dHyTnAoAajUzxRiwMLXNg5YMAnKUCKa2VENnx9X09UZ31z
     action: 待文章发布后补原文链接再发布
+- id: 2026-11-13-ershouyan
+  date: '2026-11-13'
+  title: 18岁女孩肺癌晚期：爸爸车里那支烟，到底有多毒？
+  topic: 二手烟与肺癌科普（热点选题，综合评分 8.6，百度热搜「每天坐车吸二手烟 18岁女孩确诊肺癌」88.0 +「控烟不能总让乘客忍着」96.0 叠加；时效锚点：大河报 11-12 首发河南省肿瘤医院刘杰医生病例讲述 + 柳叶刀·公共卫生 GBD 2023 二手烟研究 10-16（中疾控转）+ WHO 中国页；90 天公众号同题仅 1 篇（高铁站诉讼角度不同）、新事件角度 0 篇扎堆；候选对比：膀胱癌 9 类习惯 86.0 挂刘欢讣闻热度弃用（前日已规避该热点群）、科学流言 100 真相 85.1 角度散+近似辟谣 17 天前写过、酒精股骨头 66.0 单榜热度弱）
+  article: output/ershouyan.md
+  theme: graphite-minimal（呼吸类 auto 强命中森林湖蓝与流感篇重复，改手选严肃议题款）
+  humanness_score: 28.8
+  cover: output/ershouyan-cover.jpg
+  cover_media_id: q_zrQd1gVlCJUeajP8dHySt5nsmA4c0jE_JURvS09PTeT6XGtNx_E2eTH5U9k_L0
+  inline_images:
+  - output/ershouyan-1.jpg
+  - output/ershouyan-2.jpg
+  - output/ershouyan-3.jpg
+  - output/ershouyan-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 框架 B 故事型（A→C→D→E 后轮换），冷叙事事件钩子开场+画面收束（上篇场景开场+互动问句）；人味 28.8 在区间、合规 0/0（「根治」疗效断言改研究结论式表述）、SEO 0 error 1 warn（二手烟未进标题前 12 字，标题选肺癌进前 12，双词二选一历篇同级）；正文 2061 字；配图 5 张一轮 4 过：图1 首版右上空白对话气泡（对话框 avoid 压不住，scene 加「画面四周干净无任何气泡」+avoid 加「空白气泡」重生成通过），图2 公寓楼烟雾示意/图3 折断香烟静物/图4 CT 机器/封面 车窗晨光一轮过；illustration 模板 required 是 subject+scene（action/environment 会报 missing field: scene）；草稿核验 24 字标题、作者、101 字节摘要、封面、速查卡、无 AI 字样、无 ::: 残留
+    media_id: q_zrQd1gVlCJUeajP8dHyc5rbtodFE3k0UMQdvSn8CqDOWMv2_1KP-ajHZXxcd-g
+    action: 待发布
+- id: 2026-11-13-ershouyan-tietu
+  date: '2026-11-13'
+  kind: tietu-newspic
+  title: 车里那支烟，孩子在吸
+  article: output/ershouyan.md
+  article_title: 18岁女孩肺癌晚期：爸爸车里那支烟，到底有多毒？
+  storyboard: output/ershouyan-tietu/storyboard.json
+  images:
+  - output/ershouyan-tietu/tietu-1.jpg
+  - output/ershouyan-tietu/tietu-2.jpg
+  - output/ershouyan-tietu/tietu-3.jpg
+  - output/ershouyan-tietu/tietu-4.jpg
+  - output/ershouyan-tietu/tietu-5.jpg
+  - output/ershouyan-tietu/tietu-6.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 6 格 1080x1440 水彩绘本风（雾青烟灰蓝暖杏，与流感篇暖米珊瑚橙灰蓝、糖尿病篇奶油白橄榄绿区分）；raw 修图 9 轮：z-image 对「两人交流」场景强加空白对话气泡，avoid 堆到 15-17 项反而失效（气泡/相框连出 7 轮），缩回 11 项基础 avoid 后气泡全消；再改单人+静物暗示（书包绘本）消除对话联想；raw-1 一轮过，raw-2 三轮（风格跑写实→车窗降下与密闭车厢不符→紧闭版过），raw-3 三轮（双气泡三相框→单人书包绘本版过），raw-4 七轮（气泡/相框/汽车穿模/显示器伪字标签→桌面外套奶瓶静物特写过），raw-5 八轮（气泡/相框/窗外街景车→CT 机近景特写过）；「玄关进门」语义致汽车穿模进室内；渲染核对 caption 与回顾卡无错字无截断；图片与正文均无 AI 字样
+    media_id: q_zrQd1gVlCJUeajP8dHyeoPpGkthSrvJph2rEJWk7GaG39-Ct2vL5_HrnvbRouk
+    action: 待文章发布后补原文链接再发布
 style_sources:
 - date: '2026-10-10'
   note: 从账号 9 篇已发文章学习写作与配图风格
