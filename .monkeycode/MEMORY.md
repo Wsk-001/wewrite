@@ -138,6 +138,7 @@ Entries discovered by the Agent during task execution should follow this format:
   - 图片落盘必须让字节格式与扩展名一致：`_center_crop_to_ratio` 比例匹配时原样返回 provider 的 PNG，会写出「.jpg 装 PNG」；微信靠嗅探仍显示，但从返回 URL 可验证（`mmbiz_png` 说明上传的是 PNG，`mmbiz_jpg` 才对），已在 generate_image 落盘前统一转码
   - PNG 存照片体积是 JPEG 的 10 倍（1.7-2.1MB vs 160-230KB），微信图片上限 2MB，转码同时也是体积兜底
    - 调 `draft/get` 校验草稿时用 `r.content.decode("utf-8")` 后 `json.loads`：微信返回 `Content-Type: text/plain` 无 charset，`r.json()` 与直接 print 都会按 latin-1 解出乱码，误判成编码坏了（2026-11-13 重犯一次，虚惊）；正文 `media_id` 写错或删稿用 `draft/delete`（errcode 0 即成功）
+   - compliance_check.py 的 absolute_terms 是字面命中：否定语境里的绝对化词（如「不是什么神药」）照样报 error，成文时就别写这类词，用「谈不上神话」等替代表述（2026-11-14 天价药篇）
 
 [Project Knowledge Summary]
 - Date: 2026-10-21
@@ -186,11 +187,11 @@ Entries discovered by the Agent during task execution should follow this format:
 - Context: 历篇配图/贴图自检积累的 z-image 生成器已知行为与 brief 修正方法（低温烫伤/诺如/流感/二手烟四篇合并）
 - Category: Troubleshooting & Debugging
 - Instructions:
-  - subject 是权重最高的核心字段：修正 brief 时 action/avoid 必须连 subject 一起改，只改后者 provider 仍按 subject 画
+   - subject 是权重最高的核心字段：修正 brief 时 action/avoid 必须连 subject 一起改，只改后者 provider 仍按 subject 画；batch.json 的 scene 模板是 subject/action/environment 三段式，brief 里没有的字段写进去（如无效键 'scene'）会被静默忽略且无报错，模型一直读旧 brief（2026-11-14 天价药篇踩坑，改了三轮没生效）
   - avoid 列表堆到 15 项以上会稀释/反转负面提示（气泡/相框 7 轮连出，写进 style 主描述也压不住）；缩回基础 11 项（文字/字母/数字/标签/logo/水印/二维码/伪文字/对话框/血腥画面/相框）后立即全消；修 brief 先做减法再换构图
   - 「两人交流」场景空白对话气泡执念最强，同向注视改法无效；根除靠单人+静物暗示（书包/绘本代替人物出镜）
   - 人物+热源场景的热气会画到头顶成「冒烟/灵魂出窍」死亡隐喻，brief 直接去掉热气元素用光感表达温度
-  - 器具标签是乱码英文高发位（KAHKts 式假英文），瓶身类写「纯白无标签」并 avoid 标签贴纸；顶部贴边物（镜/画/标语）产生裁切伪字块，写「顶部只留干净墙面」；纸片道具写「空白白纸无字迹」；相框/挂画内易生成乱码文字行
+   - 器具标签是乱码英文高发位（KAHKts 式假英文），瓶身类写「纯白无标签」并 avoid 标签贴纸；顶部贴边物（镜/画/标语）产生裁切伪字块，写「顶部只留干净墙面」；纸片道具写「空白白纸无字迹」；相框/挂画内易生成乱码文字行；医疗语境（医院/诊室/桌面静物）对公告板/写字板/病历本的纸面执念极强，「空白无字迹」压不住，终局解法是把纸类载体整体移出画面（纯器物并排或居家人物场景），environment 里的「医院走廊与诊室」也会引入公告板（2026-11-14 天价药篇 5 轮验证）
   - 玄关「进门」语义会生成汽车穿模进室内，室内场景避免「出门/进门」动作词，改衣帽间/桌面静物
   - 宽幅信息图竖排多行必被中心裁切：style 写「横向 N 列并排」并 avoid「模块上下堆叠」；数值模块 detail 缩为单字评级（防伪字串+数值幻觉）
   - batch brief 字段：infographic 需 subject+modules（每项含 title）；illustration 需 subject+scene（action/environment 报 missing field: scene）；字段名是 output 非 out

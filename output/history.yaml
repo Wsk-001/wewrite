@@ -842,6 +842,46 @@ tietu:
     note: 6 格 1080x1440 水彩绘本风（雾青烟灰蓝暖杏，与流感篇暖米珊瑚橙灰蓝、糖尿病篇奶油白橄榄绿区分）；raw 修图 9 轮：z-image 对「两人交流」场景强加空白对话气泡，avoid 堆到 15-17 项反而失效（气泡/相框连出 7 轮），缩回 11 项基础 avoid 后气泡全消；再改单人+静物暗示（书包绘本）消除对话联想；raw-1 一轮过，raw-2 三轮（风格跑写实→车窗降下与密闭车厢不符→紧闭版过），raw-3 三轮（双气泡三相框→单人书包绘本版过），raw-4 七轮（气泡/相框/汽车穿模/显示器伪字标签→桌面外套奶瓶静物特写过），raw-5 八轮（气泡/相框/窗外街景车→CT 机近景特写过）；「玄关进门」语义致汽车穿模进室内；渲染核对 caption 与回顾卡无错字无截断；图片与正文均无 AI 字样
     media_id: q_zrQd1gVlCJUeajP8dHyeoPpGkthSrvJph2rEJWk7GaG39-Ct2vL5_HrnvbRouk
     action: 待文章发布后补原文链接再发布
+- id: 2026-11-14-tianjiayao
+  date: '2026-11-14'
+  title: CAR-T 进医保了：129 万到 10 万的账，先别算错
+  topic: CAR-T 倍诺达进医保科普（热点选题，综合评分 8.7，今日头条/百度双榜「原价129万一支的天价药进医保了」100.0+98.0 叠加；时效锚点：国家医保局 11-14 苏州发布 2026 版医保目录+商保创新药目录（新华社）；90 天公众号深拆 0 篇（当日快讯扎堆 8 篇但角度浅，深拆仅 2-3 篇行业向）；候选对比：糖尿病热点群 89.4/84.3/80.4 撞联合国糖尿病日且 14 天内写过弃用、断崖式降温 75.5 流感篇刚写过呼吸道角度弃用）
+  article: output/tianjiayao.md
+  theme: olive-journal（手选温暖叙事款首次使用，六款轮换余 zen-whitespace/red-white/moyu-ticket/moyu-green）
+  humanness_score: 31.7
+  cover: output/tianjiayao-cover.jpg
+  cover_media_id: q_zrQd1gVlCJUeajP8dHyecoYuzJnJgYCXUGHsZOtJ9trZd1-BE2ufVdAlKJ2NAr
+  inline_images:
+  - output/tianjiayao-1.jpg
+  - output/tianjiayao-2.jpg
+  - output/tianjiayao-3.jpg
+  - output/tianjiayao-4.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 框架 F 纯观点型首次启用（A→C→D→E→B 后轮换），数据冲击开场+亮刀子（三个数字分账：129 万原价/30 万以内谈判价/10 万以内自付估算）；人味 31.4→31.7 一次过、合规 1 error（「神药」否定语境仍被字面命中 absolute_terms，改写后 0/0）、SEO 初检 CAR-T 密度 3.1% 超标+标题双词位（改标题双核心词进前 12+3 处替换同义词后 0/0）；配图 5 张一轮过（谈判桌文件议价槌/细胞大战概念图/洁净实验室/病房家属牵手/走廊晨光封面）；漏插图 4 一处（preview Images 计数 3 发现，图3 语义移回 H2-3 生产线段、图4 补 H2-4）；草稿核验 21 字标题、作者、95 字节摘要、4 图、速查卡、无 AI 字样
+    media_id: q_zrQd1gVlCJUeajP8dHyT0TEJ3Z4u1Gvj0lCCQ8QjPmlcoKkXHrNCwtHjJXITsz
+    action: 待发布
+- id: 2026-11-14-tianjiayao-tietu
+  date: '2026-11-14'
+  kind: tietu-newspic
+  title: 天价针进医保，账这么算
+  article: output/tianjiayao.md
+  article_title: CAR-T 进医保了：129 万到 10 万的账，先别算错
+  storyboard: output/tianjiayao-tietu/storyboard.json
+  images:
+  - output/tianjiayao-tietu/tietu-1.jpg
+  - output/tianjiayao-tietu/tietu-2.jpg
+  - output/tianjiayao-tietu/tietu-3.jpg
+  - output/tianjiayao-tietu/tietu-4.jpg
+  - output/tianjiayao-tietu/tietu-5.jpg
+  - output/tianjiayao-tietu/tietu-6.jpg
+  status: draft
+  drafts:
+  - version: v1
+    note: 6 格 1152x1536 水彩绘本风（鼠尾草绿奶白赭石棕，与二手烟雾青烟灰蓝暖杏、流感篇暖米珊瑚橙、糖尿病篇奶油白橄榄绿区分）；avoid 沿用 11 项基础集；raw 修图 5 轮：医疗语境下 z-image 顽固生成墙面公告板/写字板纸面伪字（raw-3 四轮、raw-4 五轮、raw-5 五轮），第 3-4 轮踩坑——batch.json brief 是 subject/action/environment 三段式，误写无效键 'scene' 被静默忽略导致模型一直读旧 brief（改了三轮没生效）；第 5 轮改对字段+纸类载体移出画面（纯器物/居家场景）后全过；格 5 语义从「病历本静物」改「居家窗边捧保温杯安心等候」，caption 同步改「材料备齐，安心等落地」；渲染统一水彩风格，caption 与回顾卡核对无错字无截断；图片与正文均无 AI 字样；草稿核验标题正确、image_list 6 图、need_open_comment 1
+    media_id: q_zrQd1gVlCJUeajP8dHyQJTrK6hhK5Pcfr5_6cHMxDdBUb_EoX6hsszEZIV2B_i
+    action: 待文章发布后补原文链接再发布
 style_sources:
 - date: '2026-10-10'
   note: 从账号 9 篇已发文章学习写作与配图风格
